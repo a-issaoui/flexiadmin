@@ -1,24 +1,18 @@
-import { getRequestConfig } from 'next-intl/server'
-import { getUserLocale } from '@/store/locale-store'
+// src/i18n/request.ts
+import { getRequestConfig } from 'next-intl/server';
+import { headers } from 'next/headers';
+import { defaultLocale } from '@/lib/config/locales';
+import type { LocaleCode } from '@/types/locale';
 
 export default getRequestConfig(async () => {
-    // Get locale from cookies
-    const { lang: locale } = await getUserLocale()
+    // Get locale from middleware header (set in middleware.ts)
+    const headersList = await headers();
+    const locale = (headersList.get('x-locale') as LocaleCode) || defaultLocale;
 
-    try {
-        const messages = (await import(`./messages/${locale}.json`)).default
-
-        return {
-            locale,
-            messages
-        }
-    } catch (error) {
-        console.error(`Failed to load messages for locale ${locale}:`, error)
-
-        // Return empty messages to prevent crashes
-        return {
-            locale,
-            messages: {}
-        }
-    }
-})
+    return {
+        locale,
+        messages: (await import(`./messages/${locale}.json`)).default,
+        timeZone: 'UTC',
+        now: new Date(),
+    };
+});
