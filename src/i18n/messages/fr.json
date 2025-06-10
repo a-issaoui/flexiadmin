@@ -1,0 +1,6 @@
+{
+  "HomePage": {
+    "title": "Bienvenue dans notre application",
+    "description": "Il s'agit d'une application Next.js avec support d'internationalisation."
+  }
+}
