@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
 import NextTopLoader from 'nextjs-toploader';
 import { getUserLocale } from "@/store/locale-store";
+
 import "./globals.css";
 import React from "react";
 
@@ -83,7 +84,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             storageKey="flexiadmin-theme"
         >
             <NextTopLoader
-                showSpinner={false}
+                showSpinner={true}
                 color="hsl(var(--primary))"
                 height={3}
                 speed={200}
@@ -91,7 +92,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 template='<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
             />
             <NextIntlClientProvider locale={lang} messages={messages} key={lang}>
+
                 {children}
+
             </NextIntlClientProvider>
         </ThemeProvider>
         </body>

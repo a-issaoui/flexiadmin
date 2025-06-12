@@ -4,7 +4,7 @@ export const localesConfig = [
         code: 'en',
         name: 'English',
         nativeName: 'English',
-        flag: '🇺🇸',
+        flag: '🇬🇧',
         direction: 'ltr',
     },
     {

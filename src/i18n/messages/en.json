@@ -1,6 +1,24 @@
 {
   "HomePage": {
     "title": "Welcome to our app",
-    "description": "This is a Next.js application with internationalization support."
+    "description": "This is a Next.js application with internationalization support.",
+    "projectStatus": {
+      "title": "Project Status",
+      "items": "✅ Fixed React suspense error\n✅ Internationalization working\n✅ Theme switching enabled\n✅ Fixed configuration issues\n🔧 Ready for development"
+    },
+    "cards": {
+      "modernStack": {
+        "title": "Modern Stack",
+        "description": "Built with Next.js 15, React 19, and Tailwind CSS v4"
+      },
+      "internationalization": {
+        "title": "Internationalization",
+        "description": "Multi-language support with next-intl and RTL support"
+      },
+      "themeSupport": {
+        "title": "Theme Support",
+        "description": "Dark/light mode with system preference detection"
+      }
+    }
   }
 }

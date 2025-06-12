@@ -1,6 +1,24 @@
 {
   "HomePage": {
     "title": "Bienvenue dans notre application",
-    "description": "Il s'agit d'une application Next.js avec support d'internationalisation."
+    "description": "Ceci est une application Next.js avec prise en charge de l'internationalisation.",
+    "projectStatus": {
+      "title": "Statut du projet",
+      "items": "✅ Erreur React suspense corrigée\n✅ Internationalisation fonctionnelle\n✅ Changement de thème activé\n✅ Problèmes de configuration corrigés\n🔧 Prêt pour le développement"
+    },
+    "cards": {
+      "modernStack": {
+        "title": "Stack Moderne",
+        "description": "Construit avec Next.js 15, React 19 et Tailwind CSS v4"
+      },
+      "internationalization": {
+        "title": "Internationalisation",
+        "description": "Support multilingue avec next-intl et prise en charge RTL"
+      },
+      "themeSupport": {
+        "title": "Support du Thème",
+        "description": "Mode sombre/clair avec détection de préférence système"
+      }
+    }
   }
 }

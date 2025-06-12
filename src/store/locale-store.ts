@@ -1,6 +1,6 @@
 'use server'
 
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { defaultLocale, localesConfig, type LocaleCode } from '@/lib/config/locales';
 import type { LocaleCookie } from '@/types/locale';
 
@@ -12,17 +12,6 @@ function getCookieName(): string {
 
 export async function getUserLocale(): Promise<LocaleCookie> {
     try {
-        // First try to get from headers (set by middleware)
-        const headersList = await headers();
-        const headerLocale = headersList.get('x-locale');
-
-        if (headerLocale && localesConfig.some(l => l.code === headerLocale)) {
-            const config = localesConfig.find(l => l.code === headerLocale)!;
-            return {
-                lang: config.code,
-                dir: config.direction,
-            };
-        }
 
         // Fallback to cookie
         const cookieStore = await cookies();
@@ -77,7 +66,7 @@ export async function setUserLocale(lang: LocaleCode): Promise<void> {
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production',
             // Add priority for better performance
-            priority: 'high' as any,
+            priority: 'high' as const,
         });
     } catch (error) {
         console.error('Failed to set locale cookie:', error);
