@@ -1,27 +1,35 @@
-// src/store/locale-store.ts
 'use server'
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { defaultLocale, localesConfig, type LocaleCode } from '@/lib/config/locales';
 import type { LocaleCookie } from '@/types/locale';
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
-// Helper function to get cookie name
 function getCookieName(): string {
     return `${process.env.NEXT_PUBLIC_APP_NAME || 'NEXT'}_LOCALE`;
 }
 
-// Safe version that doesn't throw on not-found pages
 export async function getUserLocale(): Promise<LocaleCookie> {
     try {
+        // First try to get from headers (set by middleware)
+        const headersList = await headers();
+        const headerLocale = headersList.get('x-locale');
+
+        if (headerLocale && localesConfig.some(l => l.code === headerLocale)) {
+            const config = localesConfig.find(l => l.code === headerLocale)!;
+            return {
+                lang: config.code,
+                dir: config.direction,
+            };
+        }
+
+        // Fallback to cookie
         const cookieStore = await cookies();
         const cookieValue = cookieStore.get(getCookieName())?.value;
 
         if (cookieValue) {
             const parsed = JSON.parse(cookieValue) as LocaleCookie;
-
-            // Validate against actual config
             const isValid = localesConfig.some(
                 ({ code, direction }) => code === parsed.lang && direction === parsed.dir
             );
@@ -31,8 +39,10 @@ export async function getUserLocale(): Promise<LocaleCookie> {
             }
         }
     } catch (error) {
-        // Silently handle errors for not-found pages and other edge cases
-        console.warn('Could not read locale cookie:', error);
+        // Log error in development
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('Could not read locale:', error);
+        }
     }
 
     // Return default locale config
@@ -58,15 +68,19 @@ export async function setUserLocale(lang: LocaleCode): Promise<void> {
 
     try {
         const cookieStore = await cookies();
+
+        // Set cookie with enhanced security options
         cookieStore.set(getCookieName(), JSON.stringify(value), {
-            httpOnly: false, // Keep false for client-side access
+            httpOnly: false,
             path: '/',
             maxAge: ONE_YEAR,
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production',
+            // Add priority for better performance
+            priority: 'high' as any,
         });
     } catch (error) {
         console.error('Failed to set locale cookie:', error);
-        throw error;
+        throw new Error('Could not save locale preference');
     }
 }

@@ -6,9 +6,15 @@
     "dev": "next dev --turbopack --port 3180",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "analyze": "ANALYZE=true npm run build",
+    "clean": "rm -rf .next",
+    "postinstall": "npm run type-check"
   },
   "dependencies": {
+    "@next/bundle-analyzer": "^15.3.3",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",

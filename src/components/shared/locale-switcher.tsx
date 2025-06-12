@@ -1,4 +1,3 @@
-// LocaleSwitcher.tsx
 "use client"
 
 import { useTransition } from "react"
@@ -14,10 +13,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export function LocaleSwitcher() {
+interface LocaleSwitcherProps {
+    className?: string;
+}
+
+export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
     const router = useRouter()
-    const currentLocale = useLocale() as LocaleCode // next-intl provides current locale
+    const currentLocale = useLocale() as LocaleCode
     const [isPending, startTransition] = useTransition()
 
     const handleLocaleChange = async (value: string) => {
@@ -43,7 +48,7 @@ export function LocaleSwitcher() {
             onValueChange={handleLocaleChange}
             disabled={isPending}
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className={cn("w-[180px]", className)}>
                 <SelectValue>
                     {currentLocaleConfig && (
                         <div className="flex items-center gap-2">
@@ -56,10 +61,22 @@ export function LocaleSwitcher() {
             <SelectContent>
                 <SelectGroup>
                     {localesConfig.map((locale) => (
-                        <SelectItem key={locale.code} value={locale.code}>
+                        <SelectItem
+                            key={locale.code}
+                            value={locale.code}
+                            disabled={locale.code === currentLocale}
+                        >
                             <div className="flex items-center gap-2">
                                 <span>{locale.flag}</span>
-                                <span>{locale.name}</span>
+                                <div className="flex flex-col">
+                                    <span>{locale.name}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {locale.nativeName}
+                                    </span>
+                                </div>
+                                {locale.code === currentLocale && (
+                                    <Check className="h-4 w-4 ml-auto" />
+                                )}
                             </div>
                         </SelectItem>
                     ))}
