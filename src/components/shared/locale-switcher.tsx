@@ -1,11 +1,11 @@
+// LocaleSwitcher.tsx
 "use client"
 
-import { useState, useTransition } from "react"
+import { useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { setUserLocale } from "@/store/locale-store"
-import { localesConfig } from "@/lib/config/locales"
-import { isValidLocaleCode, type LocaleCode } from "@/types/locale"
+import { localesConfig, isValidLocaleCode, type LocaleCode } from "@/lib/config/locales"
 import {
     Select,
     SelectContent,

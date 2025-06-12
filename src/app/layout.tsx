@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getLocale } from 'next-intl/server';
+import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
 import NextTopLoader from 'nextjs-toploader';
 import { getUserLocale } from "@/store/locale-store";
@@ -29,15 +29,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-    // Get locale and direction from next-intl (configured in request.ts)
-    const locale = await getLocale();
+    // Get locale and direction from middleware headers
+    const { lang, dir } = await getUserLocale();
     const messages = await getMessages();
 
-    // Get direction from our locale store for the html dir attribute
-    const { dir } = await getUserLocale();
-
     return (
-        <html lang={locale} dir={dir} suppressHydrationWarning>
+        <html lang={lang} dir={dir} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
             attribute="class"
@@ -50,7 +47,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 color="#2563eb"
                 height={3}
             />
-            <NextIntlClientProvider locale={locale} messages={messages}>
+            <NextIntlClientProvider locale={lang} messages={messages}>
                 {children}
             </NextIntlClientProvider>
         </ThemeProvider>

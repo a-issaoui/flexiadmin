@@ -1,21 +1,8 @@
-export const LOCALE_CODES = ['en', 'fr', 'ar'] as const;
-export type LocaleCode = typeof LOCALE_CODES[number];
-export type TextDirection = 'ltr' | 'rtl';
+import type { LocaleCode, TextDirection } from '@/lib/config/locales';
 
-export interface LocaleConfig {
-    code: LocaleCode;
-    name: string;
-    nativeName: string;
-    flag: string;
-    direction: TextDirection;
-}
+export type { LocaleCode, TextDirection };
 
 export interface LocaleCookie {
     lang: LocaleCode;
     dir: TextDirection;
-}
-
-// Helper function to validate locale codes
-export function isValidLocaleCode(code: string): code is LocaleCode {
-    return LOCALE_CODES.includes(code as LocaleCode);
 }
