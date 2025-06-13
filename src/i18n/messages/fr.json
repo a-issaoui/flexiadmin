@@ -1,4 +1,9 @@
 {
+  "common": {
+    "profile": "Profil",
+    "preferences": "Préférences",
+    "logout": "Deconnexion"
+  },
   "HomePage": {
     "title": "Bienvenue dans notre application",
     "description": "Ceci est une application Next.js avec prise en charge de l'internationalisation.",

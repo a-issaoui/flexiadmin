@@ -1,4 +1,9 @@
 {
+  "common": {
+    "profile": "الصفحة الشخصية",
+    "preferences": "التفضيلات",
+    "logout": "تسجيل الخروج"
+  },
   "HomePage": {
     "title": "مرحبًا بك في تطبيقنا",
     "description": "هذا تطبيق Next.js مع دعم التدويل.",

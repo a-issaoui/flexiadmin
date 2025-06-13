@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     // Enable experimental features for better performance
     experimental: {
         optimizePackageImports: [
+            '@phosphor-icons/react',
             'lucide-react',
             '@radix-ui/react-icons',
             '@radix-ui/react-avatar',
