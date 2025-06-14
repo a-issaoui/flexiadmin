@@ -1,438 +1,311 @@
-import React from 'react'
-import { ChevronRight, MoreHorizontal } from 'lucide-react'
+import React, {memo, useEffect, useMemo, useState, useCallback} from 'react';
+import Link from 'next/link';
+import {ChevronRight, MoreHorizontal} from 'lucide-react';
 import {
     SidebarContent,
     SidebarGroup,
-    SidebarGroupAction,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarMenu,
-    SidebarMenuAction,
-    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
     SidebarMenuSubButton,
     SidebarMenuSubItem,
     useSidebar
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 import {
     Collapsible,
     CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+    CollapsibleTrigger
+} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { Icon } from "@/components/shared/icon"
-import type { TypeSidebarData, SbGroup, SbMenu, SbSubMenu, MenuAction, SidebarBadge } from "@/types/sidebar-data"
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import {Badge} from '@/components/ui/badge';
+import {cn} from '@/lib/utils';
+import {Icon} from '@/components/shared/icon';
+import type {TypeSidebarData, SbGroup, SbMenu, SbSubMenu, MenuAction, SidebarBadge} from '@/types/sidebar-data';
 
 interface AppSidebarContentProps {
-    data: TypeSidebarData
-    currentPath?: string
-    onMenuClick?: (url: string, item: SbMenu | SbSubMenu) => void
-    onActionClick?: (action: MenuAction, context?: { group?: SbGroup; menu?: SbMenu; submenu?: SbSubMenu }) => void
+    data: TypeSidebarData;
+    currentPath?: string;
+    onMenuClick?: (url: string, item: SbMenu | SbSubMenu) => void;
+    onActionClick?: (action: MenuAction, context?: { group?: SbGroup; menu?: SbMenu; submenu?: SbSubMenu }) => void;
 }
 
-// Badge Component
-const SidebarBadgeComponent: React.FC<{ badge: SidebarBadge }> = ({ badge }) => {
-    const getBadgeClasses = () => {
-        const baseClasses = "inline-flex items-center justify-center text-xs font-medium"
+const PulsingDot = memo<{ color: string }>(({color}) => (
+    <span className="relative inline-flex h-1.5 w-1.5 -translate-y-1 ml-1 mt-1 flex-shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{backgroundColor: color}}/>
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{backgroundColor: color}}/>
+    </span>
+));
+PulsingDot.displayName = 'PulsingDot';
 
-        const colorClasses = {
-            red: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-            blue: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-            green: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-            yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-            purple: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-            orange: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-            gray: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-            pink: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
-        }
+const SidebarBadgeComponent = memo<{ badge: SidebarBadge }>(({badge}) => {
+    const {count, color, variant = 'default', shape = 'default'} = badge;
+    if (!count && count !== 0) return null;
+    return <Badge variant={variant} shape={shape} color={color} className="flex-shrink-0">{count}</Badge>;
+});
+SidebarBadgeComponent.displayName = 'SidebarBadgeComponent';
 
-        const variantClasses = {
-            default: "",
-            outline: "border",
-            ghost: "bg-transparent"
-        }
+const InlineActions = memo<{
+    actions: MenuAction[];
+    onActionClick?: (action: MenuAction, context?: any) => void;
+    context?: any;
+    size?: 'sm' | 'md';
+}>(({actions, onActionClick, context, size = 'md'}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    if (!actions?.length) return null;
+    const iconSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4';
+    const buttonSize = size === 'sm' ? 'h-5 w-5' : 'h-6 w-6';
 
-        return cn(
-            baseClasses,
-            colorClasses[badge.color || 'gray'],
-            variantClasses[badge.variant || 'default']
-        )
-    }
+    const handleActionClick = useCallback((action: MenuAction) => {
+        onActionClick?.(action, context);
+        setIsOpen(false);
+    }, [onActionClick, context]);
 
-    return (
-        <SidebarMenuBadge className={getBadgeClasses()}>
-            {badge.count}
-        </SidebarMenuBadge>
-    )
-}
-
-// Menu Actions Dropdown
-const MenuActionsDropdown: React.FC<{
-    actions: MenuAction[]
-    onActionClick?: (action: MenuAction, context?: never) => void
-    context?: never
-}> = ({ actions, onActionClick, context }) => {
-    if (!actions || actions.length === 0) return null
+    const handleTriggerClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setIsOpen(prev => !prev);
+    }, []);
 
     return (
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                    <MoreHorizontal className="h-4 w-4" />
+                <div
+                    className={cn('rounded-sm flex items-center justify-center hover:bg-accent/50 transition-colors flex-shrink-0 cursor-pointer', buttonSize)}
+                    onClick={handleTriggerClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => (['Enter', ' '].includes(e.key) && handleTriggerClick(e as any))}
+                >
+                    <MoreHorizontal
+                        className={cn(iconSize, 'transition-transform duration-200', isOpen && 'rotate-90')}/>
                     <span className="sr-only">More actions</span>
-                </SidebarMenuAction>
+                </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="right" align="start">
-                {actions.map((action) => (
-                    <DropdownMenuItem
-                        key={action.id}
-                        onClick={() => onActionClick?.(action, context)}
-                        className="flex items-center gap-2"
-                    >
-                        {action.icon && (
-                            <Icon
-                                name={action.icon.name}
-                                size={action.icon.size || 16}
-                                weight={action.icon.weight || 'regular'}
-                                color={action.icon.color}
-                            />
-                        )}
+                {actions.map(action => (
+                    <DropdownMenuItem key={action.id} onClick={() => handleActionClick(action)}
+                                      className="flex items-center gap-2">
+                        {action.icon && <Icon {...action.icon} size={action.icon.size || 16}
+                                              weight={action.icon.weight || 'regular'} className="flex-shrink-0"/>}
                         {action.label}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
         </DropdownMenu>
-    )
-}
+    );
+});
+InlineActions.displayName = 'InlineActions';
 
-// Submenu Component
-const SubmenuComponent: React.FC<{
-    submenu: SbSubMenu[]
-    currentPath?: string
-    onMenuClick?: (url: string, item: SbSubMenu) => void
-    onActionClick?: (action: MenuAction, context?: never) => void
-    parentMenu?: SbMenu
-}> = ({ submenu, currentPath, onMenuClick, onActionClick, parentMenu }) => {
-    return (
-        <SidebarMenuSub>
-            {submenu.map((subItem) => {
-                const isActive = currentPath === subItem.url || subItem.isActive
+const SubmenuComponent = memo<{
+    submenu: SbSubMenu[];
+    currentPath?: string;
+    onMenuClick?: (url: string, item: SbSubMenu) => void;
+    onActionClick?: (action: MenuAction, context?: any) => void;
+    parentMenu?: SbMenu;
+}>(({submenu, currentPath, onMenuClick, onActionClick, parentMenu}) => (
+    <SidebarMenuSub>
+        {submenu.map(subItem => {
+            const isActive = currentPath === subItem.url || subItem.isActive;
+            return (
+                <SidebarMenuSubItem key={subItem.id || subItem.url} >
+                    <SidebarMenuSubButton asChild isActive={isActive}>
+                        <Link href={subItem.url} className="flex items-center gap-2 w-full"
+                              onClick={() => onMenuClick?.(subItem.url, subItem)}>
+                            {subItem.icon && <Icon {...subItem.icon} size={subItem.icon.size || 16}
+                                                   weight={subItem.icon.weight || 'regular'}
+                                                   className="flex-shrink-0"/>}
+                            <span className="flex-1 truncate flex items-center min-w-0 " style={{color: subItem.color}}>
+                                {subItem.title}
+                            </span>
+                            {subItem.badge && <SidebarBadgeComponent badge={subItem.badge}/>}
+                            {subItem.actions && <InlineActions actions={subItem.actions} onActionClick={onActionClick}
+                                                               context={{submenu: subItem, menu: parentMenu}}
+                                                               size="md"/>}
+                        </Link>
+                    </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+            );
+        })}
+    </SidebarMenuSub>
+));
+SubmenuComponent.displayName = 'SubmenuComponent';
 
-                return (
-                    <SidebarMenuSubItem key={subItem.id || subItem.url}>
-                        <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive}
-                            onClick={() => onMenuClick?.(subItem.url, subItem)}
-                        >
-                            <a href={subItem.url} className="flex items-center gap-2">
-                                {subItem.icon && (
-                                    <Icon
-                                        name={subItem.icon.name}
-                                        size={subItem.icon.size || 16}
-                                        weight={subItem.icon.weight || 'regular'}
-                                        color= {subItem.icon.color }
-                                    />
-                                )}
-                                <span style={{ color: subItem.color }}>{subItem.title}</span>
-                                {subItem.badge && <SidebarBadgeComponent badge={subItem.badge} />}
-                            </a>
-                        </SidebarMenuSubButton>
-                        {subItem.actions && (
-                            <MenuActionsDropdown
-                                actions={subItem.actions}
-                                onActionClick={onActionClick}
-                                context={{ submenu: subItem, menu: parentMenu }}
-                            />
-                        )}
-                    </SidebarMenuSubItem>
-                )
-            })}
-        </SidebarMenuSub>
-    )
-}
+const MenuItemComponent = memo<{
+    menuItem: SbMenu;
+    currentPath?: string;
+    onMenuClick?: (url: string, item: SbMenu) => void;
+    onActionClick?: (action: MenuAction, context?: any) => void;
+    group?: SbGroup;
+}>(({menuItem, currentPath, onMenuClick, onActionClick, group}) => {
+    const {state} = useSidebar();
+    const hasSubmenu = !!menuItem.submenu?.length;
+    const hasActiveSubmenu = hasSubmenu && menuItem.submenu.some(s => s.isActive || currentPath === s.url);
 
-// Main Menu Item Component
-const MenuItemComponent: React.FC<{
-    menuItem: SbMenu
-    currentPath?: string
-    onMenuClick?: (url: string, item: SbMenu) => void
-    onActionClick?: (action: MenuAction, context?: any) => void
-    group?: SbGroup
-}> = ({ menuItem, currentPath, onMenuClick, onActionClick, group }) => {
-    const { state } = useSidebar()
-    const hasSubmenu = menuItem.submenu && menuItem.submenu.length > 0
-    const isActive = currentPath === menuItem.url || menuItem.isActive
-    const [isOpen, setIsOpen] = React.useState(menuItem.defaultExpanded || false)
+    // Initialize state - prioritize defaultExpanded, then check for active submenu
+    const [isOpen, setIsOpen] = useState(() => {
+        if (menuItem.defaultExpanded !== undefined) return menuItem.defaultExpanded;
+        return hasActiveSubmenu;
+    });
 
-    const handleClick = () => {
+    const isActive = currentPath === menuItem.url || menuItem.isActive;
+
+    const handleClick = useCallback(() => {
         if (hasSubmenu) {
-            setIsOpen(!isOpen)
-        } else if (menuItem.url) {
-            onMenuClick?.(menuItem.url, menuItem)
+            setIsOpen(prev => !prev);
+        } else {
+            onMenuClick?.(menuItem.url, menuItem);
         }
-    }
+    }, [hasSubmenu, menuItem.url, onMenuClick]);
 
-    const MenuContent = () => (
+    const handleLinkClick = useCallback(() => {
+        if (menuItem.url) {
+            onMenuClick?.(menuItem.url, menuItem);
+        }
+    }, [menuItem.url, onMenuClick]);
+
+    // Check if any submenu has a badge with actual count for collapsed state indicator
+    const hasSubmenuBadges = hasSubmenu && menuItem.submenu.some(sub =>
+        sub.badge && (sub.badge.count !== undefined && sub.badge.count !== null && sub.badge.count !== '')
+    );
+
+    const MenuContent = (
         <>
             {menuItem.icon && (
-                <Icon
-                    name={menuItem.icon.name}
-                    size={menuItem.icon.size || 20}
-                    weight={menuItem.icon.weight || 'regular'}
-                    color={menuItem.icon.color }
-                />
-            )}
-            <span className="flex-1" style={{ color: menuItem.color }}>{menuItem.title}</span>
-            {menuItem.dotColor && (
-                <div
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: menuItem.dotColor }}
-                />
-            )}
-            {menuItem.badge && <SidebarBadgeComponent badge={menuItem.badge} />}
-            {hasSubmenu && (
-                <ChevronRight
-                    className={cn(
-                        "h-4 w-4 transition-transform",
-                        isOpen && "rotate-90"
-                    )}
-                />
-            )}
-        </>
-    )
-
-    if (hasSubmenu) {
-        return (
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                        <SidebarMenuButton
-                            isActive={isActive}
-                            onClick={handleClick}
-                            tooltip={state === "collapsed" ? menuItem.tooltip || menuItem.title : undefined}
-                        >
-                            <MenuContent />
-                        </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    {menuItem.actions && (
-                        <MenuActionsDropdown
-                            actions={menuItem.actions}
-                            onActionClick={onActionClick}
-                            context={{ menu: menuItem, group }}
-                        />
-                    )}
-                    <CollapsibleContent>
-                        <SubmenuComponent
-                            submenu={menuItem.submenu}
-                            currentPath={currentPath}
-                            onMenuClick={onMenuClick}
-                            onActionClick={onActionClick}
-                            parentMenu={menuItem}
-                        />
-                    </CollapsibleContent>
-                </SidebarMenuItem>
-            </Collapsible>
-        )
-    }
-
-    return (
-        <SidebarMenuItem>
-            <SidebarMenuButton
-                asChild
-                isActive={isActive}
-                tooltip={state === "collapsed" ? menuItem.tooltip || menuItem.title : undefined}
-            >
-                <a href={menuItem.url} onClick={() => menuItem.url && onMenuClick?.(menuItem.url, menuItem)}>
-                    <MenuContent />
-                </a>
-            </SidebarMenuButton>
-            {menuItem.actions && (
-                <MenuActionsDropdown
-                    actions={menuItem.actions}
-                    onActionClick={onActionClick}
-                    context={{ menu: menuItem, group }}
-                />
-            )}
-        </SidebarMenuItem>
-    )
-}
-
-// Group Actions Component
-const GroupActionsComponent: React.FC<{
-    actions: MenuAction[]
-    onActionClick?: (action: MenuAction, context?: never) => void
-    group?: SbGroup
-}> = ({ actions, onActionClick, group }) => {
-    if (!actions || actions.length === 0) return null
-
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <SidebarGroupAction>
-                    <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Group actions</span>
-                </SidebarGroupAction>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start">
-                {actions.map((action) => (
-                    <DropdownMenuItem
-                        key={action.id}
-                        onClick={() => onActionClick?.(action, { group })}
-                        className="flex items-center gap-2"
-                    >
-                        {action.icon && (
-                            <Icon
-                                name={action.icon.name}
-                                size={action.icon.size || 16}
-                                weight={action.icon.weight || 'regular'}
-                                color={action.icon.color}
-                            />
-                        )}
-                        {action.label}
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
-}
-
-// Main Sidebar Group Component
-const SidebarGroupComponent: React.FC<{
-    group: SbGroup
-    currentPath?: string
-    onMenuClick?: (url: string, item: SbMenu | SbSubMenu) => void
-    onActionClick?: (action: MenuAction, context?: any) => void
-}> = ({ group, currentPath, onMenuClick, onActionClick }) => {
-    const [isOpen, setIsOpen] = React.useState(group.defaultOpen !== false)
-
-    if (group.collapsible) {
-        return (
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                <SidebarGroup>
-                    {group.title && (
-                        <CollapsibleTrigger asChild>
-                            <SidebarGroupLabel className="flex items-center justify-between cursor-pointer">
-
-                                <span style={{ color: group.color }}>
-                                       {group.icon && (
-                                           <Icon
-                                               name={group.icon.name}
-                                               size={group.icon.size || 16}
-                                               weight={group.icon.weight || 'regular'}
-                                               color={group.icon.color}
-                                               className="mr-1"
-                                           />
-                                       )}
-                                    {group.title}</span>
-                                <ChevronRight
-                                    className={cn(
-                                        "h-4 w-4 transition-transform",
-                                        isOpen && "rotate-90"
-                                    )}
-                                />
-                            </SidebarGroupLabel>
-                        </CollapsibleTrigger>
-                    )}
-                    {group.actions && (
-                        <GroupActionsComponent
-                            actions={group.actions}
-                            onActionClick={onActionClick}
-                            group={group}
-                        />
-                    )}
-                    <CollapsibleContent>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {group.menu.map((menuItem) => (
-                                    <MenuItemComponent
-                                        key={menuItem.id || menuItem.title}
-                                        menuItem={menuItem}
-                                        currentPath={currentPath}
-                                        onMenuClick={onMenuClick}
-                                        onActionClick={onActionClick}
-                                        group={group}
-                                    />
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </CollapsibleContent>
-                </SidebarGroup>
-            </Collapsible>
-        )
-    }
-
-    return (
-        <SidebarGroup>
-            {group.title && (
-                <SidebarGroupLabel style={{ color: group.color }}>
-                    {group.icon && (
+                state === 'collapsed' ? (
+                    // Collapsed state - centered icon with potential badge dot
+                    <>
                         <Icon
-                            name={group.icon.name}
-                            size={group.icon.size || 16}
-                            weight={group.icon.weight || 'regular'}
-                            color={group.icon.color}
-                            className="mr-1"
+                            {...menuItem.icon}
+                            size={menuItem.icon.size || 20}
+                            weight={menuItem.icon.weight || 'regular'}
                         />
-                    )}
-                    {group.title}
-                </SidebarGroupLabel>
-            )}
-            {group.actions && (
-                <GroupActionsComponent
-                    actions={group.actions}
-                    onActionClick={onActionClick}
-                    group={group}
-                />
-            )}
-            <SidebarGroupContent>
-                <SidebarMenu>
-                    {group.menu.map((menuItem) => (
-                        <MenuItemComponent
-                            key={menuItem.id || menuItem.title}
-                            menuItem={menuItem}
-                            currentPath={currentPath}
-                            onMenuClick={onMenuClick}
-                            onActionClick={onActionClick}
-                            group={group}
-                        />
-                    ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
-        </SidebarGroup>
-    )
-}
-
-// Main AppSidebarContent Component
-const AppSidebarContent: React.FC<AppSidebarContentProps> = ({
-                                                                 data,
-                                                                 currentPath,
-                                                                 onMenuClick,
-                                                                 onActionClick
-                                                             }) => {
-    return (
-        <SidebarContent>
-            {data.map((group, index) => (
-                <React.Fragment key={group.id || index}>
-                    <SidebarGroupComponent
-                        group={group}
-                        currentPath={currentPath}
-                        onMenuClick={onMenuClick}
-                        onActionClick={onActionClick}
+                        {hasSubmenuBadges && (
+                            <span className="absolute -top-0.5 -right-0.5">
+                    <PulsingDot color={menuItem.dotColor || '#10b981'}/>
+                </span>
+                        )}
+                    </>
+                ) : (
+                    // Expanded state - regular icon
+                    <Icon
+                        {...menuItem.icon}
+                        size={menuItem.icon.size || 20}
+                        weight={menuItem.icon.weight || 'regular'}
+                        className="flex-shrink-0"
                     />
+                )
+            )}
+            <span className="flex-1 truncate flex items-center min-w-0" style={{color: menuItem.color}}>
+            <span className="truncate">{menuItem.title}</span>
+                {/* Show pulsing dot only when expanded and submenu has badges */}
+                {state !== 'collapsed' && hasSubmenuBadges && (
+                    <PulsingDot color={menuItem.dotColor || '#10b981'}/>
+                )}
+        </span>
+            {menuItem.badge && <SidebarBadgeComponent badge={menuItem.badge}/>}
+            {menuItem.actions && <InlineActions actions={menuItem.actions} onActionClick={onActionClick}
+                                                context={{menu: menuItem, group}} size="md"/>}
+            {hasSubmenu &&
+                <ChevronRight className={cn('h-4 w-4 transition-transform flex-shrink-0', isOpen && 'rotate-90')}/>}
+        </>
+    );
 
-                </React.Fragment>
-            ))}
-        </SidebarContent>
-    )
-}
+    return hasSubmenu ? (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton isActive={isActive} onClick={handleClick}
+                                       tooltip={state === 'collapsed' ? menuItem.tooltip || menuItem.title : undefined}
+                                       className="w-full">
+                        {MenuContent}
+                    </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SubmenuComponent submenu={menuItem.submenu!} currentPath={currentPath} onMenuClick={onMenuClick}
+                                      onActionClick={onActionClick} parentMenu={menuItem}/>
+                </CollapsibleContent>
+            </SidebarMenuItem>
+        </Collapsible>
+    ) : (
+        <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={isActive}
+                               tooltip={state === 'collapsed' ? menuItem.tooltip || menuItem.title : undefined}
+                               className="w-full">
+                <Link href={menuItem.url} onClick={handleLinkClick} className="w-full flex items-center gap-2">
+                    {MenuContent}
+                </Link>
+            </SidebarMenuButton>
+        </SidebarMenuItem>
+    );
+});
+MenuItemComponent.displayName = 'MenuItemComponent';
 
-export default AppSidebarContent
+const SidebarGroupComponent = memo<{
+    group: SbGroup;
+    currentPath?: string;
+    onMenuClick?: (url: string, item: SbMenu | SbSubMenu) => void;
+    onActionClick?: (action: MenuAction, context?: any) => void;
+}>(({group, currentPath, onMenuClick, onActionClick}) => {
+    const [isOpen, setIsOpen] = useState(group.defaultOpen !== false);
+    const GroupHeader = (
+        <span className="flex items-center w-full" style={{color: group.color}}>
+            {group.icon && <Icon {...group.icon} size={group.icon.size || 16} weight={group.icon.weight || 'regular'}
+                                 className="mr-1 flex-shrink-0"/>}
+            <span className="flex-1 truncate">{group.title}</span>
+            {group.actions &&
+                <InlineActions actions={group.actions} onActionClick={onActionClick} context={{group}} size="sm"/>}
+            {group.collapsible &&
+                <ChevronRight className={cn('h-4 w-4 transition-transform flex-shrink-0', isOpen && 'rotate-90')}/>}
+        </span>
+    );
+
+    const menuItems = useMemo(() => group.menu.map(item => (
+        <MenuItemComponent key={item.id || item.title} menuItem={item} currentPath={currentPath}
+                           onMenuClick={onMenuClick} onActionClick={onActionClick} group={group}/>
+    )), [group.menu, currentPath, onMenuClick, onActionClick, group]);
+
+    return group.collapsible ? (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <SidebarGroup>
+                {group.title && (
+                    <CollapsibleTrigger asChild>
+                        <SidebarGroupLabel>
+                         {GroupHeader}
+                        </SidebarGroupLabel>
+                    </CollapsibleTrigger>
+                )}
+                <CollapsibleContent>
+                    <SidebarGroupContent><SidebarMenu>{menuItems}</SidebarMenu></SidebarGroupContent>
+                </CollapsibleContent>
+            </SidebarGroup>
+        </Collapsible>
+    ) : (
+        <SidebarGroup >
+            {group.title && <SidebarGroupLabel
+            >{GroupHeader}</SidebarGroupLabel>}
+            <SidebarGroupContent><SidebarMenu>{menuItems}</SidebarMenu></SidebarGroupContent>
+        </SidebarGroup>
+    );
+});
+SidebarGroupComponent.displayName = 'SidebarGroupComponent';
+
+const AppSidebarContent: React.FC<AppSidebarContentProps> = memo(({data, currentPath, onMenuClick, onActionClick}) => (
+    <SidebarContent>
+        {useMemo(() => data.map((group, i) => (
+            <SidebarGroupComponent key={group.id || i} group={group} currentPath={currentPath} onMenuClick={onMenuClick}
+                                   onActionClick={onActionClick}/>
+        )), [data, currentPath, onMenuClick, onActionClick])}
+    </SidebarContent>
+));
+AppSidebarContent.displayName = 'AppSidebarContent';
+
+export default AppSidebarContent;

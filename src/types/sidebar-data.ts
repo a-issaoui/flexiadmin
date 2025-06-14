@@ -1,25 +1,12 @@
 import type { IconProps } from "@/components/shared/icon";
 
-// Badge Types
-export type SidebarBadgeColor =
-    | 'red'
-    | 'blue'
-    | 'green'
-    | 'yellow'
-    | 'purple'
-    | 'orange'
-    | 'gray'
-    | 'pink';
-
-export type SidebarBadgeVariant =
-    | 'default'
-    | 'outline'
-    | 'ghost';
+import {BadgeVariant,BadgeShape} from "@/components/ui/badge";
 
 export interface SidebarBadge {
     count?: string | number;
-    color?: SidebarBadgeColor;
-    variant?: SidebarBadgeVariant;
+    color?: string;
+    variant?: BadgeVariant;
+    shape?: BadgeShape;
 }
 
 // Menu Actions

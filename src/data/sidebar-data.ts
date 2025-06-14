@@ -31,7 +31,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'HouseLineIcon', size: 20, weight: 'regular', color: '#1f2937' },
                 url: '/admin/overview',
                 color: '#1f2937',
-                badge: { count: 5, color: 'red', variant: 'default' },
+                badge: { count: 5, color: '#fb0000', variant: 'outline', shape: 'circular' },
                 tooltip: 'Dashboard overview',
                 actions: [
                     {
@@ -47,7 +47,7 @@ export const sidebarData: TypeSidebarData = [
                 title: 'Reports',
                 icon: { name: 'ChargingStationIcon', size: 20, weight: 'regular' },
                 url: '/admin/reports',
-                dotColor: '#16a34a',
+                dotColor: '#f4a907',
                 tooltip: 'View reports',
                 submenu: [
                     {
@@ -56,7 +56,7 @@ export const sidebarData: TypeSidebarData = [
                         url: '/admin/reports/daily',
                         icon: { name: 'Calendar', size: 18, weight: 'regular', color: '#2563eb' },
                         color: '#2563eb',
-                        badge: { count: '2', color: 'blue', variant: 'outline' },
+                        badge: { count: '2', color: '#0651e6', variant: 'outline', shape: 'circular' },
                         tooltip: 'Daily insights'
                     },
                     {
@@ -65,7 +65,7 @@ export const sidebarData: TypeSidebarData = [
                         url: '/admin/reports/weekly',
                         icon: { name: 'CalendarCheck', size: 18, weight: 'regular', color: '#16a34a' },
                         color: '#16a34a',
-                        badge: { count: '1', color: 'green', variant: 'ghost' },
+                        badge: { count: '1', color: '#000000', variant: 'ghost', shape: 'default' },
                         tooltip: 'Weekly performance'
                     }
                 ]
@@ -95,7 +95,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'Users', size: 20, weight: 'regular', color: '#f4a907' },
                 url: '/admin/users',
                 color: '#0651e6',
-                badge: { count: 23, color: 'purple', variant: 'default' },
+                badge: { count: '99+', color: '#0651e6', variant: 'default', shape: 'circular' },
                 tooltip: 'Manage users',
                 actions: [
                     {
@@ -112,7 +112,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'Users', size: 20, weight: 'regular', color: '#ea580c' },
                 url: '/admin/teams',
                 color: '#ea580c',
-                badge: { count: 'New', color: 'orange', variant: 'outline' },
+                badge: { count: 'New', color: '#fb0000', variant: 'outline', shape: 'default' },
                 tooltip: 'Manage team roles and permissions'
             },
             {
@@ -146,7 +146,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'FileTextIcon', size: 20, weight: 'regular', color: '#dc2626' },
                 url: '/admin/analytics',
                 color: '#dc2626',
-                badge: { count: 8, color: 'red', variant: 'default' },
+                badge: { count: 8, color: '#2cbf0b', variant: 'default', shape: 'default' },
                 tooltip: 'View analytics dashboard',
                 actions: [
                     {
@@ -163,7 +163,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'Shield', size: 20, weight: 'regular', color: '#059669' },
                 url: '/admin/security',
                 color: '#059669',
-                badge: { count: 'Beta', color: 'green', variant: 'outline' },
+                badge: { count: 'Beta', color: '#0dc0e8', variant: 'outline', shape: 'default' },
                 tooltip: 'Security settings and logs'
             },
             {
@@ -188,7 +188,7 @@ export const sidebarData: TypeSidebarData = [
                         url: '/admin/advanced-settings/api',
                         icon: { name: 'Code', size: 18, weight: 'regular', color: '#2563eb' },
                         color: '#2563eb',
-                        badge: { count: '3', color: 'blue', variant: 'outline' },
+                        badge: { count: '3', color: '#e1a60f', variant: 'outline', shape: 'circular' },
                         tooltip: 'Configure API endpoints'
                     },
                     {
@@ -197,7 +197,7 @@ export const sidebarData: TypeSidebarData = [
                         url: '/admin/advanced-settings/webhooks',
                         icon: { name: 'HoodieIcon', size: 18, weight: 'regular', color: '#dc2626' },
                         color: '#dc2626',
-                        badge: { count: '1', color: 'red', variant: 'ghost' },
+                        badge: { count: '1', color: '#dc2626', variant: 'ghost', shape: 'circular' },
                         tooltip: 'Manage webhook endpoints',
                         actions: [
                             {
@@ -221,7 +221,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'BellZIcon', size: 20, weight: 'regular', color: '#dc0b48' },
                 url: '/admin/quick-overview',
                 color: '#dc0b48',
-                badge: { count: 5, color: 'pink', variant: 'default' },
+                badge: { count: 5, color: '#dc0b48', variant: 'default', shape: 'circular' },
                 tooltip: 'Quick overview dashboard',
                 actions: [
                     {
@@ -238,7 +238,7 @@ export const sidebarData: TypeSidebarData = [
                 icon: { name: 'Bell', size: 20, weight: 'regular', color: '#f4a907' },
                 url: '/admin/notifications',
                 color: '#0735f4',
-                dotColor: '#16a34a',
+                dotColor: '#dc0b48',
                 tooltip: 'Manage notifications',
                 submenu: [
                     {
@@ -247,16 +247,14 @@ export const sidebarData: TypeSidebarData = [
                         url: '/admin/notifications/email',
                         icon: { name: 'MessengerLogoIcon', size: 18, weight: 'regular', color: '#2563eb' },
                         color: '#2563eb',
-                        badge: { count: '12', color: 'blue', variant: 'outline' },
-                        tooltip: 'Configure email notifications'
+                         tooltip: 'Configure email notifications'
                     },
                     {
                         id: 'submenu-push-notifications',
                         title: 'Push Notifications',
-                        url: '/admin/notifications/push',
+                        url: '/admin',
                         icon: { name: 'DeviceMobileIcon', size: 18, weight: 'regular', color: '#dc0b48' },
                         color: '#16a34a',
-                        badge: { count: '5', color: 'green', variant: 'ghost' },
                         tooltip: 'Configure push notifications'
                     }
                 ]

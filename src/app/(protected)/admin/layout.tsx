@@ -15,7 +15,10 @@ export  default async function AdminLayout({ children }: { children: React.React
     }
 
     return (
-        <SidebarProvider defaultOpen={sidebarOpen}>
+        <SidebarProvider
+            defaultOpen={sidebarOpen}
+
+        >
             <AppSidebar />
             <SidebarInset className="flex min-w-0 flex-1 flex-col">
                 <main className="flex-1 m-2 overflow-hidden">
