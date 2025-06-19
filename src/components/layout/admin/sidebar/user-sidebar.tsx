@@ -1,39 +1,33 @@
-// ============================================================================
-// src/components/layout/admin/sidebar/user-sidebar.tsx
-// ============================================================================
+'use client';
 
-'use client'
-
-import * as React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import * as React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu';
 import {
     SidebarMenu,
-    SidebarMenuButton,
     SidebarMenuItem,
-} from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
-import type { TypeUserData } from '@/types/user-data'
-import { UserMenu } from '@/components/shared/user-menu'
+    SidebarMenuButton,
+} from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
+import { UserMenu } from '@/components/shared/user-menu';
+import type { TypeUserData } from '@/types/user-data';
 
-interface UserSidebarProps {
-    user: TypeUserData
-}
+export function UserSidebar({ user }: { user: TypeUserData }) {
+    const initials = React.useMemo(
+        () =>
+            user.name
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0]?.toUpperCase() || '')
+                .join(''),
+        [user.name]
+    );
 
-export function UserSidebar({ user }: UserSidebarProps) {
-    const initials = React.useMemo(() => {
-        return user.name
-            .split(' ')
-            .filter(Boolean)
-            .slice(0, 2)
-            .map((word) => word[0]?.toUpperCase() || '')
-            .join('')
-    }, [user.name])
-
-    const avatarUrl = user.avatar || user.imageUrl || ''
+    const avatarUrl = user.avatar || user.imageUrl || '';
 
     return (
         <SidebarMenu>
@@ -44,37 +38,27 @@ export function UserSidebar({ user }: UserSidebarProps) {
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="relative">
+                            <div className="relative flex gap-3 items-center">
                                 <Avatar className="h-8 w-8">
                                     <AvatarImage src={avatarUrl} alt={user.name} />
                                     <AvatarFallback>{initials}</AvatarFallback>
                                 </Avatar>
+                                <div className="flex-1 min-w-0 text-left leading-none">
+                                    <span className="block text-sm font-medium truncate">{user.name}</span>
+                                    <span className="block text-xs text-muted-foreground truncate">{user.email}</span>
+                                </div>
                                 <div
                                     className={cn(
                                         'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background',
-                                        user.status.toLowerCase() === 'active'
-                                            ? 'bg-green-500'
-                                            : 'bg-gray-400'
+                                        user.status?.toLowerCase() === 'active' ? 'bg-green-500' : 'bg-gray-400'
                                     )}
                                 />
                             </div>
-                            <div className="flex flex-col text-left leading-none min-w-0 flex-1">
-                                <span className="font-medium text-sm truncate">{user.name}</span>
-                                <span className="text-xs text-muted-foreground truncate">{user.email}</span>
-                            </div>
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
-
-                    <UserMenu
-                        user={user} // UserMenu already handles missing user.name internally with translations
-                        side="right" // Dynamically set side
-                        align="end" // 'end' is a logical alignment, typically works well
-                        sideOffset={12}
-                        alignOffset={2}
-                        collisionPadding={{ top: 10, bottom: 10 }}
-                    />
+                    <UserMenu user={user} side="right" align="end" sideOffset={12} alignOffset={2} collisionPadding={10} />
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
-    )
+    );
 }
