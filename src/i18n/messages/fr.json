@@ -1,29 +1,66 @@
 {
   "common": {
-    "profile": "Profil",
-    "preferences": "Préférences",
-    "logout": "Deconnexion"
+    "welcome": "Bienvenue",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "Chargement...",
+    "submit": "Soumettre",
+    "close": "Fermer",
+    "home": "Accueil",
+    "breadcrumb": "Fil d’Ariane"
   },
-  "HomePage": {
-    "title": "Bienvenue dans notre application",
-    "description": "Ceci est une application Next.js avec prise en charge de l'internationalisation.",
-    "projectStatus": {
-      "title": "Statut du projet",
-      "items": "✅ Erreur React suspense corrigée\n✅ Internationalisation fonctionnelle\n✅ Changement de thème activé\n✅ Problèmes de configuration corrigés\n🔧 Prêt pour le développement"
+  "sidebar": {
+    "group": {
+      "group-dashboard": "Tableau de bord",
+      "group-users": "Utilisateurs",
+      "group-settings": "Paramètres"
     },
-    "cards": {
-      "modernStack": {
-        "title": "Stack Moderne",
-        "description": "Construit avec Next.js 15, React 19 et Tailwind CSS v4"
+    "menu": {
+      "roles&permissions": "Rôles et autorisations"
+    },
+    "route": {
+      "home": {
+        "title": "Accueil",
+        "description": "Page d'accueil"
       },
-      "internationalization": {
-        "title": "Internationalisation",
-        "description": "Support multilingue avec next-intl et prise en charge RTL"
+      "dashboard": {
+        "title": "Tableau de bord",
+        "description": "Aperçu et statistiques du système"
       },
-      "themeSupport": {
-        "title": "Support du Thème",
-        "description": "Mode sombre/clair avec détection de préférence système"
+      "settings": {
+        "title": "Paramètres",
+        "description": "Gérer la configuration et les préférences de l'application"
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Voir et modifier vos informations personnelles et préférences"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "description": "Lister et gérer les utilisateurs de l'application"
+      },
+      "roles": {
+        "title": "Rôles",
+        "description": "Gérer les rôles des utilisateurs et leurs niveaux d'accès"
+      },
+      "permissions": {
+        "title": "Autorisations",
+        "description": "Définir et attribuer des autorisations aux rôles"
       }
     }
+  },
+  "actions": {
+    "refresh": "Actualiser"
+  },
+  "UserDropdown": {
+    "account": "Compte",
+    "billing": "Facturation",
+    "notifications": "Notifications",
+    "logout": "Déconnexion",
+    "guestNamePlaceholder": "Utilisateur invité"
   }
 }

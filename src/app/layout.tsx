@@ -1,9 +1,10 @@
+// src/app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
-import NextTopLoader from 'nextjs-toploader';
+import TopLoader from "@/components/shared/top-loader";
 import { getUserLocale } from "@/store/locale-store";
 
 import "./globals.css";
@@ -13,7 +14,6 @@ interface RootLayoutProps {
     children: React.ReactNode;
 }
 
-// Optimized font loading with display swap
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -25,10 +25,8 @@ const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
     display: 'swap',
-    preload: false, // Only preload main font
 });
 
-// Enhanced metadata
 export const metadata: Metadata = {
     title: {
         default: "FlexiAdmin",
@@ -53,12 +51,11 @@ export const metadata: Metadata = {
         description: "Modern admin dashboard with internationalization support",
     },
     robots: {
-        index: false, // Admin dashboard shouldn't be indexed
+        index: false,
         follow: false,
     },
 };
 
-// Viewport configuration
 export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
@@ -75,7 +72,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
     return (
         <html lang={lang} dir={dir} suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
+        <TopLoader />
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -83,18 +81,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
             storageKey="flexiadmin-theme"
         >
-            <NextTopLoader
-                showSpinner={true}
-                color="hsl(var(--primary))"
-                height={3}
-                speed={200}
-                shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
-                template='<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
-            />
             <NextIntlClientProvider locale={lang} messages={messages} key={lang}>
-
                 {children}
-
             </NextIntlClientProvider>
         </ThemeProvider>
         </body>

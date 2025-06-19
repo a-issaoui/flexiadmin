@@ -46,7 +46,7 @@ const badgeVariants = cva(
             shape: {
                 default: "rounded-md px-1.5 py-0.5",
                 square: "rounded-md p-1 min-w-[1.5rem] h-[1.5rem]",
-                circular: "rounded-full aspect-square w-5 h-5",
+                circular: "rounded-full aspect-square w-5 h-5 ",
             },
         },
         defaultVariants: {

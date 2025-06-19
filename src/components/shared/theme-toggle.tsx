@@ -1,47 +1,47 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button"; // Assuming this path is correct
-import { Icon } from "@/components/shared/icon"; // Assuming this path is correct
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/shared/icon";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ThemeToggle() {
     const { setTheme, resolvedTheme } = useTheme();
-    const [isClient, setIsClient] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setIsClient(true);
+        setMounted(true);
     }, []);
 
+    const isDark = useMemo(() => resolvedTheme === "dark", [resolvedTheme]);
+
     const toggleTheme = () => {
-        setTheme(resolvedTheme === "light" ? "dark" : "light");
+        setTheme(isDark ? "light" : "dark");
     };
 
-    if (!isClient) {
+    if (!mounted) {
         return (
             <Skeleton
-                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
+                aria-hidden
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
             />
         );
     }
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-                type: "spring",
-                stiffness: 600, // Made faster
-                damping: 20     // Adjusted damping
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
         >
             <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="rounded-full cursor-pointer w-10 h-10 p-0 overflow-hidden"
+                aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
+                className="rounded-full w-10 h-10 p-0  cursor-pointer"
             >
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
@@ -49,23 +49,18 @@ export function ThemeToggle() {
                         initial={{ y: -8, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 8, opacity: 0 }}
-                        transition={{
-                            type: "tween",
-                            ease: "easeInOut",
-                            duration: 0.2
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="flex items-center justify-center"
                     >
                         <Icon
-                            name={resolvedTheme === "light" ? "MoonIcon" : "SunIcon"}
+                            name={isDark ? "SunIcon" : "MoonIcon"}
                             size={24}
                             weight="duotone"
-                            color={resolvedTheme === "light" ? "#64748b" : "#f59e0b"}
+                            color={isDark ? "#f59e0b" : "#64748b"}
                             className="size-6"
                         />
                     </motion.div>
                 </AnimatePresence>
-
             </Button>
         </motion.div>
     );

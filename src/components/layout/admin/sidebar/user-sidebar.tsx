@@ -65,7 +65,14 @@ export function UserSidebar({ user }: UserSidebarProps) {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
 
-                    <UserMenu user={user} />
+                    <UserMenu
+                        user={user} // UserMenu already handles missing user.name internally with translations
+                        side="right" // Dynamically set side
+                        align="end" // 'end' is a logical alignment, typically works well
+                        sideOffset={12}
+                        alignOffset={2}
+                        collisionPadding={{ top: 10, bottom: 10 }}
+                    />
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>

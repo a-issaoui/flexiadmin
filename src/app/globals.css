@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -54,6 +55,7 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 }
+
 :root {
   --background: oklch(1.0000 0 0);
   --foreground: oklch(0.3211 0 0);
@@ -87,10 +89,13 @@
   --sidebar-accent-foreground: oklch(0.3791 0.1378 265.5222);
   --sidebar-border: oklch(0.9276 0.0058 264.5313);
   --sidebar-ring: oklch(0.6231 0.1880 259.8145);
+
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
+
   --radius: 0.5rem;
+
   --shadow-2xs: 1px 1px 3px 1px hsl(0 0% 0% / 0.03);
   --shadow-xs: 1px 1px 3px 1px hsl(0 0% 0% / 0.03);
   --shadow-sm: 1px 1px 3px 1px hsl(0 0% 0% / 0.05), 1px 1px 2px 0px hsl(0 0% 0% / 0.05);
@@ -102,42 +107,45 @@
 }
 
 .dark {
-  --background: oklch(0.2046 0 0);
-  --foreground: oklch(0.9219 0 0);
-  --card: oklch(0.2686 0 0);
-  --card-foreground: oklch(0.9219 0 0);
-  --popover: oklch(0.2686 0 0);
-  --popover-foreground: oklch(0.9219 0 0);
-  --primary: oklch(0.6231 0.1880 259.8145);
-  --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.2686 0 0);
-  --secondary-foreground: oklch(0.9219 0 0);
-  --muted: oklch(0.2686 0 0);
-  --muted-foreground: oklch(0.7155 0 0);
-  --accent: oklch(0.3791 0.1378 265.5222);
-  --accent-foreground: oklch(0.8823 0.0571 254.1284);
+  --background: oklch(0.14 0.005 270);                 /* Charcoal */
+  --foreground: oklch(0.95 0.005 270);                 /* Off-white text */
+  --card: oklch(0.18 0.007 270);                       /* Slightly lighter surface */
+  --card-foreground: oklch(0.92 0.01 270);
+  --popover: oklch(0.18 0.007 270);
+  --popover-foreground: oklch(0.92 0.01 270);
+  --primary: oklch(0.55 0.08 275);                     /* Muted blue-gray */
+  --primary-foreground: oklch(0.98 0.005 270);
+  --secondary: oklch(0.22 0.005 270);                  /* Slightly lifted dark for secondary */
+  --secondary-foreground: oklch(0.85 0.01 270);
+  --muted: oklch(0.18 0.005 270);
+  --muted-foreground: oklch(0.75 0.01 270);
+  --accent: oklch(0.38 0.02 275);
+  --accent-foreground: oklch(0.85 0.015 270);
   --destructive: oklch(0.6368 0.2078 25.3313);
   --destructive-foreground: oklch(1.0000 0 0);
-  --border: oklch(0.3715 0 0);
-  --input: oklch(0.3715 0 0);
-  --ring: oklch(0.6231 0.1880 259.8145);
-  --chart-1: oklch(0.7137 0.1434 254.6240);
-  --chart-2: oklch(0.6231 0.1880 259.8145);
-  --chart-3: oklch(0.5461 0.2152 262.8809);
-  --chart-4: oklch(0.4882 0.2172 264.3763);
-  --chart-5: oklch(0.4244 0.1809 265.6377);
-  --sidebar: oklch(0.2046 0 0);
-  --sidebar-foreground: oklch(0.9219 0 0);
-  --sidebar-primary: oklch(0.6231 0.1880 259.8145);
-  --sidebar-primary-foreground: oklch(1.0000 0 0);
-  --sidebar-accent: oklch(0.3791 0.1378 265.5222);
-  --sidebar-accent-foreground: oklch(0.8823 0.0571 254.1284);
-  --sidebar-border: oklch(0.3715 0 0);
-  --sidebar-ring: oklch(0.6231 0.1880 259.8145);
+  --border: oklch(0.25 0.005 270);
+  --input: oklch(0.25 0.005 270);
+  --ring: oklch(0.45 0.04 270);                        /* Subtle ring */
+  --chart-1: oklch(0.45 0.04 270);
+  --chart-2: oklch(0.38 0.03 270);
+  --chart-3: oklch(0.32 0.02 270);
+  --chart-4: oklch(0.26 0.015 270);
+  --chart-5: oklch(0.22 0.01 270);
+  --sidebar: oklch(0.12 0.005 270);
+  --sidebar-foreground: oklch(0.92 0.01 270);
+  --sidebar-primary: oklch(0.55 0.08 275);
+  --sidebar-primary-foreground: oklch(0.98 0.005 270);
+  --sidebar-accent: oklch(0.38 0.02 275);
+  --sidebar-accent-foreground: oklch(0.85 0.015 270);
+  --sidebar-border: oklch(0.25 0.005 270);
+  --sidebar-ring: oklch(0.45 0.04 270);
+
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
+
   --radius: 0.5rem;
+
   --shadow-2xs: 1px 1px 3px 1px hsl(0 0% 0% / 0.03);
   --shadow-xs: 1px 1px 3px 1px hsl(0 0% 0% / 0.03);
   --shadow-sm: 1px 1px 3px 1px hsl(0 0% 0% / 0.05), 1px 1px 2px 0px hsl(0 0% 0% / 0.05);
@@ -148,8 +156,6 @@
   --shadow-2xl: 1px 1px 3px 1px hsl(0 0% 0% / 0.13);
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -158,4 +164,3 @@
     @apply bg-background text-foreground;
   }
 }
-

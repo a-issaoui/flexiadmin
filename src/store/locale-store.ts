@@ -73,3 +73,8 @@ export async function setUserLocale(lang: LocaleCode): Promise<void> {
         throw new Error('Could not save locale preference');
     }
 }
+
+export async function isRTL(): Promise<boolean> {
+    const { dir } = await getUserLocale();
+    return dir === 'rtl';
+}

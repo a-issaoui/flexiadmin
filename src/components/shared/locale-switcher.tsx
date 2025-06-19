@@ -20,7 +20,7 @@ interface LocaleSwitcherProps {
 }
 
 
-export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
+export default function LocaleSwitcher({ className }: LocaleSwitcherProps) {
     const currentLocale = useLocale() as LocaleCode;
     const [isPending, startTransition] = useTransition();
     const [isClient, setIsClient] = useState(false);
@@ -42,7 +42,7 @@ export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
     };
 
     if (!isClient) {
-        return <Skeleton className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center" />;
+        return <Skeleton className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center" />;
     }
 
     const currentLocaleConfig = localesConfig.find(l => l.code === currentLocale);

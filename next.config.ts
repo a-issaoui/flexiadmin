@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
             '@radix-ui/react-avatar',
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-navigation-menu',
+            '@radix-ui/react-sidebarData-menu',
             '@radix-ui/react-select',
             '@radix-ui/react-separator',
             '@radix-ui/react-slot',

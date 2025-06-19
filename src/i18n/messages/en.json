@@ -1,29 +1,66 @@
 {
   "common": {
-    "profile": "Profile",
-    "preferences": "Preferences",
-    "logout": "Logout"
+    "welcome": "Welcome",
+    "login": "Login",
+    "logout": "Logout",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "close": "Close",
+    "home": "Home",
+    "breadcrumb": "Breadcrumb"
   },
-  "HomePage": {
-    "title": "Welcome to our app",
-    "description": "This is a Next.js application with internationalization support.",
-    "projectStatus": {
-      "title": "Project Status",
-      "items": "✅ Fixed React suspense error\n✅ Internationalization working\n✅ Theme switching enabled\n✅ Fixed configuration issues\n🔧 Ready for development"
+  "sidebar": {
+    "group": {
+      "group-dashboard": "Dashboard",
+      "group-users": "Users Management",
+      "group-settings": "Settings "
     },
-    "cards": {
-      "modernStack": {
-        "title": "Modern Stack",
-        "description": "Built with Next.js 15, React 19, and Tailwind CSS v4"
+    "menu": {
+      "roles&permissions": "Roles & permissions"
+    },
+    "route": {
+      "home": {
+        "title": "Home",
+        "description": "Home"
       },
-      "internationalization": {
-        "title": "Internationalization",
-        "description": "Multi-language support with next-intl and RTL support"
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "Overview and statistics of the system"
       },
-      "themeSupport": {
-        "title": "Theme Support",
-        "description": "Dark/light mode with system preference detection"
+      "settings": {
+        "title": "Settings",
+        "description": "Manage application configuration and preferences"
+      },
+      "profile": {
+        "title": "Profile",
+        "description": "View and edit your personal information and preferences"
+      },
+      "users": {
+        "title": "Users",
+        "description": "List and manage application users"
+      },
+      "roles": {
+        "title": "Roles",
+        "description": "Manage user roles and their access levels"
+      },
+      "permissions": {
+        "title": "Permissions",
+        "description": "Define and assign permissions to roles"
       }
     }
+  },
+  "actions": {
+    "refresh": "Refresh"
+  },
+  "UserDropdown": {
+    "account": "Account",
+    "billing": "Billing",
+    "notifications": "Notifications",
+    "logout": "Log out",
+    "guestNamePlaceholder": "Guest User"
   }
 }

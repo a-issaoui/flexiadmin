@@ -11,7 +11,7 @@ export interface SidebarBadge {
 
 // Menu Actions
 export interface MenuAction {
-    id: string;
+    id?: string;
     label: string;
     icon?: IconProps;
     customHandler?: string;
@@ -21,7 +21,7 @@ export interface MenuAction {
 // Submenu Item
 export interface SbSubMenu {
     id?: string;
-    title: string;
+    title?: string;
     url: string;
     icon?: IconProps;
     color?: string;
@@ -34,7 +34,7 @@ export interface SbSubMenu {
 // Main Menu Item
 export interface SbMenu {
     id?: string;
-    title: string;
+    title?: string;
     icon?: IconProps;
     color?: string;
     dotColor?: string;

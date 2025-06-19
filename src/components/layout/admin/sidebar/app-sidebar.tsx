@@ -1,81 +1,51 @@
-"use client"
+'use client'
+import { usePathname } from "next/navigation"
+// UI Components
 import { Sidebar, SidebarHeader, SidebarFooter, SidebarRail } from "@/components/ui/sidebar"
-import AppSidebarContent from "@/components/layout/admin/sidebar/components/app-sidebar-content"
 import { OrgSidebar } from "@/components/layout/admin/sidebar/org-sidebar"
 import { UserSidebar } from "@/components/layout/admin/sidebar/user-sidebar"
+
+// The refactored Presentational Component from the previous step
+import { AppSidebarContent } from "@/components/layout/admin/sidebar/components/app-sidebar-content"
+
+// Data
 import { OrganisationData } from "@/data/organisation-data"
 import { UserData } from "@/data/user-data"
 import { sidebarData } from "@/data/sidebar-data"
-import type { SbMenu, SbSubMenu, MenuAction, SbGroup } from "@/types/sidebar-data"
-import { useRouter, usePathname } from "next/navigation"
-import { useCallback } from "react"
 
-export default function AppSidebar() {
-    const router = useRouter()
+// Handlers & Hooks
+import useActionHandler from "./handlers/use-action-handler"
+import useMenuHandler from "./handlers/use-menu-handler"
+import { useSidebarData } from "@/hooks/use-sidebar-data"
+
+interface AppSidebarClientProps {
+    rtl: boolean
+}
+
+export default function AppSidebar({ rtl }: AppSidebarClientProps) {
     const pathname = usePathname()
 
-    // Handle menu navigation
-    const handleMenuClick = useCallback((url: string, item: SbMenu | SbSubMenu) => {
-        console.log('Navigating to:', url, 'Item:', item)
-        router.push(url)
-    }, [router])
+    // Process the raw data to get stable, SSR-safe IDs
+    const processedData = useSidebarData(sidebarData)
 
-    // Handle action clicks
-    const handleActionClick = useCallback((
-        action: MenuAction,
-        context?: { group?: SbGroup; menu?: SbMenu; submenu?: SbSubMenu }
-    ) => {
-        console.log('Action clicked:', action, 'Context:', context)
+    // Call the handlers
+    const { handleMenuClick } = useMenuHandler()
+    const { handleActionClick } = useActionHandler()
 
-        // Handle custom actions based on customHandler
-        switch (action.customHandler) {
-            case 'refreshAllDashboards':
-                // Implement refresh all dashboards logic
-                console.log('Refreshing all dashboards...')
-                break
-
-            case 'exportDashboardData':
-                // Implement export dashboard data logic
-                console.log('Exporting dashboard data...')
-                break
-
-            case 'refreshOverview':
-                // Implement refresh overview logic
-                console.log('Refreshing overview...')
-                break
-
-            case 'openInviteModal':
-                // Implement invite user modal logic
-                console.log('Opening invite modal...')
-                break
-
-            case 'openUserForm':
-                // Implement add user form logic
-                console.log('Opening user form...')
-                break
-
-            case 'resetAllSettings':
-                // Implement reset settings logic
-                console.log('Resetting all settings...')
-                break
-
-            default:
-                console.log('Unhandled action:', action.customHandler)
-        }
-    }, [])
+    const side: 'left' | 'right' = rtl ? 'right' : 'left';
 
     return (
         <Sidebar
             variant="sidebar"
-            side="left"
-            collapsible="icon"
+            side={side}
+            collapsible="icon" // This is key for mobile - use 'offcanvas' instead of 'icon'
         >
             <SidebarHeader>
                 <OrgSidebar organisation={OrganisationData} />
             </SidebarHeader>
 
             <AppSidebarContent
-                data={sidebarData}
+                data={processedData}
                 currentPath={pathname}
                 onMenuClick={handleMenuClick}
                 onActionClick={handleActionClick}
