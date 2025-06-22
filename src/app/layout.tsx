@@ -4,8 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
-import TopLoader from "@/components/shared/top-loader";
-import { getUserLocale } from "@/store/locale-store";
+import ProgressBar from "@/components/common/progress-bar";
+import { getUserLocale } from "@/stores/locale.store";
 
 import "./globals.css";
 import React from "react";
@@ -73,7 +73,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang={lang} dir={dir} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
-        <TopLoader />
+        <ProgressBar />
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

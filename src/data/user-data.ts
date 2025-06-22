@@ -1,4 +1,4 @@
-import { TypeUserData } from "@/types/user-data"
+import { TypeUserData } from "@/types/user.types"
 const UserData: TypeUserData = {
     id: '1',
     name: 'Foulene Ben Foulene',

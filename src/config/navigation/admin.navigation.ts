@@ -1,0 +1,57 @@
+import type { NavigationConfig } from '@/types/navigation.types';
+import { gethrefById } from '../routes';
+
+export const adminNavigation: NavigationConfig[] = [
+    {
+        id: 'group-dashboard',
+        children: [
+            {
+                id: 'dashboard',
+                icon: { name: 'WindowsLogoIcon', weight: 'duotone' },
+                href: gethrefById('dashboard', 'admin'),
+                namespace: 'sidebar.route',
+            },
+        ],
+    },
+    {
+        id: 'group-users',
+        children: [
+            {
+                id: 'users',
+                icon: { name: 'UsersIcon', weight: 'duotone' },
+                href: gethrefById('users'),
+                namespace: 'sidebar.route',
+            },
+            {
+                id: 'roles&permissions',
+                icon: { name: 'ShieldIcon', weight: 'duotone' },
+                namespace: 'sidebar.menu',
+                children: [
+                    {
+                        id: 'roles',
+                        href: gethrefById('roles'),
+                        icon: { name: 'DetectiveIcon', weight: 'duotone' },
+                        namespace: 'sidebar.route',
+                    },
+                    {
+                        id: 'permissions',
+                        href: gethrefById('permissions'),
+                        icon: { name: 'ListChecksIcon', weight: 'duotone' },
+                        namespace: 'sidebar.route',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'group-settings',
+        children: [
+            {
+                id: 'settings',
+                icon: { name: 'GearIcon', weight: 'duotone' },
+                href: gethrefById('settings'),
+                namespace: 'sidebar.route',
+            },
+        ],
+    },
+];

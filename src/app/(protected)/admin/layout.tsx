@@ -1,13 +1,13 @@
 // src/app/admin/layout.tsx
-import { cookies, headers } from 'next/headers';
-import AppSidebar from '@/components/layout/admin/sidebar/app-sidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { AppNavbar } from "@/components/layout/admin/navbar/app-navbar";
-import { isRTL } from "@/store/locale-store";
-import { getIsMobileFromCookies } from "@/hooks/use-mobile";
+import {cookies, headers} from 'next/headers';
+import {VerticalNavigation} from "@/components/features/navigation/vertical-navigation";
+import {SidebarProvider, SidebarInset} from '@/components/ui/sidebar';
+import {AppNavbar} from "@/components/features/navbar/app-navbar";
+import {isRTL} from "@/stores/locale.store";
+import {getIsMobileFromCookies} from "@/hooks/use-mobile";
 import React from "react";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({children}: { children: React.ReactNode }) {
     const rtl = await isRTL();
 
     let sidebarOpen = true;
@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         const cookieHeader = headersList.get('cookie') || '';
         isMobileSSR = getIsMobileFromCookies(cookieHeader);
 
-        console.log('🏗️ AdminLayout SSR:', { sidebarOpen, isMobileSSR, rtl });
+        console.log('🏗️ AdminLayout SSR:', {sidebarOpen, isMobileSSR, rtl});
     } catch (error) {
         console.error('Cookie state fetch failed:', error);
     }
@@ -33,10 +33,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return (
         <SidebarProvider defaultOpen={sidebarOpen}>
             <div className="flex h-screen w-full overflow-hidden">
-                <AppSidebar rtl={rtl} />
+                <VerticalNavigation rtl={rtl}/>
                 <SidebarInset className="flex flex-1 flex-col min-w-0">
                     <div className="w-full px-4 sm:px-6 lg:px-8">
-                        <AppNavbar rtl={rtl} isMobileSSR={isMobileSSR} />
+                        <AppNavbar rtl={rtl} isMobileSSR={isMobileSSR}/>
                     </div>
                     <main className="flex-1 overflow-auto px-4 py-4 sm:px-6 lg:px-8">
                         {children}

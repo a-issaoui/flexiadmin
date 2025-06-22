@@ -54,7 +54,8 @@
     }
   },
   "actions": {
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "export-data": "export data"
   },
   "UserDropdown": {
     "account": "Account",

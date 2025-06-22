@@ -1,4 +1,4 @@
-import { TypeOrganisationData } from "@/types/organisation-data"
+import { TypeOrganisationData } from "@/types/organization.types"
 
 const OrganisationData: TypeOrganisationData ={
     name: 'Ecole Ennour',

@@ -4,7 +4,6 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-    // Enable experimental features for better performance
     experimental: {
         optimizePackageImports: [
             '@phosphor-icons/react',
@@ -13,7 +12,6 @@ const nextConfig: NextConfig = {
             '@radix-ui/react-avatar',
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-sidebarData-menu',
             '@radix-ui/react-select',
             '@radix-ui/react-separator',
             '@radix-ui/react-slot',
@@ -21,74 +19,55 @@ const nextConfig: NextConfig = {
         ],
     },
 
-    // Turbopack configuration (moved from experimental)
-    turbopack: {
-        rules: {
-            '*.svg': {
-                loaders: ['@svgr/webpack'],
-                as: '*.js',
-            },
-        },
+    webpack(config) {
+        config.module.rules.push({
+            test: /\.svg$/i,
+            issuer: /\.[jt]sx?$/,
+            use: ['@svgr/webpack'],
+        });
+
+        return config; // ✅ IMPORTANT!
     },
 
-
-
-    // Image optimization
     images: {
         formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-        minimumCacheTTL: 31536000, // 1 year
+        minimumCacheTTL: 31536000,
     },
 
-    // Improve development experience
     typescript: {
         ignoreBuildErrors: false,
     },
+
     eslint: {
         ignoreDuringBuilds: false,
     },
 
+    compress: true,
+    poweredByHeader: false,
+    output: 'standalone',
 
-    // Security headers
+    productionBrowserSourceMaps: process.env.NODE_ENV === 'development',
+
+    logging: {
+        fetches: {
+            fullUrl: process.env.NODE_ENV === 'development',
+        },
+    },
+
     async headers() {
         return [
             {
                 source: '/(.*)',
                 headers: [
-                    {
-                        key: 'X-Frame-Options',
-                        value: 'DENY',
-                    },
-                    {
-                        key: 'X-Content-Type-Options',
-                        value: 'nosniff',
-                    },
-                    {
-                        key: 'Referrer-Policy',
-                        value: 'strict-origin-when-cross-origin',
-                    },
-                    {
-                        key: 'Permissions-Policy',
-                        value: 'camera=(), microphone=(), geolocation=()',
-                    },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
                 ],
             },
         ];
-    },
-
-    // Optimizations
-    compress: true,
-    poweredByHeader: false,
-
-    // Output optimization
-    output: 'standalone',
-
-    // Logging for better debugging
-    logging: {
-        fetches: {
-            fullUrl: process.env.NODE_ENV === 'development',
-        },
     },
 };
 
