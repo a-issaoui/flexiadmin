@@ -164,3 +164,6 @@
     @apply bg-background text-foreground;
   }
 }
+* {
+  /*border: 1px solid red; /* Change color/thickness as needed */
+}

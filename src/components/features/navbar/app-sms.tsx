@@ -1,7 +1,7 @@
 // AppSms.jsx - Refactored with Button + Framer Motion
 'use client';
 
-import {useState, useEffect, useMemo, useCallback} from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import {motion, AnimatePresence} from 'framer-motion';
 import {Button} from '@/components/ui/button';
 import {Icon} from '@/components/common/icon';
@@ -51,7 +51,7 @@ export default function AppSms() {
         return (
             <Skeleton
                 aria-hidden
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
             />
         );
     }

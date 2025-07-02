@@ -180,7 +180,7 @@ const AppNotification = memo(() => {
         return (
             <Skeleton
                 aria-hidden
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
             />
         );
     }
@@ -264,7 +264,7 @@ const AppNotification = memo(() => {
                                         className={cn(
                                             "flex items-start gap-3 p-3 cursor-pointer transition-all duration-150 rounded-md mx-1 my-0.5 min-h-[60px]",
                                             !read && "bg-primary/5 border border-primary/10",
-                                            "hover:bg-accent/50 hover:scale-[1.01]",
+                                            "hover:bg-accent/50",
                                             priority === 'high' && !read && "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-900/20"
                                         )}
                                     >

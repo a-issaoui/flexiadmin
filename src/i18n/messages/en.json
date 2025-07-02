@@ -17,10 +17,10 @@
     "group": {
       "group-dashboard": "Dashboard",
       "group-users": "Users Management",
-      "group-settings": "Settings "
+      "group-settings": "Settings"
     },
     "menu": {
-      "roles&permissions": "Roles & permissions"
+      "roles&permissions": "Roles & Permissions"
     },
     "route": {
       "home": {

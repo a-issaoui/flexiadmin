@@ -1,7 +1,3 @@
-// ============================================================================
-// src/components/layout/admin/sidebar/nav-organization.tsx
-// ============================================================================
-
 'use client'
 
 import * as React from 'react'
@@ -30,7 +26,7 @@ export function NavOrganization({ organisation }: OrgSidebarProps) {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton size="lg" className="gap-2">
+                <SidebarMenuButton size="lg" className="gap-2 ">
                     <Avatar className="h-8 w-8 rounded-md">
                         {organisation.imageUrl && (
                             <AvatarImage src={organisation.imageUrl} alt={organisation.name} />
@@ -39,7 +35,7 @@ export function NavOrganization({ organisation }: OrgSidebarProps) {
                             {initials}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col leading-none">
+                    <div className="flex flex-col leading-none text-start">
                         <span className="font-semibold text-sm truncate" title={organisation.name}>
                             {organisation.name}
                         </span>

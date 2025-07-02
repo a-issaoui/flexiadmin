@@ -13,7 +13,7 @@ import NavActions from '@/components/features/navigation/vertical-navigation/com
 import NavRecursiveItem from '@/components/features/navigation/vertical-navigation/components/nav-recursive-item';
 import { Icon } from '@/components/common/icon';
 import { cn } from '@/lib/utils';
-import { getTranslatedText, getTooltipText } from '@/lib/translation';
+import { getTranslatedText } from '@/lib/translation';
 
 export type NavContentProps = {
     data: NavigationConfig[];
@@ -34,7 +34,7 @@ const GroupRenderer: React.FC<{
             {group.icon && (
                 <Icon {...group.icon} size={12} weight={group.icon.weight ?? 'regular'} className="flex-shrink-0" />
             )}
-            <span className="flex-1 truncate text-start text-xs leading-none" style={{ color: group.color }}>
+            <span className="flex-1 truncate text-start text-xs " style={{ color: group.color }}>
                 {getTranslatedText(t, group, 'label', 'group')}
             </span>
             {group.actions && (
@@ -46,8 +46,16 @@ const GroupRenderer: React.FC<{
                 <Icon
                     name="CaretRightIcon"
                     size={12}
-                    className={cn('transition-transform flex-shrink-0', isOpen && 'rotate-90')}
+                    className={cn('transition-transform flex-shrink-0',
+                        isOpen
+                            ? // if open, rotate 90deg in LTR, -90deg in RTL
+                            'ltr:rotate-90 rtl:rotate-90'
+                            : // if closed, no rotation in LTR, 180deg flip in RTL
+                            'ltr:rotate-0 rtl:rotate-180'
+
+                    )}
                 />
+
             )}
         </span>
     );

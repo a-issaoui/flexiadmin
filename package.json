@@ -5,13 +5,13 @@
   "scripts": {
     "dev": "next dev --turbopack --port 3180",
     "build": "next build",
-    "start": "next start",
+    "start": "next start  --port 3180",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
-    "analyze": "ANALYZE=true npm run build",
+    "analyze": "ANALYZE=true pnpm run build",
     "clean": "rm -rf .next",
-    "postinstall": "npm run type-check"
+    "postinstall": "pnpm run type-check"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.3.3",

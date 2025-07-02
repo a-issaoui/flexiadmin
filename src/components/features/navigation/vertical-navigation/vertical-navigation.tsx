@@ -2,7 +2,7 @@
 import React from 'react';
 import { NavContent } from '@/components/features/navigation/vertical-navigation/components/nav-content'
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
+import {Sidebar, SidebarFooter, SidebarHeader, SidebarRail} from "@/components/ui/sidebar";
 import { NavOrganization } from "@/components/features/navigation/vertical-navigation/components/nav-organization";
 import { OrganisationData } from "@/data/organisation-data";
 import { NavUser } from "@/components/features/navigation/vertical-navigation/components/nav-user";
@@ -41,7 +41,6 @@ export default function VerticalNavigation({ rtl }: VerticalNavigationProps) {
             <SidebarFooter>
                 <NavUser user={UserData} />
             </SidebarFooter>
-
             <SidebarRail />
         </Sidebar>
     );

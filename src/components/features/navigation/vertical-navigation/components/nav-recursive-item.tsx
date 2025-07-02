@@ -16,6 +16,7 @@ import NavBadge from '@/components/features/navigation/vertical-navigation/compo
 import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
 import {getTooltipText, getTranslatedText} from '@/lib/translation';
 
+
 interface NavRecursiveItemProps {
     item: NavigationItem;
     currentPath: string;
@@ -91,7 +92,14 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({ item, currentPath, 
             {hasChildren && (
                 <Icon
                     name="CaretRightIcon"
-                    className={cn('transition-transform flex-shrink-0', isOpen && 'rotate-90')}
+                    className={cn(
+                        'transition-transform flex-shrink-0',
+                        isOpen
+                            ? // if open, rotate 90deg in LTR, -90deg in RTL
+                            'ltr:rotate-90 rtl:rotate-90'
+                            : // if closed, no rotation in LTR, 180deg flip in RTL
+                            'ltr:rotate-0 rtl:rotate-180'
+                    )}
                 />
             )}
         </>

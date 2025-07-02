@@ -4,6 +4,7 @@ import { gethrefById } from '../routes';
 export const adminNavigation: NavigationConfig[] = [
     {
         id: 'group-dashboard',
+        label: 'Dashboard',
         children: [
             {
                 id: 'dashboard',
@@ -15,6 +16,7 @@ export const adminNavigation: NavigationConfig[] = [
     },
     {
         id: 'group-users',
+        label: 'Users',
         children: [
             {
                 id: 'users',
@@ -45,6 +47,7 @@ export const adminNavigation: NavigationConfig[] = [
     },
     {
         id: 'group-settings',
+        label: 'Settings',
         children: [
             {
                 id: 'settings',

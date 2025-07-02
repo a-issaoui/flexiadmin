@@ -44,7 +44,7 @@ export function AppNavbar({ rtl, isMobileSSR }: AppNavbarProps) {
                 aria-label="Main navigation"
             >
                 <div className='flex items-center gap-2 sm:gap-3'>
-                    <SidebarTrigger rtl={rtl} isMobileSSR={isMobileSSR} />
+                    <SidebarTrigger rtl={rtl} isMobileSSR={isMobileSSR} className="-translate-x-4 rtl:translate-x-4"/>
                     <Separator orientation='vertical' className='me-2 h-4 opacity-60'/>
                 </div>
 

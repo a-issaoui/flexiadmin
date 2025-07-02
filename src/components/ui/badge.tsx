@@ -3,37 +3,25 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// --- Color Utility Functions ---
+// --- Color Utilities ---
 
-/**
- * Validates if a string is a 6-digit hex color.
- */
 const isValidHexColor = (color: string): boolean =>
     /^#[0-9A-Fa-f]{6}$/.test(color);
 
-/**
- * Detects if a string is a valid CSS color name.
- */
 const isValidCssColorName = (color: string): boolean => {
     const s = new Option().style;
     s.color = color;
     return !!s.color;
 };
 
-/**
- * Calculates a contrasting text color (black or white) for a given hex background.
- */
-const getContrastingTextColor = (hexColor: string): string => {
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+const getContrastingTextColor = (hex: string): string => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
     return yiq >= 128 ? "#000000" : "#FFFFFF";
 };
 
-/**
- * Converts a hex color string to an RGBA color string.
- */
 const hexToRgba = (hex: string, alpha: number): string => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -41,10 +29,10 @@ const hexToRgba = (hex: string, alpha: number): string => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-// --- Badge Styling Variants ---
+// --- Badge Variants ---
 
 const badgeVariants = cva(
-    "inline-flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden border transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 gap-0.5 whitespace-nowrap [&>svg]:size-2.5",
+    "inline-flex items-center justify-center gap-1 text-xs font-medium shrink-0 overflow-hidden border transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 whitespace-nowrap rtl:flex-row-reverse [&>svg]:size-2.5",
     {
         variants: {
             variant: {
@@ -65,7 +53,7 @@ const badgeVariants = cva(
     }
 );
 
-// --- Badge Component ---
+// --- Badge Component Types ---
 
 export type BadgeVariant = "default" | "outline" | "ghost";
 export type BadgeShape = "default" | "square" | "circular";
@@ -73,8 +61,10 @@ export type BadgeShape = "default" | "square" | "circular";
 export type BadgeProps = React.ComponentProps<"span"> &
     VariantProps<typeof badgeVariants> & {
     asChild?: boolean;
-    color?: string; // Can be hex (#RRGGBB) or named color (e.g., "red")
+    color?: string;
 };
+
+// --- Badge Component ---
 
 const Badge = React.memo(function Badge({
                                             className,
@@ -88,33 +78,33 @@ const Badge = React.memo(function Badge({
     const Comp = asChild ? Slot : "span";
 
     const customStyles = React.useMemo(() => {
-        const baseStyles = style || {};
+        const base = style || {};
 
-        if (!color) return baseStyles;
+        if (!color) return base;
 
         const isHex = isValidHexColor(color);
         const isNamed = isValidCssColorName(color);
 
-        if (!isHex && !isNamed) return baseStyles;
+        if (!isHex && !isNamed) return base;
 
         switch (variant) {
             case "outline":
                 return {
-                    ...baseStyles,
+                    ...base,
                     backgroundColor: "transparent",
                     color,
                     borderColor: color,
                 };
             case "ghost":
                 return {
-                    ...baseStyles,
+                    ...base,
                     backgroundColor: isHex ? hexToRgba(color, 0.15) : undefined,
                     color,
                     borderColor: "transparent",
                 };
             default:
                 return {
-                    ...baseStyles,
+                    ...base,
                     backgroundColor: color,
                     color: isHex ? getContrastingTextColor(color) : undefined,
                     borderColor: "transparent",

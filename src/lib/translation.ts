@@ -5,13 +5,17 @@ export function getTranslationKey(
     type: 'label' | 'tooltip' | 'title' | 'description' = 'label',
     context?: 'group' | 'item'
 ): string {
-    // Handle group translations
     if (context === 'group') {
         return `sidebar.group.${item.id}`;
     }
 
-    // Handle item translations based on namespace
-    const ns = item.namespace ?? 'sidebar.route'; // default namespace fallback
+    // Default namespace
+    const ns = item.namespace ?? 'sidebar.route';
+
+    // For items that don't need nested keys (like menu items)
+    if (ns === 'sidebar.menu') {
+        return `${ns}.${item.id}`;
+    }
 
     switch (type) {
         case 'title':
@@ -19,13 +23,11 @@ export function getTranslationKey(
         case 'description':
             return `${ns}.${item.id}.description`;
         case 'tooltip':
-            // For tooltips, try description first, then title
             return `${ns}.${item.id}.description`;
         case 'label':
         default:
-            // For menu items without children, use the key directly
-            // For route items, this will be handled by the component logic
-            return ns.includes('menu') ? `${ns}.${item.id}` : `${ns}.${item.id}.title`;
+            // Always return title key to get a string
+            return `${ns}.${item.id}.title`;
     }
 }
 
@@ -36,20 +38,16 @@ export function getTranslatedText(
     type: 'label' | 'tooltip' | 'title' | 'description' = 'label',
     context?: 'group' | 'item'
 ): string {
-    try {
-        const key = getTranslationKey(item, type, context);
-        const fallback = item.label ?? item.id ?? 'Unnamed';
+    const key = getTranslationKey(item, type, context);
+    const fallback = item.label ?? item.id ?? 'Unnamed';
 
-        return t(key, { defaultValue: fallback });
+    try {
+        const translated = t(key, { defaultValue: fallback });
+        // If translation returns the key itself, use fallback
+        return translated === key ? fallback : translated;
     } catch (error) {
-        console.error('Translation error in getTranslatedText:', {
-            error,
-            item: item.id,
-            type,
-            context,
-            namespace: item.namespace
-        });
-        return item.label ?? item.id ?? 'Unnamed';
+        console.warn(`Translation error for key: ${key}`, error);
+        return fallback;
     }
 }
 
@@ -59,128 +57,52 @@ export function getTooltipText(
     item: NavigationItem,
     checkTranslationExists?: (key: string) => boolean
 ): string {
-    try {
-        const ns = item.namespace ?? 'sidebar.route';
+    const ns = item.namespace ?? 'sidebar.route';
+    const fallback = item.label ?? item.id ?? 'Unnamed';
 
-        // If we have a way to check if translation exists, use it for smart fallback
-        if (checkTranslationExists) {
-            try {
-                // 1. Try custom tooltip first
-                if (item.tooltip) {
-                    const tooltipKey = `${ns}.${item.tooltip}.tooltip`;
-                    if (checkTranslationExists(tooltipKey)) {
-                        return t(tooltipKey);
-                    }
-                }
-
-                // 2. Try title (but only for route items, not menu items)
-                if (!ns.includes('menu')) {
-                    const titleKey = `${ns}.${item.id}.title`;
-                    if (checkTranslationExists(titleKey)) {
-                        return t(titleKey);
-                    }
-                }
-
-                // 3. Try direct label (for menu items)
-                const labelKey = `${ns}.${item.id}`;
-                if (checkTranslationExists(labelKey)) {
-                    return t(labelKey);
-                }
-
-                // 4. Try description last (but only for route items, not menu items)
-                if (!ns.includes('menu')) {
-                    const descriptionKey = `${ns}.${item.id}.description`;
-                    if (checkTranslationExists(descriptionKey)) {
-                        return t(descriptionKey);
-                    }
-                }
-            } catch (error) {
-                console.error('Translation error in getTooltipText (with checker):', {
-                    error,
-                    item: item.id,
-                    namespace: ns,
-                    hasTooltip: !!item.tooltip
-                });
-            }
-        } else {
-            // Fallback approach using next-intl's behavior
-            // We'll try each key and see what we get back
-
-            try {
-                // 1. Try custom tooltip first
-                if (item.tooltip) {
-                    const tooltipKey = `${ns}.${item.tooltip}.tooltip`;
-                    const tooltipResult = t(tooltipKey, { defaultValue: null });
-                    if (tooltipResult !== null && tooltipResult !== tooltipKey) {
-                        return tooltipResult;
-                    }
-                }
-            } catch (error) {
-                console.error('Translation error for custom tooltip:', {
-                    error,
-                    item: item.id,
-                    tooltip: item.tooltip,
-                    key: `${ns}.${item.tooltip}.tooltip`
-                });
-            }
-
-            try {
-                // 2. Try title (but only for route items, not menu items)
-                if (!ns.includes('menu')) {
-                    const titleKey = `${ns}.${item.id}.title`;
-                    const titleResult = t(titleKey, { defaultValue: null });
-                    if (titleResult !== null && titleResult !== titleKey) {
-                        return titleResult;
-                    }
-                }
-            } catch (error) {
-                console.error('Translation error for title:', {
-                    error,
-                    item: item.id,
-                    key: `${ns}.${item.id}.title`
-                });
-            }
-
-            try {
-                // 3. Try direct label (for menu items)
-                const labelKey = `${ns}.${item.id}`;
-                const labelResult = t(labelKey, { defaultValue: null });
-                if (labelResult !== null && labelResult !== labelKey) {
-                    return labelResult;
-                }
-            } catch (error) {
-                console.error('Translation error for label:', {
-                    error,
-                    item: item.id,
-                    key: `${ns}.${item.id}`
-                });
-            }
-
-            try {
-                // 4. Try description last (but only for route items, not menu items)
-                if (!ns.includes('menu')) {
-                    const descriptionKey = `${ns}.${item.id}.description`;
-                    const descriptionResult = t(descriptionKey, { defaultValue: null });
-                    if (descriptionResult !== null && descriptionResult !== descriptionKey) {
-                        return descriptionResult;
-                    }
-                }
-            } catch (error) {
-                console.error('Translation error for description:', {
-                    error,
-                    item: item.id,
-                    key: `${ns}.${item.id}.description`
-                });
-            }
+    // For menu items, just use the simple key
+    if (ns === 'sidebar.menu') {
+        try {
+            const translated = t(`${ns}.${item.id}`, { defaultValue: fallback });
+            return translated === `${ns}.${item.id}` ? fallback : translated;
+        } catch (error) {
+            console.warn(`Translation error for menu item: ${item.id}`, error);
+            return fallback;
         }
-    } catch (error) {
-        console.error('Critical translation error in getTooltipText:', {
-            error,
-            item: item.id,
-            namespace: item.namespace
-        });
     }
 
-    // Final fallback if nothing is found
-    return item.label ?? item.id ?? 'Unnamed';
+    // For route items, try the description key
+    const descriptionKey = `${ns}.${item.id}.description`;
+    const titleKey = `${ns}.${item.id}.title`;
+
+    // If we have a way to check translation existence
+    if (checkTranslationExists) {
+        if (checkTranslationExists(descriptionKey)) {
+            return t(descriptionKey);
+        }
+        if (checkTranslationExists(titleKey)) {
+            return t(titleKey);
+        }
+        return fallback;
+    }
+
+    // Otherwise, try with error handling
+    try {
+        // Try description first for tooltips
+        const description = t(descriptionKey, { defaultValue: null });
+        if (description && description !== descriptionKey) {
+            return description;
+        }
+
+        // Then try title
+        const title = t(titleKey, { defaultValue: null });
+        if (title && title !== titleKey) {
+            return title;
+        }
+
+        return fallback;
+    } catch (error) {
+        console.warn(`Translation error for tooltip: ${item.id}`, error);
+        return fallback;
+    }
 }

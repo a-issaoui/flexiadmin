@@ -5,6 +5,7 @@ import {SidebarProvider, SidebarInset} from '@/components/ui/sidebar';
 import {AppNavbar} from "@/components/features/navbar/app-navbar";
 import {isRTL} from "@/stores/locale.store";
 import {getIsMobileFromCookies} from "@/hooks/use-mobile";
+import {PageHeader} from "@/components/common/page-header";
 import React from "react";
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
@@ -39,6 +40,10 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <AppNavbar rtl={rtl} isMobileSSR={isMobileSSR}/>
                     </div>
                     <main className="flex-1 overflow-auto px-4 py-4 sm:px-6 lg:px-8">
+                        <PageHeader
+                            rtl={rtl}
+                            showBreadcrumb={false} // Dashboard doesn't need breadcrumb
+                        />
                         {children}
                     </main>
                 </SidebarInset>

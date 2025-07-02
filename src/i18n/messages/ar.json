@@ -16,7 +16,7 @@
   "sidebar": {
     "group": {
       "group-dashboard": "لوحة التحكم",
-      "group-users": "المستخدمون",
+      "group-users": "إدارة المستخدمين",
       "group-settings": "الإعدادات"
     },
     "menu": {
@@ -54,7 +54,8 @@
     }
   },
   "actions": {
-    "refresh": "تحديث"
+    "refresh": "تحديث",
+    "export-data": "تصدير البيانات"
   },
   "UserDropdown": {
     "account": "الحساب",

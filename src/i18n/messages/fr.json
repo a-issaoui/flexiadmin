@@ -11,12 +11,12 @@
     "submit": "Soumettre",
     "close": "Fermer",
     "home": "Accueil",
-    "breadcrumb": "Fil d’Ariane"
+    "breadcrumb": "Fil d'Ariane"
   },
   "sidebar": {
     "group": {
       "group-dashboard": "Tableau de bord",
-      "group-users": "Utilisateurs",
+      "group-users": "Gestion des utilisateurs",
       "group-settings": "Paramètres"
     },
     "menu": {
@@ -54,7 +54,8 @@
     }
   },
   "actions": {
-    "refresh": "Actualiser"
+    "refresh": "Actualiser",
+    "export-data": "exporter les données"
   },
   "UserDropdown": {
     "account": "Compte",
