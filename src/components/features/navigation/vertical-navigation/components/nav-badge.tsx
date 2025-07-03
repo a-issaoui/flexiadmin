@@ -7,7 +7,7 @@ type Props = {
 };
 
 const NavBadge: React.FC<Props> = ({ badge }) => {
-    const { value, color, variant = 'default', shape = 'default' } = badge;
+    const { value, color ='#10b981', variant = 'default', shape = 'default' } = badge;
 
     if (value === null || value === undefined) return null;
 

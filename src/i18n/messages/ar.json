@@ -1,65 +1,208 @@
 {
   "common": {
-    "welcome": "مرحبًا",
+    "welcome": "مرحبا",
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "save": "حفظ",
     "cancel": "إلغاء",
     "delete": "حذف",
     "edit": "تعديل",
-    "loading": "جارٍ التحميل...",
+    "loading": "جار التحميل...",
     "submit": "إرسال",
     "close": "إغلاق",
-    "home": "الصفحة الرئيسية",
+    "home": "الرئيسية",
     "breadcrumb": "مسار التنقل"
   },
-  "sidebar": {
-    "group": {
-      "group-dashboard": "لوحة التحكم",
-      "group-users": "إدارة المستخدمين",
-      "group-settings": "الإعدادات"
+  "navigation": {
+    "admin": {
+      "groups": {
+        "group-dashboard": "لوحة التحكم",
+        "group-users": "إدارة المستخدمين",
+        "group-settings": "الإعدادات",
+        "userManagement": "إدارة المستخدمين",
+        "overview": "نظرة عامة",
+        "system": "النظام"
+      },
+      "items": {
+        "dashboard": "لوحة التحكم",
+        "users": "المستخدمون",
+        "roles&permissions": "الأدوار والصلاحيات",
+        "roles": "الأدوار",
+        "permissions": "الصلاحيات",
+        "settings": "الإعدادات",
+        "analytics": "التحليلات"
+      }
     },
-    "menu": {
-      "roles&permissions": "الأدوار والصلاحيات"
+    "teacher": {
+      "groups": {
+        "overview": "نظرة عامة",
+        "teaching": "التدريس",
+        "assessment": "التقييم"
+      },
+      "items": {
+        "dashboard": "لوحة التحكم",
+        "schedule": "الجدول",
+        "classes": "فصلي",
+        "students": "الطلاب",
+        "assignments": "الواجبات",
+        "gradebook": "سجل الدرجات",
+        "reports": "التقارير"
+      }
+    },
+    "student": {
+      "groups": {
+        "overview": "نظرة عامة",
+        "academics": "الأكاديميات"
+      },
+      "items": {
+        "dashboard": "لوحة التحكم",
+        "schedule": "الجدول",
+        "classes": "فصلي",
+        "assignments": "الواجبات",
+        "grades": "الدرجات"
+      }
+    },
+    "parent": {
+      "groups": {
+        "overview": "نظرة عامة",
+        "children": "الأطفال",
+        "communication": "التواصل"
+      },
+      "items": {
+        "dashboard": "لوحة التحكم",
+        "children": "أطفالي",
+        "progress": "التقدم الأكاديمي",
+        "messages": "الرسائل",
+        "meetings": "الاجتماعات"
+      }
     }
   },
-  "routes": {
-    "home": {
-      "title": "الصفحة الرئيسية",
-      "description": "صفحة البداية"
+  "pages": {
+    "admin": {
+      "dashboard": {
+        "title": "لوحة التحكم",
+        "description": "نظرة عامة وإحصائيات النظام"
+      },
+      "users": {
+        "title": "المستخدمون",
+        "description": "قائمة وإدارة مستخدمي التطبيق"
+      },
+      "roles": {
+        "title": "الأدوار",
+        "description": "إدارة أدوار المستخدمين ومستويات الوصول"
+      },
+      "permissions": {
+        "title": "الصلاحيات",
+        "description": "تحديد وتعيين الصلاحيات للأدوار"
+      },
+      "settings": {
+        "title": "الإعدادات",
+        "description": "إدارة إعدادات التطبيق وتفضيلاته"
+      }
     },
-    "dashboard": {
-      "title": "لوحة التحكم",
-      "description": "نظرة عامة وإحصائيات النظام"
+    "teacher": {
+      "dashboard": {
+        "title": "لوحة تحكم المعلم",
+        "description": "نظرتك العامة للتدريس والإجراءات السريعة"
+      },
+      "schedule": {
+        "title": "جدولي",
+        "description": "عرض جدول التدريس والتقويم الخاص بك"
+      },
+      "classes": {
+        "title": "فصلي",
+        "description": "إدارة فصولك وطلابك"
+      },
+      "students": {
+        "title": "الطلاب",
+        "description": "عرض وإدارة معلومات الطلاب"
+      },
+      "assignments": {
+        "title": "الواجبات",
+        "description": "إنشاء وإدارة الواجبات"
+      },
+      "gradebook": {
+        "title": "سجل الدرجات",
+        "description": "تسجيل وتتبع درجات الطلاب"
+      },
+      "reports": {
+        "title": "تقارير الفصل",
+        "description": "إنشاء وعرض تقارير أداء الفصل"
+      }
     },
-    "settings": {
-      "title": "الإعدادات",
-      "description": "إدارة إعدادات التطبيق والتفضيلات"
+    "student": {
+      "dashboard": {
+        "title": "لوحة تحكم الطالب",
+        "description": "نظرتك الأكاديمية والمهام القادمة"
+      },
+      "schedule": {
+        "title": "جدولي",
+        "description": "عرض جدول الفصول والتقويم الأكاديمي"
+      },
+      "classes": {
+        "title": "فصلي",
+        "description": "عرض الفصول التي قمت بالتسجيل بها"
+      },
+      "assignments": {
+        "title": "واجباتي",
+        "description": "عرض وتسليم الواجبات"
+      },
+      "grades": {
+        "title": "درجاتي",
+        "description": "عرض تقدمك الأكاديمي ودرجاتك"
+      }
     },
-    "profile": {
-      "title": "الملف الشخصي",
-      "description": "عرض وتعديل معلوماتك الشخصية وتفضيلاتك"
+    "parent": {
+      "dashboard": {
+        "title": "لوحة تحكم الوالدين",
+        "description": "نظرة عامة على تقدم أطفالك الأكاديمي"
+      },
+      "children": {
+        "title": "أطفالي",
+        "description": "عرض معلومات وتقدم أطفالك"
+      },
+      "progress": {
+        "title": "التقدم الأكاديمي",
+        "description": "متابعة الأداء الأكاديمي لأطفالك"
+      },
+      "messages": {
+        "title": "الرسائل",
+        "description": "التواصل مع المعلمين والمدرسة"
+      },
+      "meetings": {
+        "title": "الاجتماعات",
+        "description": "جدولة وإدارة اجتماعات أولياء الأمور والمعلمين"
+      }
     },
-    "users": {
-      "title": "المستخدمون",
-      "description": "عرض وإدارة مستخدمي التطبيق"
-    },
-    "roles": {
-      "title": "الأدوار",
-      "description": "إدارة أدوار المستخدمين ومستويات الوصول"
-    },
-    "permissions": {
-      "title": "الصلاحيات",
-      "description": "تحديد وتعيين الصلاحيات للأدوار"
+    "global": {
+      "home": {
+        "title": "الرئيسية",
+        "description": "مرحباً بك في التطبيق"
+      },
+      "profile": {
+        "title": "الملف الشخصي",
+        "description": "عرض وتعديل معلوماتك الشخصية وتفضيلاتك"
+      }
     }
   },
   "actions": {
     "refresh": "تحديث",
-    "export-data": "تصدير البيانات"
+    "refresh-analytics": "تحديث التحليلات",
+    "export-data": "تصدير البيانات",
+    "add-user": "إضافة مستخدم",
+    "export-users": "تصدير المستخدمين",
+    "audit-permissions": "مراجعة الصلاحيات",
+    "backup-settings": "نسخ احتياطي للإعدادات",
+    "reset-settings": "إعادة الإعدادات للوضع الافتراضي",
+    "bulk-actions": "إجراءات مجمعة",
+    "quick-grade": "تقييم سريع",
+    "create-class": "إنشاء فصل جديد",
+    "export-grades": "تصدير الدرجات",
+    "grade-calculator": "حاسبة الدرجات"
   },
   "UserDropdown": {
     "account": "الحساب",
-    "billing": "الفوترة",
+    "billing": "الفواتير",
     "notifications": "الإشعارات",
     "logout": "تسجيل الخروج",
     "guestNamePlaceholder": "مستخدم زائر"

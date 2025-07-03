@@ -1,3 +1,5 @@
+// src/components/features/navigation/vertical-navigation/components/nav-content.tsx
+
 import React, { memo, useState } from 'react';
 import {
     SidebarContent,
@@ -7,55 +9,71 @@ import {
     SidebarMenu,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useTranslations } from 'next-intl';
-import type { NavigationConfig, NavigationItem } from '@/types/navigation.types';
-import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
+import type { ProcessedNavigationGroup, ProcessedNavigationItem } from '@/config/navigation/types';
 import NavRecursiveItem from '@/components/features/navigation/vertical-navigation/components/nav-recursive-item';
+import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
 import { Icon } from '@/components/common/icon';
 import { cn } from '@/lib/utils';
-import { getTranslatedText } from '@/lib/translation';
 
 export type NavContentProps = {
-    data: NavigationConfig[];
+    navigationGroups: ProcessedNavigationGroup[];
     currentPath: string;
-    onMenuClick: (item: NavigationItem, event?: React.MouseEvent) => void;
+    onMenuClick: (item: ProcessedNavigationItem, event?: React.MouseEvent) => void;
 };
 
+/**
+ * Enhanced group renderer with full feature support including colors, icons, and actions
+ */
 const GroupRenderer: React.FC<{
-    group: NavigationConfig;
+    group: ProcessedNavigationGroup;
     currentPath: string;
-    onMenuClick: (item: NavigationItem, event?: React.MouseEvent) => void;
+    onMenuClick: (item: ProcessedNavigationItem, event?: React.MouseEvent) => void;
 }> = ({ group, currentPath, onMenuClick }) => {
-    const t = useTranslations(); // Remove hardcoded namespace
     const [isOpen, setIsOpen] = useState(group.defaultOpen ?? true);
 
     const labelContent = (
         <span className="flex items-center w-full gap-1">
+            {/* Enhanced group icon support */}
             {group.icon && (
-                <Icon {...group.icon} size={12} weight={group.icon.weight ?? 'regular'} className="flex-shrink-0" />
+                <Icon
+                    {...group.icon}
+                    size={12}
+                    className="flex-shrink-0"
+                    color={group.icon.color || "currentColor"}
+                />
             )}
-            <span className="flex-1 truncate text-start text-xs " style={{ color: group.color }}>
-                {getTranslatedText(t, group, 'label', 'group')}
+
+            {/* Enhanced group label with custom color */}
+            <span
+                className="flex-1 truncate text-start text-xs"
+                style={{ color: group.color || undefined }}
+            >
+                {group.label}
             </span>
+
+            {/* Enhanced group actions support */}
             {group.actions && (
                 <div className="flex-shrink-0">
-                    <NavActions actions={group.actions} size="sm" sideOffset={20} />
+                    <NavActions
+                        actions={group.actions}
+                        size="sm"
+                        sideOffset={20}
+                    />
                 </div>
             )}
+
+            {/* Enhanced collapsible indicator with custom color */}
             {group.collapsible && (
                 <Icon
                     name="CaretRightIcon"
                     size={12}
                     className={cn('transition-transform flex-shrink-0',
                         isOpen
-                            ? // if open, rotate 90deg in LTR, -90deg in RTL
-                            'ltr:rotate-90 rtl:rotate-90'
-                            : // if closed, no rotation in LTR, 180deg flip in RTL
-                            'ltr:rotate-0 rtl:rotate-180'
-
+                            ? 'ltr:rotate-90 rtl:rotate-90'
+                            : 'ltr:rotate-0 rtl:rotate-180'
                     )}
+                    color={group.color || "currentColor"}
                 />
-
             )}
         </span>
     );
@@ -63,7 +81,7 @@ const GroupRenderer: React.FC<{
     const childrenContent = (
         <SidebarGroupContent>
             <SidebarMenu>
-                {group.children.map((item) => (
+                {group.items.map((item) => (
                     <NavRecursiveItem
                         key={item.id}
                         item={item}
@@ -80,11 +98,9 @@ const GroupRenderer: React.FC<{
         return (
             <Collapsible asChild open={isOpen} onOpenChange={setIsOpen}>
                 <SidebarGroup>
-                    {group.label && (
-                        <SidebarGroupLabel asChild>
-                            <CollapsibleTrigger className="w-full">{labelContent}</CollapsibleTrigger>
-                        </SidebarGroupLabel>
-                    )}
+                    <SidebarGroupLabel asChild>
+                        <CollapsibleTrigger className="w-full">{labelContent}</CollapsibleTrigger>
+                    </SidebarGroupLabel>
                     <CollapsibleContent>{childrenContent}</CollapsibleContent>
                 </SidebarGroup>
             </Collapsible>
@@ -93,17 +109,29 @@ const GroupRenderer: React.FC<{
 
     return (
         <SidebarGroup>
-            {group.label && <SidebarGroupLabel>{labelContent}</SidebarGroupLabel>}
+            <SidebarGroupLabel>{labelContent}</SidebarGroupLabel>
             {childrenContent}
         </SidebarGroup>
     );
 };
 
-const NavContentComponent: React.FC<NavContentProps> = ({ data, currentPath, onMenuClick }) => {
+/**
+ * Enhanced navigation content component with full feature support
+ */
+const NavContentComponent: React.FC<NavContentProps> = ({
+                                                            navigationGroups,
+                                                            currentPath,
+                                                            onMenuClick
+                                                        }) => {
     return (
         <SidebarContent>
-            {data.map((group) => (
-                <GroupRenderer key={group.id} group={group} currentPath={currentPath} onMenuClick={onMenuClick} />
+            {navigationGroups.map((group) => (
+                <GroupRenderer
+                    key={group.id}
+                    group={group}
+                    currentPath={currentPath}
+                    onMenuClick={onMenuClick}
+                />
             ))}
         </SidebarContent>
     );

@@ -13,49 +13,192 @@
     "home": "Home",
     "breadcrumb": "Breadcrumb"
   },
-  "sidebar": {
-    "group": {
-      "group-dashboard": "Dashboard",
-      "group-users": "Users Management",
-      "group-settings": "Settings"
+  "navigation": {
+    "admin": {
+      "groups": {
+        "group-dashboard": "Dashboard",
+        "group-users": "User Management",
+        "group-settings": "Settings",
+        "userManagement": "Users Management",
+        "overview": "overview",
+        "system": "System"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "users": "Users",
+        "roles&permissions": "Roles & Permissions",
+        "roles": "Roles",
+        "permissions": "Permissions",
+        "settings": "Settings",
+        "analytics": "Analytics"
+      }
     },
-    "menu": {
-      "roles&permissions": "Roles & Permissions"
+    "teacher": {
+      "groups": {
+        "overview": "Overview",
+        "teaching": "Teaching",
+        "assessment": "Assessment"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "schedule": "Schedule",
+        "classes": "My Classes",
+        "students": "Students",
+        "assignments": "Assignments",
+        "gradebook": "Gradebook",
+        "reports": "Reports"
+      }
+    },
+    "student": {
+      "groups": {
+        "overview": "Overview",
+        "academics": "Academics"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "schedule": "Schedule",
+        "classes": "My Classes",
+        "assignments": "Assignments",
+        "grades": "Grades"
+      }
+    },
+    "parent": {
+      "groups": {
+        "overview": "Overview",
+        "children": "Children",
+        "communication": "Communication"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "children": "My Children",
+        "progress": "Academic Progress",
+        "messages": "Messages",
+        "meetings": "Meetings"
+      }
     }
   },
-  "routes": {
-    "home": {
-      "title": "Home",
-      "description": "Home"
+  "pages": {
+    "admin": {
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "Overview and statistics of the system"
+      },
+      "users": {
+        "title": "Users",
+        "description": "List and manage application users"
+      },
+      "roles": {
+        "title": "Roles",
+        "description": "Manage user roles and their access levels"
+      },
+      "permissions": {
+        "title": "Permissions",
+        "description": "Define and assign permissions to roles"
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Manage application configuration and preferences"
+      }
     },
-    "dashboard": {
-      "title": "Dashboard",
-      "description": "Overview and statistics of the system"
+    "teacher": {
+      "dashboard": {
+        "title": "Teacher Dashboard",
+        "description": "Your teaching overview and quick actions"
+      },
+      "schedule": {
+        "title": "My Schedule",
+        "description": "View your teaching schedule and calendar"
+      },
+      "classes": {
+        "title": "My Classes",
+        "description": "Manage your classes and students"
+      },
+      "students": {
+        "title": "Students",
+        "description": "View and manage student information"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "description": "Create and manage assignments"
+      },
+      "gradebook": {
+        "title": "Gradebook",
+        "description": "Record and track student grades"
+      },
+      "reports": {
+        "title": "Class Reports",
+        "description": "Generate and view class performance reports"
+      }
     },
-    "settings": {
-      "title": "Settings",
-      "description": "Manage application configuration and preferences"
+    "student": {
+      "dashboard": {
+        "title": "Student Dashboard",
+        "description": "Your academic overview and upcoming tasks"
+      },
+      "schedule": {
+        "title": "My Schedule",
+        "description": "View your class schedule and academic calendar"
+      },
+      "classes": {
+        "title": "My Classes",
+        "description": "View your enrolled classes"
+      },
+      "assignments": {
+        "title": "My Assignments",
+        "description": "View and submit assignments"
+      },
+      "grades": {
+        "title": "My Grades",
+        "description": "View your academic progress and grades"
+      }
     },
-    "profile": {
-      "title": "Profile",
-      "description": "View and edit your personal information and preferences"
+    "parent": {
+      "dashboard": {
+        "title": "Parent Dashboard",
+        "description": "Overview of your children's academic progress"
+      },
+      "children": {
+        "title": "My Children",
+        "description": "View your children's information and progress"
+      },
+      "progress": {
+        "title": "Academic Progress",
+        "description": "Track your children's academic performance"
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Communication with teachers and school"
+      },
+      "meetings": {
+        "title": "Meetings",
+        "description": "Schedule and manage parent-teacher meetings"
+      }
     },
-    "users": {
-      "title": "Users",
-      "description": "List and manage application users"
-    },
-    "roles": {
-      "title": "Roles",
-      "description": "Manage user roles and their access levels"
-    },
-    "permissions": {
-      "title": "Permissions",
-      "description": "Define and assign permissions to roles"
+    "global": {
+      "home": {
+        "title": "Home",
+        "description": "Welcome to the application"
+      },
+      "profile": {
+        "title": "Profile",
+        "description": "View and edit your personal information and preferences"
+      }
     }
   },
   "actions": {
     "refresh": "Refresh",
-    "export-data": "export data"
+    "refresh-analytics": "Refresh Analytics",
+    "export-data": "Export Data",
+    "add-user": "Add User",
+    "export-users": "Export Users",
+    "audit-permissions": "Audit Permissions",
+    "backup-settings": "Backup Settings",
+    "reset-settings": "Reset to Defaults",
+    "bulk-actions": "Bulk Actions",
+    "quick-grade": "Quick Grade",
+    "create-class": "Create New Class",
+    "export-grades": "Export Grades",
+    "grade-calculator": "Grade Calculator"
   },
   "UserDropdown": {
     "account": "Account",

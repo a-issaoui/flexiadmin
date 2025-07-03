@@ -2,15 +2,16 @@
 "use client"
 import { useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import type { NavigationItem } from "@/types/navigation.types";
+import type { ProcessedNavigationItem } from "@/config/navigation/types";
 
 export default function useMenuHandler() {
     const router = useRouter();
     const pathname = usePathname();
 
     const handleMenuClick = useCallback(
-        (item: NavigationItem, event?: React.MouseEvent) => {
+        (item: ProcessedNavigationItem, event?: React.MouseEvent) => {
             const url = item.href;
+            console.log(url)
 
             // Don't navigate if URL is invalid
             if (!url || url === '#') {

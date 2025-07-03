@@ -12,28 +12,44 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icon } from '@/components/common/icon';
 import { useIsMobileWithCookies } from '@/hooks/use-mobile';
+import type { UserType } from '@/types/user.types';
 
-const UserInfo = React.memo(({ user, initials }: { user: any; initials: string }) => (
-    <div className="flex items-center gap-2 px-1 py-1.5 rtl:flex-row-reverse text-sm text-left rtl:text-right">
-        <Avatar className="h-8 w-8 rounded-lg shrink-0">
-            <AvatarImage src={user.imageUrl} alt={user.name || ''} />
-            <AvatarFallback className="rounded-lg bg-gray-200">{initials}</AvatarFallback>
-        </Avatar>
-        <div className="grid flex-1 min-w-0 leading-tight">
-      <span className="truncate font-medium" title={user.name}>
-        {user.name}
-      </span>
-            <span className="truncate text-xs text-muted-foreground" title={user.email}>
-        {user.email}
-      </span>
+interface UserDropdownProps {
+    user: UserType;
+    side?: 'top' | 'right' | 'bottom' | 'left';
+    align?: 'start' | 'center' | 'end';
+    sideOffset?: number;
+    alignOffset?: number;
+    collisionPadding?: number;
+    isMobileSSR?: boolean;
+}
+
+const UserInfo = React.memo(
+    ({ user, initials }: { user: UserType; initials: string }) => (
+        <div className="flex items-center gap-2 px-1 py-1.5 rtl:flex-row-reverse text-sm text-left rtl:text-right">
+            <Avatar className="h-8 w-8 rounded-lg shrink-0">
+                <AvatarImage src={user.imageUrl} alt={user.name || ''} />
+                <AvatarFallback className="rounded-lg bg-gray-200">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 min-w-0 leading-tight">
+        <span className="truncate font-medium" title={user.name || ''}>
+          {user.name}
+        </span>
+                <span
+                    className="truncate text-xs text-muted-foreground"
+                    title={user.email || ''}
+                >
+          {user.email}
+        </span>
+            </div>
         </div>
-    </div>
-));
+    )
+);
 UserInfo.displayName = 'UserInfo';
 
 const MenuItems = React.memo(() => {
     const t = useTranslations('UserDropdown');
-    const base = "flex items-center gap-2 rtl:flex-row-reverse";
+    const base = 'flex items-center gap-2 rtl:flex-row-reverse';
 
     return (
         <>
@@ -52,7 +68,9 @@ const MenuItems = React.memo(() => {
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className={`${base} text-destructive focus:text-destructive`}>
+            <DropdownMenuItem
+                className={`${base} text-destructive focus:text-destructive`}
+            >
                 <Icon name="SignOutIcon" className="h-4 w-4 shrink-0" />
                 <span>{t('logout')}</span>
             </DropdownMenuItem>
@@ -62,38 +80,30 @@ const MenuItems = React.memo(() => {
 MenuItems.displayName = 'MenuItems';
 
 export function UserDropdown({
-                             user,
-                             side,
-                             align,
-                             sideOffset = 4,
-                             alignOffset,
-                             collisionPadding,
-                             isMobileSSR = false,
-                         }: {
-    user: any;
-    side?: 'top' | 'right' | 'bottom' | 'left';
-    align?: 'start' | 'center' | 'end';
-    sideOffset?: number;
-    alignOffset?: number;
-    collisionPadding?: number;
-    isMobileSSR?: boolean;
-}) {
+                                 user,
+                                 side,
+                                 align,
+                                 sideOffset = 4,
+                                 alignOffset,
+                                 collisionPadding,
+                                 isMobileSSR = false,
+                             }: UserDropdownProps) {
     const { isMobile } = useIsMobileWithCookies();
     const t = useTranslations('UserDropdown');
 
-    if (!user) return null;
+    // Always call hooks before returns
+    const nameForInitials = user?.name?.trim() || t('guestNamePlaceholder');
 
-    const nameForInitials = user.name || t('guestNamePlaceholder');
-    const initials = React.useMemo(
-        () =>
-            nameForInitials
-                .split(' ')
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((w) => w[0].toUpperCase())
-                .join(''),
-        [nameForInitials]
-    );
+    const initials = React.useMemo(() => {
+        return nameForInitials
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((w) => w[0].toUpperCase())
+            .join('');
+    }, [nameForInitials]);
+
+    if (!user) return null;
 
     return (
         <DropdownMenuContent

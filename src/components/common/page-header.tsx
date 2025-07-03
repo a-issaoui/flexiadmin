@@ -1,57 +1,28 @@
 // src/components/common/page-header.tsx
+
 'use client';
 
-import {usePathname} from 'next/navigation';
-import {useTranslations} from 'next-intl';
-import {cn} from '@/lib/utils';
-import {getBaseRouteIdByPath, getRouteByPath} from '@/config/routes/helpers';
-import {createContext, useContext} from 'react';
-
-// Page Header Context for controlling from child pages
-interface PageHeaderContextType {
-    setHeaderConfig: (config: Partial<PageHeaderProps>) => void;
-}
-
-const PageHeaderContext = createContext<PageHeaderContextType | null>(null);
-
-export const usePageHeader = () => {
-    const context = useContext(PageHeaderContext);
-    if (!context) {
-        throw new Error('usePageHeader must be used within a PageHeaderProvider');
-    }
-    return context;
-};
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { getPageInfo } from '@/lib/navigation-utils';
 
 interface PageHeaderProps {
-    /**
-     * Optional custom title - if provided, will override route-based title
-     */
     title?: string;
-    /**
-     * Optional custom description - if provided, will override route-based description
-     */
     description?: string;
-    /**
-     * Additional CSS classes
-     */
     className?: string;
-    /**
-     * RTL support
-     */
     rtl?: boolean;
-    /**
-     * Hide the entire header
-     */
-    /**
-     * Show breadcrumb navigation
-     */
     showBreadcrumb?: boolean;
-    /**
-     * Hide the entire header
-     */
     hidden?: boolean;
 }
 
+/**
+ * Page header component that automatically generates titles and breadcrumbs
+ * based on the current URL path.
+ *
+ * This is much simpler than the old route-based system because we use
+ * direct path-to-content mapping instead of complex route resolution.
+ */
 export function PageHeader({
                                title: customTitle,
                                description: customDescription,
@@ -63,27 +34,12 @@ export function PageHeader({
     const pathname = usePathname();
     const t = useTranslations();
 
-    // Get current route information
-    const currentRoute = getRouteByPath(pathname);
-    const baseRouteId = getBaseRouteIdByPath(pathname); // This gives you the ID without role
-    console.log(currentRoute)
-    console.log(baseRouteId)
-    // Determine title and description
-    const getTitle = (): string => {
+    // Get page information using simple path-based lookup
+    const { title: pathTitle, description: pathDescription } = getPageInfo(pathname, t);
 
-            // Try to get translation for base route title (without role)
-            const titleKey = `routes.${baseRouteId}.title`;
-           return  t(titleKey);
-    };
-
-    const getDescription = (): string => {
-        if (customDescription) return customDescription;
-
-            // Try to get translation for base route description (without role)
-            const descriptionKey = `routes.${baseRouteId}.description`;
-             return t(descriptionKey);
-
-    };
+    // Use custom values if provided, otherwise use path-based values
+    const title = customTitle || pathTitle;
+    const description = customDescription || pathDescription;
 
     const getBreadcrumb = () => {
         if (!showBreadcrumb) return null;
@@ -91,14 +47,10 @@ export function PageHeader({
         const segments = pathname.split('/').filter(Boolean);
         const breadcrumbItems = segments.map((segment, index) => {
             const path = '/' + segments.slice(0, index + 1).join('/');
-            const route = getRouteByPath(path);
-
-            const label = route?.id
-                ? t(`routes.${route.id}.title`, { fallback: segment.replace(/-/g, ' ') })
-                : segment.replace(/-/g, ' ');
+            const { title } = getPageInfo(path, t);
 
             return {
-                label: label.replace(/^./, str => str.toUpperCase()),
+                label: title,
                 path,
                 isLast: index === segments.length - 1
             };
@@ -112,73 +64,72 @@ export function PageHeader({
                 )}
                 aria-label={t('common.breadcrumb')}
             >
-                <a
-                    href="/"
-                    className="hover:text-foreground transition-colors"
+                {/* Home link */}
+           <a
+                href="/"
+                className="hover:text-foreground transition-colors"
                 >
-                    {t('common.home')}
-                </a>
-                {breadcrumbItems.map((item, index) => (
-                    <div key={item.path} className="flex items-center">
-            <span className={cn("mx-2", rtl && "rotate-180")}>
-              /
-            </span>
-                        {item.isLast ? (
-                            <span className="text-foreground font-medium">
-                {item.label}
-              </span>
-                        ) : (
-                            <a
-                                href={item.path}
-                                className="hover:text-foreground transition-colors"
-                            >
+                {t('common.home')}
+            </a>
+
+        {/* Dynamic breadcrumb items */}
+        {breadcrumbItems.map((item, index) => (
+            <div key={item.path} className="flex items-center">
+                        <span className={cn("mx-2", rtl && "rotate-180")}>
+                            /
+                        </span>
+                {item.isLast ? (
+                    <span className="text-foreground font-medium">
                                 {item.label}
-                            </a>
-                        )}
-                    </div>
-                ))}
-            </nav>
-        );
-    };
+                            </span>
+                ) : (
+                  <a
+                    href={item.path}
+                    className="hover:text-foreground transition-colors"
+                    >
+                {item.label}
+                    </a>
+                    )}
+    </div>
+    ))}
+</nav>
+);
+};
 
-    const title = getTitle();
-    const description = getDescription();
+if (hidden) {
+    return null;
+}
 
-    // Don't render if hidden
-    if (hidden) {
-        return null;
-    }
+return (
+    <div
+        className={cn(
+            "pb-4",
+            rtl && "text-right",
+            className
+        )}
+        dir={rtl ? 'rtl' : 'ltr'}
+    >
+        {getBreadcrumb()}
 
-    return (
-        <div
+        <h1
             className={cn(
-                "pb-4",
-                rtl && "text-right",
-                className
+                "text-2xl sm:text-3xl font-bold tracking-tight text-foreground",
+                "leading-tight"
             )}
-            dir={rtl ? 'rtl' : 'ltr'}
         >
-            {getBreadcrumb()}
+            {title}
+        </h1>
 
-            <h1
+        {description && (
+            <p
                 className={cn(
-                    "text-2xl sm:text-3xl font-bold tracking-tight text-foreground",
-                    "leading-tight"
+                    "text-base text-muted-foreground leading-relaxed",
+                    "max-w-3xl"
                 )}
             >
-                {title}
-            </h1>
-
-            {description && (
-                <p
-                    className={cn(
-                        "text-base text-muted-foreground leading-relaxed",
-                        "max-w-3xl"
-                    )}
-                >
-                    {description}
-                </p>
-            )}
-        </div>
-    );
+                {description}
+            </p>
+        )}
+    </div>
+);
 }

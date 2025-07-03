@@ -13,9 +13,9 @@ import {
     SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { UserDropdown } from '@/components/common/user-dropdown';
-import type { TypeUserData } from '@/types/user.types';
+import type { UserType } from '@/types/user.types';
 
-export function NavUser({ user }: { user: TypeUserData }) {
+export function NavUser({ user }: { user: UserType }) {
     const initials = React.useMemo(
         () =>
             user.name
@@ -46,7 +46,7 @@ export function NavUser({ user }: { user: TypeUserData }) {
                                 </Avatar>
                                 {/* 'end-0' is a logical property, correct for LTR/RTL */}
                                 <span
-                                    className="absolute bottom-0 end-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white translate-1/6"/>
+                                    className="absolute bottom-0 end-0 h-2 w-2 rounded-full bg-green-500 border-1 border-white translate-1/10"/>
                             </div>
 
                             {/* 'text-start' and 'ms-2' are logical properties, correct for LTR/RTL */}

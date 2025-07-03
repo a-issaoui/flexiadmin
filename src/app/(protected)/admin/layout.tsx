@@ -1,4 +1,5 @@
-// src/app/admin/layout.tsx
+// src/app/(protected)/admin/layout.tsx
+
 import {cookies, headers} from 'next/headers';
 import {VerticalNavigation} from "@/components/features/navigation/vertical-navigation";
 import {SidebarProvider, SidebarInset} from '@/components/ui/sidebar';
@@ -25,16 +26,22 @@ export default async function AdminLayout({children}: { children: React.ReactNod
         // Read mobile state from cookies
         const cookieHeader = headersList.get('cookie') || '';
         isMobileSSR = getIsMobileFromCookies(cookieHeader);
-
-        console.log('🏗️ AdminLayout SSR:', {sidebarOpen, isMobileSSR, rtl});
     } catch (error) {
         console.error('Cookie state fetch failed:', error);
     }
 
+    // TODO: When you implement authentication, get user permissions here
+    // const userPermissions = await getUserPermissions();
+
     return (
         <SidebarProvider defaultOpen={sidebarOpen}>
             <div className="flex h-screen w-full overflow-hidden">
-                <VerticalNavigation rtl={rtl}/>
+                {/* Use role-specific navigation - simple and direct */}
+                <VerticalNavigation
+                    rtl={rtl}
+                    role="admin"
+                    userPermissions={undefined} // Will be filled in when permissions are implemented
+                />
                 <SidebarInset className="flex flex-1 flex-col min-w-0">
                     <div className="w-full px-4 sm:px-6 lg:px-8">
                         <AppNavbar rtl={rtl} isMobileSSR={isMobileSSR}/>
@@ -42,7 +49,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                     <main className="flex-1 overflow-auto px-4 py-4 sm:px-6 lg:px-8">
                         <PageHeader
                             rtl={rtl}
-                            showBreadcrumb={false} // Dashboard doesn't need breadcrumb
+                            showBreadcrumb={true}
                         />
                         {children}
                     </main>

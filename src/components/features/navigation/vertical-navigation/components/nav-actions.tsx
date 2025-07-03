@@ -52,7 +52,7 @@ const NavActions: React.FC<NavActionsProps> = ({ actions, size = 'md', sideOffse
                     )}
                 >
                     <Icon
-                        name="DotsThreeOutline"
+                        name="DotsThreeOutlineIcon"
                         className={cn(iconSize, 'transition-transform flex-shrink-0', isOpen && 'rotate-90')}
                         weight="duotone"
                     />

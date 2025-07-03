@@ -3,29 +3,73 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// --- Color Utilities ---
+// --- Enhanced Color Utilities (SSR-Safe) ---
 
 const isValidHexColor = (color: string): boolean =>
     /^#[0-9A-Fa-f]{6}$/.test(color);
 
+/**
+ * SSR-safe color validation that works in both server and browser environments
+ */
 const isValidCssColorName = (color: string): boolean => {
-    const s = new Option().style;
-    s.color = color;
-    return !!s.color;
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') {
+        // Server-side: Use a conservative approach with known color names
+        const commonCssColors = [
+            'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink',
+            'black', 'white', 'gray', 'grey', 'brown', 'cyan', 'magenta',
+            'lime', 'navy', 'teal', 'silver', 'gold', 'transparent',
+            'currentcolor', 'inherit', 'initial', 'unset', 'revert',
+            // Add more common colors as needed
+            'crimson', 'coral', 'tomato', 'orangered', 'gold', 'khaki',
+            'lightgreen', 'darkgreen', 'lightblue', 'darkblue', 'violet'
+        ];
+
+        // Also check for CSS function patterns
+        const cssFunctionPattern = /^(rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch)\s*\(/i;
+
+        return commonCssColors.includes(color.toLowerCase()) ||
+            cssFunctionPattern.test(color) ||
+            isValidHexColor(color);
+    }
+
+    // Browser-side: Use DOM-based validation for comprehensive checking
+    try {
+        const testElement = document.createElement('div');
+        testElement.style.color = color;
+        return testElement.style.color !== '';
+    } catch {
+        return false;
+    }
 };
 
+/**
+ * Enhanced contrast calculation with better algorithm
+ */
 const getContrastingTextColor = (hex: string): string => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-    return yiq >= 128 ? "#000000" : "#FFFFFF";
+    // Remove the hash if present
+    const cleanHex = hex.replace('#', '');
+
+    // Parse RGB values
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
+
+    // Use relative luminance calculation (WCAG standard)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return white for dark colors, black for light colors
+    return luminance > 0.5 ? "#000000" : "#FFFFFF";
 };
 
+/**
+ * Convert hex color to RGBA with alpha transparency
+ */
 const hexToRgba = (hex: string, alpha: number): string => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const cleanHex = hex.replace('#', '');
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
@@ -64,7 +108,7 @@ export type BadgeProps = React.ComponentProps<"span"> &
     color?: string;
 };
 
-// --- Badge Component ---
+// --- Enhanced Badge Component ---
 
 const Badge = React.memo(function Badge({
                                             className,
@@ -77,16 +121,23 @@ const Badge = React.memo(function Badge({
                                         }: BadgeProps) {
     const Comp = asChild ? Slot : "span";
 
+    // Memoize style calculations for performance
     const customStyles = React.useMemo(() => {
         const base = style || {};
 
+        // If no custom color is provided, use default styling
         if (!color) return base;
 
         const isHex = isValidHexColor(color);
         const isNamed = isValidCssColorName(color);
 
-        if (!isHex && !isNamed) return base;
+        // If the color isn't valid, fall back to default styling
+        if (!isHex && !isNamed) {
+            console.warn(`Invalid color provided to Badge: ${color}`);
+            return base;
+        }
 
+        // Apply color styling based on variant
         switch (variant) {
             case "outline":
                 return {
@@ -98,7 +149,7 @@ const Badge = React.memo(function Badge({
             case "ghost":
                 return {
                     ...base,
-                    backgroundColor: isHex ? hexToRgba(color, 0.15) : undefined,
+                    backgroundColor: isHex ? hexToRgba(color, 0.15) : `color-mix(in srgb, ${color} 15%, transparent)`,
                     color,
                     borderColor: "transparent",
                 };
@@ -121,5 +172,7 @@ const Badge = React.memo(function Badge({
         />
     );
 });
+
+Badge.displayName = 'Badge';
 
 export { Badge, badgeVariants };

@@ -13,55 +13,198 @@
     "home": "Accueil",
     "breadcrumb": "Fil d'Ariane"
   },
-  "sidebar": {
-    "group": {
-      "group-dashboard": "Tableau de bord",
-      "group-users": "Gestion des utilisateurs",
-      "group-settings": "Paramètres"
+  "navigation": {
+    "admin": {
+      "groups": {
+        "group-dashboard": "Tableau de bord",
+        "group-users": "Gestion des utilisateurs",
+        "group-settings": "Paramètres",
+        "userManagement": "Gestion des utilisateurs",
+        "overview": "aperçu",
+        "system": "Système"
+      },
+      "items": {
+        "dashboard": "Tableau de bord",
+        "users": "Utilisateurs",
+        "roles&permissions": "Rôles & Permissions",
+        "roles": "Rôles",
+        "permissions": "Permissions",
+        "settings": "Paramètres",
+        "analytics": "Analytique"
+      }
     },
-    "menu": {
-      "roles&permissions": "Rôles et autorisations"
+    "teacher": {
+      "groups": {
+        "overview": "Aperçu",
+        "teaching": "Enseignement",
+        "assessment": "Évaluation"
+      },
+      "items": {
+        "dashboard": "Tableau de bord",
+        "schedule": "Emploi du temps",
+        "classes": "Mes classes",
+        "students": "Étudiants",
+        "assignments": "Devoirs",
+        "gradebook": "Carnet de notes",
+        "reports": "Rapports"
+      }
+    },
+    "student": {
+      "groups": {
+        "overview": "Aperçu",
+        "academics": "Scolarité"
+      },
+      "items": {
+        "dashboard": "Tableau de bord",
+        "schedule": "Emploi du temps",
+        "classes": "Mes classes",
+        "assignments": "Devoirs",
+        "grades": "Notes"
+      }
+    },
+    "parent": {
+      "groups": {
+        "overview": "Aperçu",
+        "children": "Enfants",
+        "communication": "Communication"
+      },
+      "items": {
+        "dashboard": "Tableau de bord",
+        "children": "Mes enfants",
+        "progress": "Progression scolaire",
+        "messages": "Messages",
+        "meetings": "Réunions"
+      }
     }
   },
-  "routes": {
-    "home": {
-      "title": "Accueil",
-      "description": "Page d'accueil"
+  "pages": {
+    "admin": {
+      "dashboard": {
+        "title": "Tableau de bord",
+        "description": "Vue d'ensemble et statistiques du système"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "description": "Lister et gérer les utilisateurs de l'application"
+      },
+      "roles": {
+        "title": "Rôles",
+        "description": "Gérer les rôles des utilisateurs et leurs niveaux d'accès"
+      },
+      "permissions": {
+        "title": "Permissions",
+        "description": "Définir et attribuer les permissions aux rôles"
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Gérer la configuration et les préférences de l'application"
+      }
     },
-    "dashboard": {
-      "title": "Tableau de bord",
-      "description": "Aperçu et statistiques du système"
+    "teacher": {
+      "dashboard": {
+        "title": "Tableau de bord enseignant",
+        "description": "Votre aperçu d'enseignement et actions rapides"
+      },
+      "schedule": {
+        "title": "Mon emploi du temps",
+        "description": "Voir votre planning et calendrier d'enseignement"
+      },
+      "classes": {
+        "title": "Mes classes",
+        "description": "Gérer vos classes et étudiants"
+      },
+      "students": {
+        "title": "Étudiants",
+        "description": "Voir et gérer les informations des étudiants"
+      },
+      "assignments": {
+        "title": "Devoirs",
+        "description": "Créer et gérer les devoirs"
+      },
+      "gradebook": {
+        "title": "Carnet de notes",
+        "description": "Enregistrer et suivre les notes des étudiants"
+      },
+      "reports": {
+        "title": "Rapports de classe",
+        "description": "Générer et consulter les rapports de performance"
+      }
     },
-    "settings": {
-      "title": "Paramètres",
-      "description": "Gérer la configuration et les préférences de l'application"
+    "student": {
+      "dashboard": {
+        "title": "Tableau de bord étudiant",
+        "description": "Votre aperçu académique et tâches à venir"
+      },
+      "schedule": {
+        "title": "Mon emploi du temps",
+        "description": "Voir votre planning de cours et calendrier académique"
+      },
+      "classes": {
+        "title": "Mes classes",
+        "description": "Voir vos classes inscrites"
+      },
+      "assignments": {
+        "title": "Mes devoirs",
+        "description": "Voir et soumettre les devoirs"
+      },
+      "grades": {
+        "title": "Mes notes",
+        "description": "Voir votre progression académique et notes"
+      }
     },
-    "profile": {
-      "title": "Profil",
-      "description": "Voir et modifier vos informations personnelles et préférences"
+    "parent": {
+      "dashboard": {
+        "title": "Tableau de bord parent",
+        "description": "Vue d'ensemble de la progression scolaire de vos enfants"
+      },
+      "children": {
+        "title": "Mes enfants",
+        "description": "Voir les informations et progrès de vos enfants"
+      },
+      "progress": {
+        "title": "Progression scolaire",
+        "description": "Suivre la performance académique de vos enfants"
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Communication avec les enseignants et l'école"
+      },
+      "meetings": {
+        "title": "Réunions",
+        "description": "Planifier et gérer les réunions parents-enseignants"
+      }
     },
-    "users": {
-      "title": "Utilisateurs",
-      "description": "Lister et gérer les utilisateurs de l'application"
-    },
-    "roles": {
-      "title": "Rôles",
-      "description": "Gérer les rôles des utilisateurs et leurs niveaux d'accès"
-    },
-    "permissions": {
-      "title": "Autorisations",
-      "description": "Définir et attribuer des autorisations aux rôles"
+    "global": {
+      "home": {
+        "title": "Accueil",
+        "description": "Bienvenue dans l'application"
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Voir et modifier vos informations personnelles et préférences"
+      }
     }
   },
   "actions": {
     "refresh": "Actualiser",
-    "export-data": "exporter les données"
+    "refresh-analytics": "Actualiser les analyses",
+    "export-data": "Exporter les données",
+    "add-user": "Ajouter un utilisateur",
+    "export-users": "Exporter les utilisateurs",
+    "audit-permissions": "Auditer les permissions",
+    "backup-settings": "Sauvegarder les paramètres",
+    "reset-settings": "Réinitialiser par défaut",
+    "bulk-actions": "Actions groupées",
+    "quick-grade": "Notation rapide",
+    "create-class": "Créer une nouvelle classe",
+    "export-grades": "Exporter les notes",
+    "grade-calculator": "Calculateur de notes"
   },
   "UserDropdown": {
     "account": "Compte",
     "billing": "Facturation",
     "notifications": "Notifications",
-    "logout": "Déconnexion",
+    "logout": "Se déconnecter",
     "guestNamePlaceholder": "Utilisateur invité"
   }
 }
