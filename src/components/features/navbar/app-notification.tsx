@@ -65,7 +65,7 @@ const initialNotifications = [
         message: 'Alice commented on your article about React performance.',
         time: '5m ago',
         read: false,
-        icon: 'MessageSquareicon',
+        icon: 'EnvelopeIcon',
         priority: 'normal',
         type: 'comment'
     },
@@ -346,7 +346,7 @@ const AppNotification = memo(() => {
                             onClick={handleClearAll}
                             className="flex items-center justify-center gap-2 p-3 cursor-pointer text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/5 focus:bg-destructive/5 focus:text-destructive"
                         >
-                            <Icon name="Trash" size={14} />
+                            <Icon name="TrashSimpleIcon" size={14} />
                             Clear all notifications
                         </DropdownMenuItem>
                     </>

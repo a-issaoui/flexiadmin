@@ -129,7 +129,7 @@ export default function SidebarTrigger({
             )}
         >
             <Icon
-                name="ArrowLineRight"
+                name="ArrowLineRightIcon"
                 className={cn(
                     'transition-transform duration-200 ease-out ',
                     iconRotation

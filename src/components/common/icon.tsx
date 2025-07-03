@@ -1,26 +1,139 @@
-// ============================================================================
-// src/components/ui/icon.tsx - Simplified Icon Component
-// ============================================================================
-
+// src/components/ui/icon.tsx
 "use client"
 
-import * as Icons from "@phosphor-icons/react"
 import { forwardRef } from "react"
 import { cn } from "@/lib/utils"
+import type { IconProps as PhosphorIconProps } from "@phosphor-icons/react"
 
+// Import only the icons your application actually uses
+// This ensures proper tree-shaking and optimal bundle size
+import {
+    // Core UI Icons
+    HouseIcon,
+    MagnifyingGlassIcon,
+    GearIcon,
+    UserIcon,
+    UsersIcon,
+    UserCircleIcon,
 
-// Create proper type for icon names
-export type IconName = keyof typeof Icons
+    // Navigation Icons
+    CaretUpIcon,
+    CaretDownIcon,
+    CaretLeftIcon,
+    CaretRightIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    ArrowLineRightIcon,
 
-export interface IconProps {
+    // Action Icons
+    PlusIcon,
+    MinusIcon,
+    XIcon,
+    CheckIcon,
+    TrashIcon,
+    PencilSimpleIcon,
+
+    // Status Icons
+    WarningIcon,
+    InfoIcon,
+    CheckCircleIcon,
+    XCircleIcon,
+    QuestionMarkIcon,
+
+    // Communication Icons
+    BellIcon,
+    EnvelopeIcon,
+    ChatCircleIcon,
+
+    // Data Icons
+    CalendarIcon,
+    ClockIcon,
+    FolderIcon,
+    FileIcon,
+    DownloadIcon,
+    UploadIcon,
+
+    // Utility Icons
+    MoonIcon,
+    SunIcon,
+    DotsThreeOutlineIcon,
+    ListIcon,
+    CircleNotchIcon,
+    QuestionIcon,
+    SignOutIcon,
+    ShieldIcon,
+    LockIcon,
+    DetectiveIcon,
+    ListChecksIcon,
+    WindowsLogoIcon,
+    TrashSimpleIcon,
+
+    // Prevent/Prohibition Icons
+    ProhibitIcon,
+} from "@phosphor-icons/react"
+
+// Create the icon registry
+// This gives us type safety and ensures we only use imported icons
+const iconRegistry = {
+    HouseIcon,
+    MagnifyingGlassIcon,
+    GearIcon,
+    UserIcon,
+    UsersIcon,
+    UserCircleIcon,
+    CaretUpIcon,
+    CaretDownIcon,
+    CaretLeftIcon,
+    CaretRightIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    ArrowLineRightIcon,
+    PlusIcon,
+    MinusIcon,
+    XIcon,
+    CheckIcon,
+    TrashIcon,
+    PencilSimpleIcon,
+    WarningIcon,
+    InfoIcon,
+    CheckCircleIcon,
+    XCircleIcon,
+    QuestionMarkIcon,
+    BellIcon,
+    EnvelopeIcon,
+    ChatCircleIcon,
+    CalendarIcon,
+    ClockIcon,
+    FolderIcon,
+    FileIcon,
+    DownloadIcon,
+    UploadIcon,
+    DotsThreeOutlineIcon,
+    ListIcon,
+    CircleNotchIcon,
+    QuestionIcon,
+    SignOutIcon,
+    ShieldIcon,
+    LockIcon,
+    DetectiveIcon,
+    ListChecksIcon,
+    WindowsLogoIcon,
+    ProhibitIcon,
+    MoonIcon,
+    SunIcon,
+    TrashSimpleIcon
+} as const
+
+// Export the type for use in other components
+export type IconName = keyof typeof iconRegistry
+
+// Define the props interface
+export interface IconProps extends Omit<PhosphorIconProps, 'ref'> {
     name: IconName
-    size?: number | string
-    weight?: Icons.IconWeight
-    color?: string
     className?: string
-    mirrored?: boolean
 }
 
+// Main Icon component
 export const Icon = forwardRef<SVGSVGElement, IconProps>(({
                                                               name,
                                                               size = 20,
@@ -30,19 +143,18 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(({
                                                               mirrored = false,
                                                               ...props
                                                           }, ref) => {
-    const Component = Icons[name] as React.ComponentType<{
-        size?: number | string
-        weight?: Icons.IconWeight
-        color?: string
-        className?: string
-        mirrored?: boolean
-        ref?: React.Ref<SVGSVGElement>
-    }>
+    const IconComponent = iconRegistry[name]
 
-    if (!Component) {
-        console.warn(`Icon "${name}" not found in @phosphor-icons/react`)
-        // Fallback to Question icon
-        const FallbackIcon = Icons.QuestionIcon
+    // In development, provide helpful error messages
+    if (!IconComponent) {
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(
+                `Icon "${name}" not found in registry.\n` +
+                `Available icons: ${Object.keys(iconRegistry).join(', ')}\n` +
+                `To add a new icon, import it from @phosphor-icons/react and add it to the iconRegistry.`
+            )
+        }
+        const FallbackIcon = iconRegistry.QuestionIcon
         return (
             <FallbackIcon
                 ref={ref}
@@ -57,7 +169,7 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(({
     }
 
     return (
-        <Component
+        <IconComponent
             ref={ref}
             size={size}
             weight={weight}
@@ -70,49 +182,3 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(({
 })
 
 Icon.displayName = "Icon"
-
-// Pre-defined icon variants for common use cases
-export const CheckIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="CheckIcon" {...props} />
-
-export const XIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="XIcon" {...props} />
-
-export const ChevronDownIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="CaretDownIcon" {...props} />
-
-export const ChevronRightIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="CaretRightIcon" {...props} />
-
-export const LoadingIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="CircleNotchIcon" weight="bold" className="animate-spin" {...props} />
-
-export const MenuIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="ListIcon" {...props} />
-
-export const SearchIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="MagnifyingGlassIcon" {...props} />
-
-export const UserIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="UserIcon" {...props} />
-
-export const SettingsIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="GearIcon" {...props} />
-
-export const HomeIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="HouseIcon" {...props} />
-
-export const NotificationIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="BellIcon" {...props} />
-
-export const MessageIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="EnvelopeIcon" {...props} />
-
-export const CalendarIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="CalendarIcon" {...props} />
-
-export const FolderIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="FolderIcon" {...props} />
-
-export const UsersIcon = (props: Omit<IconProps, 'name'>) =>
-    <Icon name="UsersIcon" {...props} />
