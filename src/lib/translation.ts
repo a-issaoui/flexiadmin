@@ -10,7 +10,7 @@ export function getTranslationKey(
     }
 
     // Default namespace
-    const ns = item.namespace ?? 'sidebar.route';
+    const ns = item.namespace ?? 'route';
 
     // For items that don't need nested keys (like menu items)
     if (ns === 'sidebar.menu') {
@@ -57,7 +57,7 @@ export function getTooltipText(
     item: NavigationItem,
     checkTranslationExists?: (key: string) => boolean
 ): string {
-    const ns = item.namespace ?? 'sidebar.route';
+    const ns = item.namespace ?? 'route';
     const fallback = item.label ?? item.id ?? 'Unnamed';
 
     // For menu items, just use the simple key

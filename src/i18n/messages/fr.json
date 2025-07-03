@@ -21,36 +21,36 @@
     },
     "menu": {
       "roles&permissions": "Rôles et autorisations"
+    }
+  },
+  "routes": {
+    "home": {
+      "title": "Accueil",
+      "description": "Page d'accueil"
     },
-    "route": {
-      "home": {
-        "title": "Accueil",
-        "description": "Page d'accueil"
-      },
-      "dashboard": {
-        "title": "Tableau de bord",
-        "description": "Aperçu et statistiques du système"
-      },
-      "settings": {
-        "title": "Paramètres",
-        "description": "Gérer la configuration et les préférences de l'application"
-      },
-      "profile": {
-        "title": "Profil",
-        "description": "Voir et modifier vos informations personnelles et préférences"
-      },
-      "users": {
-        "title": "Utilisateurs",
-        "description": "Lister et gérer les utilisateurs de l'application"
-      },
-      "roles": {
-        "title": "Rôles",
-        "description": "Gérer les rôles des utilisateurs et leurs niveaux d'accès"
-      },
-      "permissions": {
-        "title": "Autorisations",
-        "description": "Définir et attribuer des autorisations aux rôles"
-      }
+    "dashboard": {
+      "title": "Tableau de bord",
+      "description": "Aperçu et statistiques du système"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Gérer la configuration et les préférences de l'application"
+    },
+    "profile": {
+      "title": "Profil",
+      "description": "Voir et modifier vos informations personnelles et préférences"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "description": "Lister et gérer les utilisateurs de l'application"
+    },
+    "roles": {
+      "title": "Rôles",
+      "description": "Gérer les rôles des utilisateurs et leurs niveaux d'accès"
+    },
+    "permissions": {
+      "title": "Autorisations",
+      "description": "Définir et attribuer des autorisations aux rôles"
     }
   },
   "actions": {

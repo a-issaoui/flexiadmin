@@ -21,36 +21,36 @@
     },
     "menu": {
       "roles&permissions": "Roles & Permissions"
+    }
+  },
+  "routes": {
+    "home": {
+      "title": "Home",
+      "description": "Home"
     },
-    "route": {
-      "home": {
-        "title": "Home",
-        "description": "Home"
-      },
-      "dashboard": {
-        "title": "Dashboard",
-        "description": "Overview and statistics of the system"
-      },
-      "settings": {
-        "title": "Settings",
-        "description": "Manage application configuration and preferences"
-      },
-      "profile": {
-        "title": "Profile",
-        "description": "View and edit your personal information and preferences"
-      },
-      "users": {
-        "title": "Users",
-        "description": "List and manage application users"
-      },
-      "roles": {
-        "title": "Roles",
-        "description": "Manage user roles and their access levels"
-      },
-      "permissions": {
-        "title": "Permissions",
-        "description": "Define and assign permissions to roles"
-      }
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Overview and statistics of the system"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage application configuration and preferences"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "View and edit your personal information and preferences"
+    },
+    "users": {
+      "title": "Users",
+      "description": "List and manage application users"
+    },
+    "roles": {
+      "title": "Roles",
+      "description": "Manage user roles and their access levels"
+    },
+    "permissions": {
+      "title": "Permissions",
+      "description": "Define and assign permissions to roles"
     }
   },
   "actions": {

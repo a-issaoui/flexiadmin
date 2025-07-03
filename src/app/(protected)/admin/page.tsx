@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 
 export default function HomePage() {
-    const t = useTranslations('sidebar.route');
+    const t = useTranslations('routes');
 
     return (
         <div >

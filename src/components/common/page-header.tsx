@@ -72,7 +72,7 @@ export function PageHeader({
     const getTitle = (): string => {
 
             // Try to get translation for base route title (without role)
-            const titleKey = `sidebar.route.${baseRouteId}.title`;
+            const titleKey = `routes.${baseRouteId}.title`;
            return  t(titleKey);
     };
 
@@ -80,7 +80,7 @@ export function PageHeader({
         if (customDescription) return customDescription;
 
             // Try to get translation for base route description (without role)
-            const descriptionKey = `sidebar.route.${baseRouteId}.description`;
+            const descriptionKey = `routes.${baseRouteId}.description`;
              return t(descriptionKey);
 
     };
