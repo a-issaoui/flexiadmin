@@ -1,6 +1,6 @@
 // src/config/navigation/admin-navigation.ts
 
-import type { NavigationGroup } from './types';
+import type { NavigationGroup ,SafeColor} from './types';
 import {NavigationActions} from "@/lib/navigation-actions";
 /**
  * Admin navigation demonstrating correct pulsing dot usage.
@@ -22,7 +22,7 @@ export const adminNavigation: NavigationGroup[] = [
                 labelKey: 'navigation.admin.items.analytics',
                 href: '/admin/analytics',
                 icon: { name: 'ChartBarIcon', weight: 'duotone' },
-                color: '#8b5cf6',
+                color: '#8b5cf6'  as SafeColor,
                 // Leaf item - no pulsing dot even if we set dotColor
                 actions: [
                     {
@@ -44,13 +44,13 @@ export const adminNavigation: NavigationGroup[] = [
                 labelKey: 'navigation.admin.items.users',
                 href: '/admin/users',
                 icon: { name: 'UsersIcon', weight: 'duotone' ,color:'blue'},
-                color: '#2cbf0b',
+                color: '#2cbf0b' as SafeColor,
                 requiredPermissions: ['users:read'],
                 // Leaf item with badge - no pulsing dot since it has no children
                 badge: {
                     value: 1247,
                     variant: 'outline',
-                    color: '#6b7280'
+                    color: '#6b7280' as SafeColor,
                 },
                 actions: [
                     {
@@ -65,10 +65,10 @@ export const adminNavigation: NavigationGroup[] = [
                 id: 'roles&permissions',
                 labelKey: 'navigation.admin.items.roles&permissions',
                 icon: { name: 'ShieldIcon', weight: 'duotone' },
-                color: '#f59e0b',
+                color: '#f59e0b' as SafeColor,
                 // This item has children, so it CAN show pulsing dots when collapsed
                 // The dot will appear because children have badges
-                dotColor: '#ef4444', // Custom dot color
+                dotColor: '#ef4444'  as SafeColor,
                 defaultExpanded: false,
                 children: [
                     {
@@ -76,14 +76,14 @@ export const adminNavigation: NavigationGroup[] = [
                         labelKey: 'navigation.admin.items.roles',
                         href: '/admin/roles',
                         icon: { name: 'DetectiveIcon', weight: 'duotone' },
-                        color: '#f59e0b',
+                        color: '#f59e0b' as SafeColor,
                         requiredPermissions: ['roles:read'],
                         // This child has a badge - will trigger pulsing dot on parent when sidebar is collapsed
                         badge: {
                             value: 8,
                             variant: 'default',
                             shape: 'circular',
-                            color: '#0735f4'
+                            color: '#0735f4'  as SafeColor,
                         },
                     },
                     {
@@ -91,13 +91,13 @@ export const adminNavigation: NavigationGroup[] = [
                         labelKey: 'navigation.admin.items.permissions',
                         href: '/admin/permissions',
                         icon: { name: 'ListChecksIcon', weight: 'duotone' },
-                        color: '#f59e0b',
+                        color: '#f59e0b' as SafeColor,
                         requiredPermissions: ['permissions:read'],
                         // This child also has a badge - reinforces the pulsing dot behavior
                         badge: {
                             value: 'Updated',
                             variant: 'default',
-                            color: '#2cbf0b'
+                            color: '#2cbf0b'  as SafeColor,
                         },
                         actions: [
                             {
@@ -116,14 +116,14 @@ export const adminNavigation: NavigationGroup[] = [
         id: 'system',
         labelKey: 'navigation.admin.groups.system',
         icon: { name: 'GearIcon', weight: 'duotone' },
-        color: '#6b7280',
+        color: '#6b7280' as SafeColor,
         items: [
             {
                 id: 'settings',
                 labelKey: 'navigation.admin.items.settings',
                 href: '/admin/settings',
                 icon: { name: 'GearIcon', weight: 'duotone' ,color:'blue'},
-                color: '#6b7280',
+                color: '#6b7280' as SafeColor,
                 requiredPermissions: ['settings:write'],
                 // Leaf item - no pulsing dot behavior
                 actions: [

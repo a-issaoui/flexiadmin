@@ -1,6 +1,7 @@
 // src/config/navigation/types.ts
 
 import type { IconProps } from "@/components/common/icon";
+import type { SafeColor } from '@/lib/color-validation';
 
 // Badge types
 export type BadgeVariant = "default" | "outline" | "ghost";
@@ -11,7 +12,7 @@ export type BadgeShape = "default" | "square" | "circular";
  */
 export interface NavigationBadge {
     value?: string | number;
-    color?: string;
+    color?: SafeColor;
     variant?: BadgeVariant;
     shape?: BadgeShape;
 }
@@ -34,8 +35,8 @@ export interface NavigationItem {
     labelKey: string;                   // Translation key for the display text
     href?: string;                      // Direct URL - no complex generation needed
     icon?: IconProps;                   // Full icon configuration with proper typing
-    color?: string;                     // Custom color for the item (CSS color value)
-    dotColor?: string;                  // Color for the pulsing dot indicator
+    color?: SafeColor;                     // Custom color for the item (CSS color value)
+    dotColor?: SafeColor;                  // Color for the pulsing dot indicator
     badge?: NavigationBadge;            // Badge configuration
     actions?: NavigationAction[];       // Dropdown actions for this item
     children?: NavigationItem[];        // Child navigation items
@@ -53,7 +54,7 @@ export interface NavigationItem {
 export interface NavigationGroup {
     id: string;                         // Unique identifier for this group
     labelKey: string;                   // Translation key for group heading
-    color?: string;                     // Custom color for the group header
+    color?: SafeColor;                     // Custom color for the group header
     icon?: IconProps;                   // Optional icon for the group header
     items: NavigationItem[];            // Items within this group
     collapsible?: boolean;              // Whether the group can be collapsed
@@ -72,8 +73,8 @@ export interface ProcessedNavigationItem {
     label: string;                      // Resolved translation
     href?: string;
     icon?: IconProps;                   // Full icon configuration
-    color?: string;                     // Custom color for styling
-    dotColor?: string;                  // Color for pulsing dot
+    color?: SafeColor;                     // Custom color for styling
+    dotColor?: SafeColor;                  // Color for pulsing dot
     badge?: NavigationBadge;            // Badge with resolved translations
     actions?: NavigationAction[];       // Available actions
     children?: ProcessedNavigationItem[];
@@ -88,7 +89,7 @@ export interface ProcessedNavigationItem {
 export interface ProcessedNavigationGroup {
     id: string;
     label: string;                      // Resolved translation
-    color?: string;                     // Custom color for group
+    color?: SafeColor;                     // Custom color for group
     icon?: IconProps;                   // Group icon
     items: ProcessedNavigationItem[];
     collapsible?: boolean;

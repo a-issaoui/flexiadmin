@@ -16,6 +16,7 @@ import type { ProcessedNavigationItem } from '@/config/navigation/types';
 import NavPulsingDot from '@/components/features/navigation/vertical-navigation/components/nav-pulsing-dot';
 import NavBadge from '@/components/features/navigation/vertical-navigation/components/nav-badge';
 import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
+import { sanitizeColor } from '@/lib/color-validation';
 
 interface NavRecursiveItemProps {
     item: ProcessedNavigationItem;
@@ -124,8 +125,8 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                             "flex-shrink-0",
                             item.disabled && "opacity-50"
                         )}
-                        color={item.disabled ? undefined : (item.icon.color || "currentColor")}
-                    />
+                        color={item.disabled ? undefined : (sanitizeColor(item.icon.color) || "currentColor")}
+                  />
                     {/* CORRECTED: Only show pulsing dot for collapsed sidebar with child badges */}
                     {shouldShowPulsingDot && (
                         <div className="absolute -top-2 -end-0.5">
@@ -140,7 +141,7 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                 <span
                     className={cn("truncate", item.disabled && "opacity-50")}
                     style={{
-                        color: item.disabled ? undefined : (item.color || undefined)
+                        color: item.disabled ? undefined : sanitizeColor(item.color)
                     }}
                 >
                     {item.label}
@@ -176,7 +177,7 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                             ? 'ltr:rotate-90 rtl:rotate-90'
                             : 'ltr:rotate-0 rtl:rotate-180'
                     )}
-                    color={item.disabled ? undefined : (item.color || "currentColor")}
+                    color={item.disabled ? undefined : (sanitizeColor(item.color) || "currentColor")}
                 />
             )}
         </>
@@ -240,7 +241,7 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                     aria-disabled={item.disabled}
                     style={{
                         // Apply custom color to the entire link if specified
-                        color: item.disabled ? undefined : (item.color || undefined)
+                        color: item.disabled ? undefined : sanitizeColor(item.color)
                     }}
                 >
                     {renderMenuContent()}

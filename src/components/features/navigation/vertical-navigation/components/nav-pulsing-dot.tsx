@@ -1,7 +1,7 @@
 // src/components/features/navigation/vertical-navigation/components/nav-pulsing-dot.tsx
 
 import React, { memo } from 'react';
-
+import { sanitizeColor, getSafeColor } from '@/lib/color-validation';
 type NavPulsingDotProps = {
     color?: string;
     size?: 'sm' | 'md' | 'lg';
@@ -30,19 +30,18 @@ const NavPulsingDot: React.FC<NavPulsingDotProps> = ({
         md: 'h-2 w-2',
         lg: 'h-2.5 w-2.5'
     };
-
+    // Validate the color with a fallback
+    const safeColor = getSafeColor(color, '#10b981');
     return (
         <span className={`relative inline-flex ${sizeClasses[size]} ${className || ''}`}>
-            {/* Pulsing outer ring */}
             <span
                 className={`animate-ping absolute inline-flex ${pulseSize[size]} rounded-full opacity-75`}
-                style={{ backgroundColor: color }}
+                style={{backgroundColor: safeColor}}
                 aria-hidden="true"
             />
-            {/* Solid inner dot */}
             <span
                 className={`relative inline-flex rounded-full ${sizeClasses[size]}`}
-                style={{ backgroundColor: color }}
+                style={{backgroundColor: safeColor}}
                 aria-label="Activity indicator"
             />
         </span>
