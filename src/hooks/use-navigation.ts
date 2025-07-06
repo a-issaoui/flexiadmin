@@ -6,8 +6,8 @@ import { adminNavigation } from '@/config/navigation/admin.navigation';
 import { teacherNavigation } from '@/config/navigation/teacher.navigation';
 import { studentNavigation } from '@/config/navigation/student.navigation';
 import { parentNavigation } from '@/config/navigation/parent.navigation';
-import { translateNavigation } from '@/lib/navigation/navigation-utils';
-import { filterNavigationByPermissions } from '@/lib/navigation/navigation-permissions';
+import { translateNavigation } from '@/lib/navigation-utils';
+import { filterNavigationByPermissions } from '@/lib/navigation-permissions';
 import type { ProcessedNavigationGroup, UserPermissions } from '@/config/navigation/types';
 
 /**

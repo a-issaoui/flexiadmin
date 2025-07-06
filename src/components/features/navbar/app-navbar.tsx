@@ -70,12 +70,7 @@ export function AppNavbar({ rtl, isMobileSSR }: AppNavbarProps) {
 
                     {/* Component controls - Priority order for mobile */}
                     <div className="flex items-center gap-1 order-1 sm:order-2">
-                        <LanguageSelector
-                            variant="button"
-                            showDirectionToggle
-                            showReset
-                            refreshOnChange={false}
-                        />
+                        <LanguageSelector />
                         <ThemeSwitcher />
                         <AppSms />
                         <AppNotification />
