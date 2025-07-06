@@ -1,7 +1,8 @@
 // src/config/navigation/admin-navigation.ts
 
-import type { NavigationGroup ,SafeColor} from './types';
-import {NavigationActions} from "@/lib/navigation-actions";
+import type { NavigationGroup } from './types';
+import type {SafeColor} from "@/lib/color-validation";
+import {NavigationActions} from "@/lib/navigation/navigation-actions";
 /**
  * Admin navigation demonstrating correct pulsing dot usage.
  * Pulsing dots will only appear on parent items when their children have badges.

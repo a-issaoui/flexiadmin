@@ -5,7 +5,7 @@
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { getPageInfo } from '@/lib/navigation-utils';
+import { getPageInfo } from '@/lib/navigation/navigation-utils';
 
 interface PageHeaderProps {
     title?: string;

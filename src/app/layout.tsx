@@ -5,7 +5,10 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
-import { getUserLocale } from "@/stores/locale.store";
+
+import { getLocaleFromServerCookie } from '@/lib/ssr/locale-cookie';
+import { LocaleHydrator } from '@/components/common/hydrator/LocaleHydrator';
+
 
 import "./globals.css";
 import React from "react";
@@ -66,13 +69,18 @@ export const viewport: Viewport = {
     ],
 };
 
-export default async function RootLayout({ children }: RootLayoutProps) {
-    const { lang, dir } = await getUserLocale();
+export default async function RootLayout({
+                                             children
+                                         }: {
+    children: React.ReactNode
+}) {
+    const { lang, dir } = await getLocaleFromServerCookie();
     const messages = await getMessages();
 
     return (
         <html lang={lang} dir={dir} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
+        <LocaleHydrator />
         <ProgressBar />
         <ThemeProvider
             attribute="class"

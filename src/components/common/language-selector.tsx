@@ -1,104 +1,306 @@
-"use client";
-
-import React, { useTransition, useEffect, useState } from "react";
-import { useLocale } from "next-intl";
-import { Check } from "lucide-react";
-import { setUserLocale } from "@/stores/locale.store";
+// components/AdminLanguageSelector.tsx - Perfect admin language selector
+'use client';
+import React, { useState } from 'react';
+import { Check, Globe, RotateCcw, Languages } from 'lucide-react';
+import { useLocale } from '@/stores/locale.store';
 import {
     localesConfig,
     isValidLocaleCode,
     type LocaleCode,
-} from "@/config/locales.config";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/config/locales.config';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+    DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { useTranslations } from '@/hooks/useTranslations';
 
-interface LocaleSwitcherProps {
+interface AdminLanguageSelectorProps {
     className?: string;
+    variant?: 'icon' | 'button' | 'compact' | 'full';
+    showDirectionToggle?: boolean;
+    showReset?: boolean;
 }
 
-export default function LanguageSelector({ className }: LocaleSwitcherProps) {
-    const currentLocale = useLocale() as LocaleCode;
-    const [isPending, startTransition] = useTransition();
-    const [isClient, setIsClient] = useState(false);
-    const [isOpen, setIsOpen] = useState(false); // Track dropdown open state
+export default function AdminLanguageSelector({
+                                                  className,
+                                                  variant = 'icon',
+                                                  showDirectionToggle = true,
+                                                  showReset = false
+                                              }: AdminLanguageSelectorProps) {
+    const t = useTranslations('common');
+    const {
+        lang,
+        dir,
+        config,
+        setLocale,
+        setDirection,
+        resetLocale,
+        _hydrated
+    } = useLocale();
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+    const [isOpen, setIsOpen] = useState(false);
 
-    const handleLocaleChange = (value: string) => {
-        if (!isValidLocaleCode(value) || value === currentLocale) return;
-
-        startTransition(async () => {
-            try {
-                await setUserLocale(value);
-            } catch (error) {
-                console.error("Failed to set user locale:", error);
-            }
-        });
+    const handleLocaleChange = (newLocale: LocaleCode) => {
+        if (!isValidLocaleCode(newLocale) || newLocale === lang) return;
+        setIsOpen(false);
+        setLocale(newLocale); // ✨ Instant change!
     };
 
-    if (!isClient) {
+    const handleDirectionToggle = () => {
+        setDirection(dir === 'ltr' ? 'rtl' : 'ltr');
+    };
+
+    const handleReset = () => {
+        resetLocale();
+    };
+
+    if (!_hydrated) {
+        return <Skeleton className="w-10 h-10 rounded-full animate-pulse" />;
+    }
+
+    // Compact variant for tight spaces
+    if (variant === 'compact') {
         return (
-            <Skeleton
-                aria-hidden
-                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
-            />
+            <select
+                value={lang}
+                onChange={(e) => handleLocaleChange(e.target.value as LocaleCode)}
+                className={cn(
+                    "px-2 py-1 text-sm bg-background border rounded focus:ring-2 focus:ring-primary",
+                    dir === 'rtl' && "text-right",
+                    className
+                )}
+                title={t('language')}
+            >
+                {localesConfig.map((locale) => (
+                    <option key={locale.code} value={locale.code}>
+                        {locale.flag} {locale.code.toUpperCase()}
+                    </option>
+                ))}
+            </select>
         );
     }
 
-    const currentLocaleConfig = localesConfig.find((l) => l.code === currentLocale);
+    // Full variant with labels
+    if (variant === 'full') {
+        return (
+            <div className={cn("flex items-center gap-3", className)}>
+                <Languages className="h-4 w-4 text-muted-foreground" />
+                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className={cn(
+                                "justify-between gap-3 min-w-[140px]",
+                                dir === 'rtl' && "flex-row-reverse"
+                            )}
+                        >
+                            <div className={cn(
+                                "flex items-center gap-2",
+                                dir === 'rtl' && "flex-row-reverse"
+                            )}>
+                                <span className="text-lg">{config.flag}</span>
+                                <span className="font-medium">{config.nativeName}</span>
+                            </div>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align={dir === 'rtl' ? 'start' : 'end'} className="w-56">
+                        <DropdownMenuLabel>{t('selectLanguage')}</DropdownMenuLabel>
+                        {localesConfig.map((locale) => (
+                            <DropdownMenuItem
+                                key={locale.code}
+                                onClick={() => handleLocaleChange(locale.code)}
+                                className="cursor-pointer"
+                            >
+                                <LocaleMenuItem
+                                    locale={locale}
+                                    isSelected={locale.code === lang}
+                                    dir={dir}
+                                />
+                            </DropdownMenuItem>
+                        ))}
 
-    return (
-        <div className="relative w-10 h-10 flex items-center justify-center">
+                        {(showDirectionToggle || showReset) && (
+                            <>
+                                <DropdownMenuSeparator />
+                                {showDirectionToggle && (
+                                    <DropdownMenuItem onClick={handleDirectionToggle} className="cursor-pointer">
+                                        <div className={cn(
+                                            "flex items-center gap-3 w-full",
+                                            dir === 'rtl' && "flex-row-reverse"
+                                        )}>
+                                            <RotateCcw className="h-4 w-4" />
+                                            <span>{t('toggleDirection')}: {dir.toUpperCase()}</span>
+                                        </div>
+                                    </DropdownMenuItem>
+                                )}
+                                {showReset && (
+                                    <DropdownMenuItem onClick={handleReset} className="cursor-pointer text-muted-foreground">
+                                        <div className={cn(
+                                            "flex items-center gap-3 w-full",
+                                            dir === 'rtl' && "flex-row-reverse"
+                                        )}>
+                                            <Globe className="h-4 w-4" />
+                                            <span>{t('resetToDefault')}</span>
+                                        </div>
+                                    </DropdownMenuItem>
+                                )}
+                            </>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        );
+    }
+
+    // Button variant
+    if (variant === 'button') {
+        return (
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={isPending}
+                        variant="outline"
+                        size="sm"
                         className={cn(
-                            "rounded-full cursor-pointer w-10 h-10",
-                            isOpen && "bg-accent",
+                            "gap-2",
+                            dir === 'rtl' && "flex-row-reverse",
                             className
                         )}
                     >
-            <span className="flex items-center justify-center text-[18px] w-7 h-7">
-              {currentLocaleConfig?.flag || "🌐"}
-            </span>
+                        <span className="text-lg">{config.flag}</span>
+                        <span className="hidden sm:inline">{config.nativeName}</span>
+                        <span className="sm:hidden">{lang.toUpperCase()}</span>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 p-1">
+                <DropdownMenuContent align={dir === 'rtl' ? 'start' : 'end'} className="w-48">
+                    <DropdownMenuLabel>{t('selectLanguage')}</DropdownMenuLabel>
                     {localesConfig.map((locale) => (
                         <DropdownMenuItem
                             key={locale.code}
                             onClick={() => handleLocaleChange(locale.code)}
-                            disabled={locale.code === currentLocale || isPending}
                             className="cursor-pointer"
                         >
-                            <div className="flex items-center gap-3 w-full">
-                                <span className="text-lg">{locale.flag}</span>
-                                <div className="flex flex-col flex-1">
-                                    <span className="font-medium">{locale.name}</span>
-                                    <span className="text-xs text-muted-foreground">
-                    {locale.nativeName}
-                  </span>
-                                </div>
-                                {locale.code === currentLocale && (
-                                    <Check className="h-4 w-4 text-primary" />
-                                )}
-                            </div>
+                            <LocaleMenuItem
+                                locale={locale}
+                                isSelected={locale.code === lang}
+                                dir={dir}
+                            />
                         </DropdownMenuItem>
                     ))}
+
+                    {showDirectionToggle && (
+                        <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleDirectionToggle} className="cursor-pointer">
+                                <div className={cn(
+                                    "flex items-center gap-3 w-full",
+                                    dir === 'rtl' && "flex-row-reverse"
+                                )}>
+                                    <RotateCcw className="h-4 w-4" />
+                                    <span>{t('toggleDirection')}</span>
+                                </div>
+                            </DropdownMenuItem>
+                        </>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
+        );
+    }
+
+    // Default icon variant
+    return (
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                        "rounded-full w-9 h-9 relative hover:bg-accent",
+                        className
+                    )}
+                    title={`${t('currentLanguage')}: ${config.nativeName}`}
+                >
+                    <span className="text-lg">{config.flag}</span>
+                    {dir === 'rtl' && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full flex items-center justify-center text-[8px] text-primary-foreground font-bold">
+              ر
+            </span>
+                    )}
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={dir === 'rtl' ? 'start' : 'end'} className="w-52">
+                <DropdownMenuLabel>{t('selectLanguage')}</DropdownMenuLabel>
+                {localesConfig.map((locale) => (
+                    <DropdownMenuItem
+                        key={locale.code}
+                        onClick={() => handleLocaleChange(locale.code)}
+                        className="cursor-pointer"
+                    >
+                        <LocaleMenuItem
+                            locale={locale}
+                            isSelected={locale.code === lang}
+                            dir={dir}
+                        />
+                    </DropdownMenuItem>
+                ))}
+
+                {showDirectionToggle && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleDirectionToggle} className="cursor-pointer">
+                            <div className={cn(
+                                "flex items-center gap-3 w-full",
+                                dir === 'rtl' && "flex-row-reverse"
+                            )}>
+                                <RotateCcw className="h-4 w-4" />
+                                <div className="flex flex-col flex-1">
+                                    <span className="font-medium">{t('toggleDirection')}</span>
+                                    <span className="text-xs text-muted-foreground">
+                    {t('current')}: {dir.toUpperCase()}
+                  </span>
+                                </div>
+                            </div>
+                        </DropdownMenuItem>
+                    </>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+// LocaleMenuItem component
+interface LocaleMenuItemProps {
+    locale: typeof localesConfig[number];
+    isSelected: boolean;
+    dir: 'ltr' | 'rtl';
+}
+
+function LocaleMenuItem({ locale, isSelected, dir }: LocaleMenuItemProps) {
+    return (
+        <div className={cn(
+            "flex items-center gap-3 w-full",
+            dir === 'rtl' && "flex-row-reverse"
+        )}>
+            <span className="text-lg">{locale.flag}</span>
+            <div className={cn(
+                "flex flex-col flex-1",
+                dir === 'rtl' && "items-end"
+            )}>
+                <span className="font-medium">{locale.name}</span>
+                <span className="text-xs text-muted-foreground">
+          {locale.nativeName}
+        </span>
+            </div>
+            {isSelected && (
+                <Check className="h-4 w-4 text-primary" />
+            )}
         </div>
     );
 }
+

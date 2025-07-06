@@ -1,5 +1,4 @@
 // src/components/features/navigation/vertical-navigation/components/nav-recursive-item.tsx
-
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import {
@@ -25,9 +24,6 @@ interface NavRecursiveItemProps {
     level: number;
 }
 
-/**
- * Enhanced navigation item component with correct pulsing dot logic
- */
 const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                                                                item,
                                                                currentPath,
@@ -37,8 +33,8 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
     const { state } = useSidebar();
     const hasChildren = !!item.children?.length;
     const isSubmenu = level > 0;
+    const isCollapsed = state === 'collapsed';
 
-    // Enhanced active state calculation
     const isActive = useMemo(() => {
         const checkActive = (navItem: ProcessedNavigationItem): boolean => {
             if (navItem.href === currentPath) return true;
@@ -47,57 +43,28 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
         return checkActive(item);
     }, [item, currentPath]);
 
-    /**
-     * CORRECTED LOGIC: Pulsing dots should only show for collapsible parent items
-     * when their children (or nested children) have badges.
-     *
-     * This function recursively checks if any descendant has a badge.
-     */
     const hasDescendantBadges = useMemo(() => {
         if (!hasChildren) return false;
-
         const checkDescendantBadges = (navItem: ProcessedNavigationItem): boolean => {
-            // Check if this item has a badge
             if (navItem.badge?.value !== undefined && navItem.badge?.value !== null && navItem.badge?.value !== '') {
                 return true;
             }
-
-            // Recursively check children
             if (navItem.children?.length) {
                 return navItem.children.some(checkDescendantBadges);
             }
-
             return false;
         };
-
         return item.children?.some(checkDescendantBadges) ?? false;
     }, [hasChildren, item.children]);
 
-    /**
-     * Determine if pulsing dot should be shown.
-     * Only show for:
-     * 1. Items that have children (collapsible items)
-     * 2. When those children (or their descendants) have badges
-     * 3. When sidebar is collapsed (so badges aren't visible)
-     */
     const shouldShowPulsingDot = useMemo(() => {
-        return hasChildren && hasDescendantBadges && state === 'collapsed';
-    }, [hasChildren, hasDescendantBadges, state]);
+        return hasChildren && hasDescendantBadges && isCollapsed;
+    }, [hasChildren, hasDescendantBadges, isCollapsed]);
 
-    /**
-     * For expanded sidebar, show a small indicator if children have badges
-     * but the menu is collapsed (closed, not sidebar collapsed)
-     */
     const [isOpen, setIsOpen] = useState(item.defaultExpanded ?? isActive);
-    const shouldShowExpandedIndicator = useMemo(() => {
-        return hasChildren && hasDescendantBadges && state !== 'collapsed' && !isOpen;
-    }, [hasChildren, hasDescendantBadges, state, isOpen]);
-
-
 
     const handleTriggerClick = useCallback(
         (e: React.MouseEvent) => {
-            // Don't do anything if the item is disabled
             if (item.disabled) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -113,81 +80,127 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
         [hasChildren, item, onMenuClick]
     );
 
+    // 🎯 FIXED: Proper icon centering with consistent sizing
+    const renderIcon = () => {
+        if (!item.icon) return null;
+
+        return (
+            <div className={cn(
+                // ✅ CRITICAL: Consistent container sizing for all states
+                "relative flex items-center justify-center shrink-0",
+                // ✅ Fixed size container that doesn't change between states
+                "w-5 h-5",
+                // ✅ Ensure submenu icons are slightly smaller but still centered
+                isSubmenu && "w-4 h-4"
+            )}>
+                <Icon
+                    {...item.icon}
+                    // ✅ CRITICAL: Consistent icon sizing
+                    size={isSubmenu ? 14 : 16}
+                    className={cn(
+                        // ✅ Remove any margin/padding that could offset centering
+                        "shrink-0",
+                        // ✅ Ensure icon fills container properly
+                        "w-full h-full",
+                        item.disabled && "opacity-50"
+                    )}
+                    color={item.disabled ? undefined : (sanitizeColor(item.icon.color) || "currentColor")}
+                />
+
+                {/* ✅ FIXED: Pulsing dot positioned relative to icon container */}
+                {shouldShowPulsingDot && (
+                    <div className="absolute -top-2 -end-1.25">
+                        <NavPulsingDot color={item.dotColor || '#10b981'} size="sm" />
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // 🎯 FIXED: Proper content rendering that handles collapsed state
     const renderMenuContent = () => (
         <>
-            {/* Enhanced icon with pulsing dot logic */}
-            {item.icon && (
-                <div className="relative">
-                    <Icon
-                        {...item.icon}
-                        size={isSubmenu ? 16 : 18}
-                        className={cn(
-                            "flex-shrink-0",
-                            item.disabled && "opacity-50"
-                        )}
-                        color={item.disabled ? undefined : (sanitizeColor(item.icon.color) || "currentColor")}
-                  />
-                    {/* CORRECTED: Only show pulsing dot for collapsed sidebar with child badges */}
-                    {shouldShowPulsingDot && (
-                        <div className="absolute -top-2 -end-0.5">
-                            <NavPulsingDot color={item.dotColor || '#10b981'}/>
-                        </div>
+            {/* ✅ Icon with proper centering */}
+            {renderIcon()}
+
+            {/* ✅ CRITICAL: Content that disappears completely in collapsed state */}
+            <div className={cn(
+                "flex items-center justify-between flex-1 min-w-0",
+                // ✅ Hide content in collapsed state, not just make transparent
+                isCollapsed && "sr-only"
+            )}>
+                {/* Label and indicator */}
+                <span className={cn(
+                    "flex items-center flex-1 min-w-0",
+                    item.disabled && "opacity-50"
+                )}>
+                    <span
+                        className="truncate"
+                        style={{
+                            color: item.disabled ? undefined : sanitizeColor(item.color)
+                        }}
+                    >
+                        {item.label}
+                    </span>
+
+                    {/* Expanded indicator for non-collapsed state */}
+                    {hasChildren && hasDescendantBadges && !isCollapsed && !isOpen && (
+                        <span className="ms-1 mb-3">
+                            <NavPulsingDot color={item.dotColor || '#10b981'} size="sm" />
+                        </span>
+                    )}
+                </span>
+
+                {/* Right side content */}
+                <div className="flex items-center gap-1 ml-2">
+                    {/* Badge */}
+                    {item.badge && <NavBadge badge={item.badge} />}
+
+                    {/* Actions */}
+                    {item.actions && (
+                        <NavActions
+                            actions={item.actions}
+                            size="md"
+                            sideOffset={hasChildren ? 44 : 20}
+                        />
+                    )}
+
+                    {/* Expand indicator */}
+                    {hasChildren && (
+                        <Icon
+                            name="CaretRightIcon"
+                            size={14}
+                            className={cn(
+                                'transition-transform shrink-0',
+                                item.disabled && "opacity-50",
+                                isOpen
+                                    ? 'rotate-90'
+                                    : 'rotate-0'
+                            )}
+                            color={item.disabled ? undefined : (sanitizeColor(item.color) || "currentColor")}
+                        />
                     )}
                 </div>
-            )}
-
-            {/* Enhanced label with expanded indicator logic */}
-            <span className="flex-1 truncate flex items-center min-w-0">
-                <span
-                    className={cn("truncate", item.disabled && "opacity-50")}
-                    style={{
-                        color: item.disabled ? undefined : sanitizeColor(item.color)
-                    }}
-                >
-                    {item.label}
-                </span>
-                {/* CORRECTED: Show small indicator for expanded sidebar when menu is closed but has child badges */}
-                {shouldShowExpandedIndicator && (
-                    <span className="ms-1 mb-1">
-                        <NavPulsingDot color={item.dotColor || '#10b981'} />
-                    </span>
-                )}
-            </span>
-
-            {/* Badge - only for this specific item, not related to children */}
-            {item.badge && <NavBadge badge={item.badge} />}
-
-            {/* Actions support */}
-            {item.actions && (
-                <NavActions
-                    actions={item.actions}
-                    size="md"
-                    sideOffset={hasChildren ? 44 : 20}
-                />
-            )}
-
-            {/* Enhanced expand indicator with custom color */}
-            {hasChildren && (
-                <Icon
-                    name="CaretRightIcon"
-                    className={cn(
-                        'transition-transform flex-shrink-0',
-                        item.disabled && "opacity-50",
-                        isOpen
-                            ? 'ltr:rotate-90 rtl:rotate-90'
-                            : 'ltr:rotate-0 rtl:rotate-180'
-                    )}
-                    color={item.disabled ? undefined : (sanitizeColor(item.color) || "currentColor")}
-                />
-            )}
+            </div>
         </>
     );
 
+    // ✅ CRITICAL: Proper button styling for collapsed state
     const buttonProps = {
         isActive,
-        tooltip: state === 'collapsed' ? item.label : undefined,
+        tooltip: isCollapsed ? item.label : undefined,
         className: cn(
-            'w-full',
+            // ✅ Ensure consistent width and centering
+            "w-full relative",
+            // ✅ CRITICAL: Proper centering in collapsed state
+            isCollapsed && [
+                "justify-center", // Center content horizontally
+                "px-0",           // Remove horizontal padding
+                "h-8",            // Fixed height for consistency
+            ],
+            // ✅ Normal spacing for expanded state
+            !isCollapsed && "justify-start px-2",
+            // ✅ Disabled state
             item.disabled && 'cursor-not-allowed opacity-50'
         ),
         disabled: item.disabled,
@@ -205,25 +218,28 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                             {renderMenuContent()}
                         </SidebarMenuButton>
                     </CollapsibleTrigger>
-                    <CollapsibleContent>
-                        <SidebarMenuSub>
-                            {(item.children ?? []).map((child) => (
-                                <NavRecursiveItem
-                                    key={child.id}
-                                    item={child}
-                                    currentPath={currentPath}
-                                    onMenuClick={onMenuClick}
-                                    level={level + 1}
-                                />
-                            ))}
-                        </SidebarMenuSub>
-                    </CollapsibleContent>
+                    {/* ✅ Only render children in expanded sidebar */}
+                    {!isCollapsed && (
+                        <CollapsibleContent>
+                            <SidebarMenuSub>
+                                {(item.children ?? []).map((child) => (
+                                    <NavRecursiveItem
+                                        key={child.id}
+                                        item={child}
+                                        currentPath={currentPath}
+                                        onMenuClick={onMenuClick}
+                                        level={level + 1}
+                                    />
+                                ))}
+                            </SidebarMenuSub>
+                        </CollapsibleContent>
+                    )}
                 </ItemContainer>
             </Collapsible>
         );
     }
 
-    // Leaf items that navigate to pages - these should NEVER show pulsing dots
+    // Leaf items
     return (
         <ItemContainer>
             <SidebarMenuButton asChild {...buttonProps}>
@@ -237,10 +253,9 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                         }
                         onMenuClick(item, e);
                     }}
-                    className="w-full flex items-center gap-2"
+                    className="w-full flex items-center"
                     aria-disabled={item.disabled}
                     style={{
-                        // Apply custom color to the entire link if specified
                         color: item.disabled ? undefined : sanitizeColor(item.color)
                     }}
                 >
@@ -250,7 +265,5 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
         </ItemContainer>
     );
 };
-
-NavRecursiveItem.displayName = 'NavRecursiveItem';
 
 export default memo(NavRecursiveItem);

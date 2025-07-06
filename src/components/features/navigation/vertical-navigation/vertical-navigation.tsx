@@ -1,5 +1,3 @@
-// src/components/features/navigation/vertical-navigation/vertical-navigation.tsx
-
 "use client"
 import React from 'react';
 import { NavContent } from '@/components/features/navigation/vertical-navigation/components/nav-content'
@@ -11,6 +9,7 @@ import { NavUser } from "@/components/features/navigation/vertical-navigation/co
 import { UserData } from "@/data/user-data";
 import useMenuHandler from "@/hooks/use-menu-handler"
 import { useRoleNavigation } from "@/hooks/use-navigation";
+import { useLayoutStore } from '@/stores/layout.store';
 import type { UserPermissions } from '@/config/navigation/types';
 
 export type VerticalNavigationProps = {
@@ -30,6 +29,9 @@ export default function VerticalNavigation({ rtl, role, userPermissions }: Verti
     const pathname = usePathname();
     const { handleMenuClick } = useMenuHandler();
 
+    // Get the current sidebar variant from the store
+    const sidebarVariant = useLayoutStore(state => state.sidebar.sidebarVariant);
+
     // Get the navigation data for the specified role
     const navigationGroups = useRoleNavigation(role, userPermissions);
 
@@ -37,7 +39,7 @@ export default function VerticalNavigation({ rtl, role, userPermissions }: Verti
 
     return (
         <Sidebar
-            variant="sidebar"
+            variant={sidebarVariant} // Use the dynamic variant from the store
             side={side}
             collapsible="icon"
         >
