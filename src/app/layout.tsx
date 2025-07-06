@@ -5,17 +5,16 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
+import { LocaleProvider } from '@/common/LocaleProvider';
+import { I18nProvider } from '@/i18n/I18nProvider';
 
 import { getLocaleFromServerCookie } from '@/lib/ssr/locale-cookie';
-import { LocaleHydrator } from '@/components/common/hydrator/LocaleHydrator';
 
 
 import "./globals.css";
 import React from "react";
 
-interface RootLayoutProps {
-    children: React.ReactNode;
-}
+
 
 const geistSans = Geist({
     variable: "--font-geist-sans",

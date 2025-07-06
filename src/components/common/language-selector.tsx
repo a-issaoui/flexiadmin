@@ -1,8 +1,7 @@
-// components/AdminLanguageSelector.tsx - Perfect admin language selector
 'use client';
 import React, { useState } from 'react';
 import { Check, Globe, RotateCcw, Languages } from 'lucide-react';
-import { useLocale } from '@/stores/locale.store';
+import { useLocaleStore } from '@/stores/locale.store';
 import {
     localesConfig,
     isValidLocaleCode,
@@ -19,9 +18,9 @@ import {
     DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useTranslations } from '@/hooks/useTranslations';
+import { useTranslations } from '@/hooks/i18n/useTranslations';
 
-interface AdminLanguageSelectorProps {
+interface LanguageSelectorProps {
     className?: string;
     variant?: 'icon' | 'button' | 'compact' | 'full';
     showDirectionToggle?: boolean;
@@ -33,7 +32,7 @@ export default function AdminLanguageSelector({
                                                   variant = 'icon',
                                                   showDirectionToggle = true,
                                                   showReset = false
-                                              }: AdminLanguageSelectorProps) {
+                                              }: LanguageSelectorProps) {
     const t = useTranslations('common');
     const {
         lang,
@@ -43,7 +42,7 @@ export default function AdminLanguageSelector({
         setDirection,
         resetLocale,
         _hydrated
-    } = useLocale();
+    } = useLocaleStore();
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -303,4 +302,3 @@ function LocaleMenuItem({ locale, isSelected, dir }: LocaleMenuItemProps) {
         </div>
     );
 }
-
