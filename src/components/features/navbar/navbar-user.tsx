@@ -11,7 +11,7 @@ import { UserDropdown } from '@/components/common/user-dropdown';
 import { useNavbar } from '@/components/features/navbar/app-navbar';
 import type { UserType } from '@/types/user.types';
 
-export function NavUser({ user }: { user: UserType }) {
+export function NavbarUser({ user }: { user: UserType }) {
     const { activeDropdown, setActiveDropdown } = useNavbar();
 
     // State to track image loading and error

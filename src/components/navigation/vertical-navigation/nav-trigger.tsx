@@ -1,4 +1,4 @@
-// src/components/features/navbar/SidebarTrigger.tsx
+// src/components/features/navbar/NavTrigger.tsx
 'use client';
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
@@ -15,7 +15,7 @@ type SidebarTriggerProps = {
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-export default function SidebarTrigger({
+export default function NavTrigger({
                                            className,
                                            onClick,
                                            isMobileSSR = false,
@@ -30,7 +30,7 @@ export default function SidebarTrigger({
 
     useEffect(() => {
         setMounted(true);
-        console.log('🔧 RTL SidebarTrigger mounted:', {
+        console.log('🔧 RTL NavTrigger mounted:', {
             isRTL,
             direction,
             open,

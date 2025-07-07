@@ -1,6 +1,6 @@
 'use client';
 
-export default function SearchInput() {
+export default function NavabarSearch() {
     return (
         null
     )
@@ -10,7 +10,7 @@ import { useKBar } from 'kbar';
 import { ListMagnifyingGlassIcon } from "@phosphor-icons/react";
 import { Button } from '@/components/ui/button';
 
-export default function SearchInput() {
+export default function NavabarSearch() {
     const { query } = useKBar();
     return (
         <div className='w-full space-y-2'>

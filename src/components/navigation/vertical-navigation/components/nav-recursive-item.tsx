@@ -13,9 +13,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/common/icon';
 import type { ProcessedNavigationItem } from '@/config/navigation/types';
-import NavPulsingDot from '@/components/features/navigation/vertical-navigation/components/nav-pulsing-dot';
-import NavBadge from '@/components/features/navigation/vertical-navigation/components/nav-badge';
-import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
+import NavPulsingDot from '@/components/navigation/vertical-navigation/components/nav-pulsing-dot';
+import NavBadge from '@/components/navigation/vertical-navigation/components/nav-badge';
+import NavActions from '@/components/navigation/vertical-navigation/components/nav-actions';
 import { sanitizeColor } from '@/lib/color-validation';
 
 interface NavRecursiveItemProps {

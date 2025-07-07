@@ -1,4 +1,4 @@
-// AppSms.jsx - Refactored with Button + Framer Motion
+// NavbarSms.jsx - Refactored with Button + Framer Motion
 'use client';
 
 import React, {useState, useEffect, useMemo, useCallback} from 'react';
@@ -7,7 +7,7 @@ import {Button} from '@/components/ui/button';
 import {Icon} from '@/components/common/icon';
 import {Skeleton} from '@/components/ui/skeleton';
 
-export default function AppSms() {
+export default function NavbarSms() {
     const [isAvailable, setIsAvailable] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ export default function AppSms() {
                 return newState;
             });
         } catch (error) {
-            console.error('Failed to toggle AppSms:', error);
+            console.error('Failed to toggle NavbarSms:', error);
         } finally {
             setIsLoading(false);
         }

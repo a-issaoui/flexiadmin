@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { ProcessedNavigationGroup, ProcessedNavigationItem } from '@/config/navigation/types';
-import NavRecursiveItem from '@/components/features/navigation/vertical-navigation/components/nav-recursive-item';
-import NavActions from '@/components/features/navigation/vertical-navigation/components/nav-actions';
+import NavRecursiveItem from '@/components/navigation/vertical-navigation/components/nav-recursive-item';
+import NavActions from '@/components/navigation/vertical-navigation/components/nav-actions';
 import { Icon } from '@/components/common/icon';
 import { cn } from '@/lib/utils';
 

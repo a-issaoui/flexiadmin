@@ -71,7 +71,7 @@ const initialNotifications = [
     },
 ];
 
-// AppNotification actions based on type
+// NavbarNotification actions based on type
 const notificationActions = {
     'comment': { primary: 'Reply', secondary: 'View Post' },
     'system': { primary: 'View Details', secondary: 'Dismiss' },
@@ -98,7 +98,7 @@ const NotificationIcon = memo(({ iconName, className, priority }) => {
 
 NotificationIcon.displayName = 'NotificationIcon';
 
-const AppNotification = memo(() => {
+const NavbarNotification = memo(() => {
     const { activeDropdown, setActiveDropdown } = useNavbar();
     const [mounted, setMounted] = useState(false);
     const [notifications, setNotifications] = useState(initialNotifications);
@@ -360,6 +360,6 @@ const AppNotification = memo(() => {
 );
 });
 
-AppNotification.displayName = 'AppNotification';
+NavbarNotification.displayName = 'NavbarNotification';
 
-export default AppNotification;
+export default NavbarNotification;

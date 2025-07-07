@@ -1,7 +1,7 @@
 // src/app/(protected)/admin/layout.tsx
 
 import { cookies, headers } from 'next/headers';
-import { VerticalNavigation } from "@/components/features/navigation/vertical-navigation";
+import { VerticalNavigation } from "@/components/navigation/vertical-navigation";
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppNavbar } from "@/components/features/navbar/app-navbar";
 import { getIsMobileFromCookies } from "@/hooks/use-mobile";

@@ -2,13 +2,13 @@
 "use client";
 
 import React, { createContext, useContext, useState } from 'react';
-import SidebarTrigger from '@/components/features/navbar/SidebarTrigger';
+import NavTrigger from '@/components/navigation/vertical-navigation/nav-trigger';
 import { Separator } from '@/components/ui/separator';
-import SearchInput from '@/components/features/navbar/SearchInput';
-import { NavUser } from '@/components/features/navbar/nav-user';
+import NavabarSearch from '@/components/features/navbar/navabar-search';
+import { NavbarUser } from '@/components/features/navbar/navbar-user';
 import { ThemeSwitcher } from '@/components/common/theme-switcher';
-import AppSms from '@/components/features/navbar/app-sms';
-import AppNotification from '@/components/features/navbar/app-notification';
+import NavbarSms from '@/components/features/navbar/navbar-sms';
+import NavbarNotification from '@/components/features/navbar/navbar-notification';
 import LanguageSelector from '@/components/common/language-selector';
 import { UserData } from '@/data/user-data';
 import { useRTL } from '@/providers/rtl-provider';
@@ -61,8 +61,8 @@ export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
                 dir={direction} // Set direction for proper RTL behavior
             >
                 <div className={`flex items-center gap-2 sm:gap-3`}>
-                    {/* SidebarTrigger automatically detects RTL */}
-                    <SidebarTrigger
+                    {/* NavTrigger automatically detects RTL */}
+                    <NavTrigger
                         isMobileSSR={isMobileSSR}
                         className={isRTL ? "translate-x-4" : "-translate-x-4"}
                     />
@@ -73,7 +73,7 @@ export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
                     {/* Search - Hidden on mobile, shown in responsive order */}
                     <div className="flex items-center gap-1 order-2 sm:order-1">
                         <div className="hidden sm:flex">
-                            <SearchInput />
+                            <NavabarSearch />
                         </div>
                     </div>
 
@@ -81,9 +81,9 @@ export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
                     <div className="flex items-center gap-1 order-1 sm:order-2">
                         <LanguageSelector />
                         <ThemeSwitcher />
-                        <AppSms />
-                        <AppNotification />
-                        <NavUser user={UserData} />
+                        <NavbarSms />
+                        <NavbarNotification />
+                        <NavbarUser user={UserData} />
                     </div>
                 </div>
             </nav>

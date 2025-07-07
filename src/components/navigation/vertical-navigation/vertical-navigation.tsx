@@ -2,12 +2,12 @@
 
 "use client"
 import React from 'react';
-import { NavContent } from '@/components/features/navigation/vertical-navigation/components/nav-content'
+import { NavContent } from '@/components/navigation/vertical-navigation/components/nav-content'
 import { usePathname } from "next/navigation";
 import { Sidebar, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
-import { NavOrganization } from "@/components/features/navigation/vertical-navigation/components/nav-organization";
+import { NavOrganization } from "@/components/navigation/vertical-navigation/components/nav-organization";
 import { OrganisationData } from "@/data/organisation-data";
-import { NavUser } from "@/components/features/navigation/vertical-navigation/components/nav-user";
+import { NavUser } from "@/components/navigation/vertical-navigation/components/nav-user";
 import { UserData } from "@/data/user-data";
 import useMenuHandler from "@/hooks/use-menu-handler"
 import { useRoleNavigation } from "@/hooks/use-navigation";

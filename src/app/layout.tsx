@@ -6,7 +6,7 @@ import {getMessages} from 'next-intl/server';
 import {ThemeProvider} from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
 import {getLocaleDataSSR} from "@/lib/cookies/locale/locale-cookie.server";
-import LocaleHydrator from "@/components/common/hydration/locale-hydrator";
+import LocaleHydrator from "@/components/hydration/locale-hydrator";
 import {RTLProvider} from "@/providers/rtl-provider";
 import {LocaleProvider} from "@/providers/locale-provider";
 
