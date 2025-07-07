@@ -1,13 +1,14 @@
 // src/app/layout.tsx
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { ThemeProvider } from "@/providers/theme-provider";
+import type {Metadata, Viewport} from "next";
+import {Geist, Geist_Mono} from "next/font/google";
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
+import {ThemeProvider} from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
-import { getLocaleDataSSR } from "@/lib/cookies/locale/locale-cookie.server";
+import {getLocaleDataSSR} from "@/lib/cookies/locale/locale-cookie.server";
 import LocaleHydrator from "@/components/common/hydration/locale-hydrator";
-import { LocaleProvider } from "@/providers/locale-provider";
+import {RTLProvider} from "@/providers/rtl-provider";
+import {LocaleProvider} from "@/providers/locale-provider";
 
 import "./globals.css";
 
@@ -38,9 +39,9 @@ export const viewport: Viewport = {
     initialScale: 1,
 };
 
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({children}: RootLayoutProps) {
     // Get initial locale data from cookie
-    const { locale, direction } = await getLocaleDataSSR();
+    const {locale, direction} = await getLocaleDataSSR();
 
     // Get SSR messages for the current locale
     const messages = await getMessages();
@@ -49,8 +50,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
     return (
         <html lang={locale} dir={direction} suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
-        <ProgressBar />
+        <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
+        <ProgressBar/>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -65,15 +67,38 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 timeZone="UTC"
                 now={new Date()}
             >
-                {/* Initialize the client store with SSR data */}
-                <LocaleHydrator initialLocale={locale} initialDirection={direction} />
+                <RTLProvider
+                    direction={direction}
+                    locale={locale}
+                >
+                    <LocaleHydrator initialLocale={locale} initialDirection={direction}/>
 
-                {/* Enhanced provider that won't show skeleton for SSR content */}
-                <LocaleProvider>
-                    {children}
-                </LocaleProvider>
+                    {/* Enhanced provider that won't show skeleton for SSR content */}
+                    <LocaleProvider>
+                        <div
+                            className="rtl-hydrating"
+                            data-testid="app-content"
+                        >
+                            {children}
+                        </div>
+                    </LocaleProvider>
+                </RTLProvider>
             </NextIntlClientProvider>
         </ThemeProvider>
+        <script
+            dangerouslySetInnerHTML={{
+                __html: `
+                            // Show content after hydration starts
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const content = document.querySelector('[data-testid="app-content"]');
+                                if (content) {
+                                    content.classList.remove('rtl-hydrating');
+                                    content.classList.add('rtl-hydrated');
+                                }
+                            });
+                        `
+            }}
+        />
         </body>
         </html>
     );

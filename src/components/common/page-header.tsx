@@ -5,34 +5,33 @@
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { getPageInfo } from '@/lib/navigation-utils';
-
+import { getPageInfo } from '@/lib/navigation/navigation-utils';
+import { useRTL } from '@/providers/rtl-provider';
+import Link from 'next/link'
 interface PageHeaderProps {
     title?: string;
     description?: string;
     className?: string;
-    rtl?: boolean;
     showBreadcrumb?: boolean;
     hidden?: boolean;
 }
 
 /**
  * Page header component that automatically generates titles and breadcrumbs
- * based on the current URL path.
- *
- * This is much simpler than the old route-based system because we use
- * direct path-to-content mapping instead of complex route resolution.
+ * based on the current URL path. Automatically detects RTL - no props needed!
  */
 export function PageHeader({
                                title: customTitle,
                                description: customDescription,
                                className,
-                               rtl = false,
                                showBreadcrumb = true,
                                hidden = false,
                            }: PageHeaderProps) {
     const pathname = usePathname();
     const t = useTranslations();
+
+    // Automatically detect RTL - no props needed!
+    const { isRTL, direction } = useRTL();
 
     // Get page information using simple path-based lookup
     const { title: pathTitle, description: pathDescription } = getPageInfo(pathname, t);
@@ -60,76 +59,76 @@ export function PageHeader({
             <nav
                 className={cn(
                     "flex items-center space-x-1 text-sm text-muted-foreground mb-2",
-                    rtl && "space-x-reverse"
+                    isRTL && "space-x-reverse"
                 )}
                 aria-label={t('common.breadcrumb')}
+                dir={direction}
             >
                 {/* Home link */}
-           <a
-                href="/"
-                className="hover:text-foreground transition-colors"
+                <Link
+                    href="/"
+                    className="hover:text-foreground transition-colors"
                 >
-                {t('common.home')}
-            </a>
+                    {t('common.home')}
+                </Link>
 
-        {/* Dynamic breadcrumb items */}
-        {breadcrumbItems.map((item, index) => (
-            <div key={item.path} className="flex items-center">
-                        <span className={cn("mx-2", rtl && "rotate-180")}>
+                {/* Dynamic breadcrumb items */}
+                {breadcrumbItems.map((item, index) => (
+                    <div key={item.path} className="flex items-center">
+                        <span className={cn("mx-2", isRTL && "rotate-180")}>
                             /
                         </span>
-                {item.isLast ? (
-                    <span className="text-foreground font-medium">
+                        {item.isLast ? (
+                            <span className="text-foreground font-medium">
                                 {item.label}
                             </span>
-                ) : (
-                  <a
-                    href={item.path}
-                    className="hover:text-foreground transition-colors"
-                    >
-                {item.label}
-                    </a>
-                    )}
-    </div>
-    ))}
-</nav>
-);
-};
+                        ) : (
+                            <a
+                                href={item.path}
+                                className="hover:text-foreground transition-colors"
+                            >
+                                {item.label}
+                            </a>
+                        )}
+                    </div>
+                ))}
+            </nav>
+        );
+    };
 
-if (hidden) {
-    return null;
-}
+    if (hidden) {
+        return null;
+    }
 
-return (
-    <div
-        className={cn(
-            "pb-4",
-            rtl && "text-right",
-            className
-        )}
-        dir={rtl ? 'rtl' : 'ltr'}
-    >
-        {getBreadcrumb()}
-
-        <h1
+    return (
+        <div
             className={cn(
-                "text-2xl sm:text-3xl font-bold tracking-tight text-foreground",
-                "leading-tight"
+                "pb-4",
+                className
             )}
+            dir={direction}
         >
-            {title}
-        </h1>
+            {getBreadcrumb()}
 
-        {description && (
-            <p
+            <h1
                 className={cn(
-                    "text-base text-muted-foreground leading-relaxed",
-                    "max-w-3xl"
+                    "text-2xl sm:text-3xl font-bold tracking-tight text-foreground",
+                    "leading-tight"
                 )}
             >
-                {description}
-            </p>
-        )}
-    </div>
-);
+                {title}
+            </h1>
+
+            {description && (
+                <p
+                    className={cn(
+                        "text-base text-muted-foreground leading-relaxed",
+                        "max-w-3xl"
+                    )}
+                >
+                    {description}
+                </p>
+            )}
+        </div>
+    );
 }

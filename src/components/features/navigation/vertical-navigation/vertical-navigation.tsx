@@ -11,29 +11,28 @@ import { NavUser } from "@/components/features/navigation/vertical-navigation/co
 import { UserData } from "@/data/user-data";
 import useMenuHandler from "@/hooks/use-menu-handler"
 import { useRoleNavigation } from "@/hooks/use-navigation";
+import { useRTL } from "@/providers/rtl-provider";
 import type { UserPermissions } from '@/config/navigation/types';
 
 export type VerticalNavigationProps = {
-    rtl: boolean;
     role: string;                       // Which role's navigation to display
     userPermissions?: UserPermissions;  // Optional permissions for filtering
 }
 
 /**
- * Main vertical navigation component.
- *
- * This component is now much simpler because it uses role-specific navigation hooks
- * that handle all the complexity of building navigation data, applying translations,
- * and filtering permissions.
+ * Main vertical navigation component with automatic RTL detection.
+ * No need to pass RTL props - it detects direction automatically!
  */
-export default function VerticalNavigation({ rtl, role, userPermissions }: VerticalNavigationProps) {
+export default function VerticalNavigation({ role, userPermissions }: VerticalNavigationProps) {
     const pathname = usePathname();
     const { handleMenuClick } = useMenuHandler();
+    const { isRTL } = useRTL(); // Automatically detect RTL
 
     // Get the navigation data for the specified role
     const navigationGroups = useRoleNavigation(role, userPermissions);
 
-    const side: 'left' | 'right' = rtl ? 'right' : 'left';
+    // Automatically determine sidebar side based on RTL
+    const side: 'left' | 'right' = isRTL ? 'right' : 'left';
 
     return (
         <Sidebar
@@ -47,7 +46,7 @@ export default function VerticalNavigation({ rtl, role, userPermissions }: Verti
 
             {/*
                 The NavContent component now receives processed navigation data.
-                No more complex configuration objects or translation helpers needed.
+                No RTL props needed - components detect direction automatically.
             */}
             <NavContent
                 navigationGroups={navigationGroups}

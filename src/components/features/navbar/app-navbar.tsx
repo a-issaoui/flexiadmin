@@ -1,3 +1,4 @@
+// src/components/features/navbar/app-navbar.tsx
 "use client";
 
 import React, { createContext, useContext, useState } from 'react';
@@ -10,6 +11,7 @@ import AppSms from '@/components/features/navbar/app-sms';
 import AppNotification from '@/components/features/navbar/app-notification';
 import LanguageSelector from '@/components/common/language-selector';
 import { UserData } from '@/data/user-data';
+import { useRTL } from '@/providers/rtl-provider';
 
 // Define allowed dropdown types or null
 type DropdownType = 'user' | null;
@@ -33,13 +35,15 @@ export const useNavbar = (): NavbarContextType => {
 };
 
 interface AppNavbarProps {
-    rtl: boolean;
     isMobileSSR?: boolean;
 }
 
-export function AppNavbar({ rtl, isMobileSSR }: AppNavbarProps) {
+export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
     const [activeDropdown, setActiveDropdown] = useState<DropdownType>(null);
     const [isSearchOpen, setSearchOpen] = useState(false);
+
+    // Automatically detect RTL - no props needed!
+    const { isRTL, direction } = useRTL();
 
     return (
         <NavbarContext.Provider
@@ -54,13 +58,18 @@ export function AppNavbar({ rtl, isMobileSSR }: AppNavbarProps) {
                 className="flex h-14 shrink-0 items-center justify-between gap-2 transition-all duration-300 ease-in-out backdrop-blur-sm bg-background/95"
                 role="navigation"
                 aria-label="Main navigation"
+                dir={direction} // Set direction for proper RTL behavior
             >
-                <div className="flex items-center gap-2 sm:gap-3">
-                    <SidebarTrigger rtl={rtl} isMobileSSR={isMobileSSR} className="-translate-x-4 rtl:translate-x-4" />
-                    <Separator orientation="vertical" className="me-2 h-4 opacity-60" />
+                <div className={`flex items-center gap-2 sm:gap-3`}>
+                    {/* SidebarTrigger automatically detects RTL */}
+                    <SidebarTrigger
+                        isMobileSSR={isMobileSSR}
+                        className={isRTL ? "translate-x-4" : "-translate-x-4"}
+                    />
+                    <Separator orientation="vertical" className="h-4 opacity-60 me-2" />
                 </div>
 
-                <div className="flex items-center gap-1 sm:gap-1.5">
+                <div className={`flex items-center gap-1 sm:gap-1.5`}>
                     {/* Search - Hidden on mobile, shown in responsive order */}
                     <div className="flex items-center gap-1 order-2 sm:order-1">
                         <div className="hidden sm:flex">
