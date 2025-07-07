@@ -1,9 +1,9 @@
-// src/components/language-selector.tsx
+// src/components/common/language-selector.tsx
 "use client";
 
 import React, { useTransition, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
-import { useLocaleStore } from "@/stores/locale.store";
+import { useLocaleStore } from "@/stores/locale.store"; // Updated import
 import {
     SUPPORTED_LOCALES,
     isSupportedLocale,
@@ -24,32 +24,62 @@ interface LocaleSwitcherProps {
 }
 
 export default function LanguageSelector({ className }: LocaleSwitcherProps) {
-    const { locale: currentLocale, direction, setLocale, isHydrated, isLoading } = useLocaleStore();
+    const {
+        locale: currentLocale,
+        direction,
+        setLocale,
+        isHydrated,
+        isLoading,
+        isTranslationsReady, // NEW
+        translationError    // NEW
+    } = useLocaleStore();
+
     const [isPending, startTransition] = useTransition();
     const [isOpen, setIsOpen] = useState(false);
 
-    const isDisabled = isPending || isLoading;
+    const isDisabled = isPending || isLoading || !isTranslationsReady;
 
     const handleLocaleChange = (value: string) => {
         if (!isSupportedLocale(value) || value === currentLocale || isDisabled) return;
 
         startTransition(() => {
             try {
-                setLocale(value as LocaleCode);
+                setLocale(value as LocaleCode); // ✨ This now switches instantly!
                 setIsOpen(false);
+
+                // Optional: Add user feedback
+                console.log(`🎉 Language switched to ${value} instantly!`);
+
+                // Optional: Toast notification
+                // toast.success(`Language changed to ${SUPPORTED_LOCALES.find(l => l.code === value)?.name}`);
             } catch (error) {
                 console.error("Failed to set user locale:", error);
             }
         });
     };
 
-    // Show skeleton until hydrated
-    if (!isHydrated) {
+    // Show skeleton until hydrated and translations ready
+    if (!isHydrated || !isTranslationsReady) {
         return (
             <Skeleton
                 aria-hidden
                 className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center"
             />
+        );
+    }
+
+    // Show error state
+    if (translationError) {
+        return (
+            <Button
+                variant="ghost"
+                size="icon"
+                disabled
+                className="rounded-full cursor-not-allowed w-10 h-10 opacity-50"
+                title="Translation error"
+            >
+                <span className="text-destructive">⚠️</span>
+            </Button>
         );
     }
 
@@ -84,9 +114,7 @@ export default function LanguageSelector({ className }: LocaleSwitcherProps) {
                 <DropdownMenuContent
                     side="bottom"
                     align="end"
-
                     className="w-42 p-1"
-
                 >
                     {SUPPORTED_LOCALES.map((locale) => {
                         const isCurrentLocale = locale.code === currentLocale;

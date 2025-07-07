@@ -13,11 +13,13 @@ export default function LocaleHydrator({ initialLocale, initialDirection }: Loca
     const { hydrate, isHydrated } = useLocaleStore();
 
     useEffect(() => {
-        // Only hydrate once on mount
+        // Hydrate on mount - this will also initialize messages
         if (!isHydrated) {
+            console.log('🚀 Hydrating locale store...');
             hydrate();
         }
     }, [hydrate, isHydrated]);
 
+    // This component doesn't render anything
     return null;
 }
