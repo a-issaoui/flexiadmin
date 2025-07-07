@@ -20,7 +20,7 @@
         "group-users": "User Management",
         "group-settings": "Settings",
         "userManagement": "Users Management",
-        "overview": "overview",
+        "overview": "Overview",
         "system": "System"
       },
       "items": {
@@ -37,28 +37,47 @@
       "groups": {
         "overview": "Overview",
         "teaching": "Teaching",
-        "assessment": "Assessment"
+        "assessment": "Assessment",
+        "dashboard": "Dashboard",
+        "students": "Students",
+        "communication": "Communication"
       },
       "items": {
-        "dashboard": "Dashboard",
-        "schedule": "Schedule",
-        "classes": "My Classes",
-        "students": "Students",
-        "assignments": "Assignments",
-        "gradebook": "Gradebook",
-        "reports": "Reports"
+        "attendance": "Attendance",
+        "overview": "Teacher Overview",
+        "lessons": "Lessons",
+        "myClasses": "My Classes",
+        "lessonPlans": "Lesson Plans",
+        "messages": "Messages",
+        "assessments": "Assessments",
+        "announcements": "Announcements",
+        "studentList": "Student List",
+        "grades": "Grades",
+        "assignments": "Assignments"
       }
     },
     "student": {
       "groups": {
         "overview": "Overview",
-        "academics": "Academics"
+        "academics": "Academics",
+        "communication": "Communication",
+        "resources": "Resources",
+        "performance": "Performance",
+        "dashboard": "Dashboard"
       },
       "items": {
-        "dashboard": "Dashboard",
-        "schedule": "Schedule",
-        "classes": "My Classes",
+        "overview": "Student Overview",
+        "courses": "Courses",
+        "certificates": "Certificates",
+        "progress": "Progress",
+        "messages": "Messages",
+        "library": "Library",
+        "help": "Help",
+        "forum": "Forum",
+        "materials": "Materials",
         "assignments": "Assignments",
+        "currentCourses": "Current Courses",
+        "schedule": "Schedule",
         "grades": "Grades"
       }
     },
@@ -66,14 +85,28 @@
       "groups": {
         "overview": "Overview",
         "children": "Children",
-        "communication": "Communication"
+        "communication": "Communication",
+        "academicTracking": "Academic Tracking",
+        "schoolInfo": "School Information",
+        "settings": "Settings",
+        "dashboard": "Dashboard"
       },
       "items": {
-        "dashboard": "Dashboard",
-        "children": "My Children",
-        "progress": "Academic Progress",
+        "reportCards": "Report Cards",
+        "overview": "Parent Overview",
+        "events": "Events",
+        "attendance": "Attendance",
+        "schoolCalendar": "School Calendar",
+        "resources": "Resources",
+        "myChildren": "My Children",
+        "assignments": "Assignments",
+        "grades": "Grades",
+        "notifications": "Notifications",
+        "profile": "Profile",
+        "announcements": "Announcements",
         "messages": "Messages",
-        "meetings": "Meetings"
+        "currentGrades": "Current Grades",
+        "teacherMeetings": "Teacher Meetings"
       }
     }
   },
@@ -198,7 +231,12 @@
     "quick-grade": "Quick Grade",
     "create-class": "Create New Class",
     "export-grades": "Export Grades",
-    "grade-calculator": "Grade Calculator"
+    "grade-calculator": "Grade Calculator",
+    "schedule-meeting": "Schedule Meeting",
+    "view-report": "View Report",
+    "create-assessment": "Create Assessment",
+    "submit-assignment": "Submit Assignment",
+    "view-attendance-report": "View Attendance Report"
   },
   "UserDropdown": {
     "account": "Account",
