@@ -8,7 +8,7 @@ import {
     getLocaleData,
     LocaleCode,
     LocaleDirection,
-    SUPPORTED_LOCALES, // ✨ Import the config
+    SUPPORTED_LOCALES,
 } from '@/config/locales.config';
 import {
     getLocaleDataClient,
@@ -25,6 +25,7 @@ interface LocaleState {
     translationError: string | null;
     isHydrated: boolean;
     isLoading: boolean;
+    isInitializing: boolean; // NEW: Prevent multiple initialization attempts
 
     setLocale: (locale: LocaleCode) => void;
     initializeMessages: () => Promise<void>;
@@ -44,53 +45,71 @@ export const useLocaleStore = create<LocaleState>()(
             translationError: null,
             isHydrated: false,
             isLoading: false,
+            isInitializing: false, // NEW
 
-            // ✨ Dynamic message loading based on config
             initializeMessages: async () => {
+                const currentState = get();
+
+                // Prevent multiple simultaneous initialization attempts
+                if (currentState.isInitializing || currentState.isTranslationsReady) {
+                    console.log('🔄 Messages already loading or ready, skipping...');
+                    return;
+                }
+
+                set((state) => {
+                    state.isInitializing = true;
+                    state.translationError = null;
+                });
+
                 try {
                     console.log('🌍 Loading translations for supported locales...');
 
-                    // ✨ Dynamically import based on SUPPORTED_LOCALES config
                     const messagePromises = SUPPORTED_LOCALES.map(async (localeConfig) => {
                         try {
-                            const messages = await import(`@/i18n/messages/${localeConfig.code}.json`);
+                            // More explicit import path
+                            const messages = await import(`../i18n/messages/${localeConfig.code}.json`);
+                            console.log(`✅ Loaded ${localeConfig.code} messages:`, !!messages.default);
                             return {
                                 code: localeConfig.code,
-                                messages: messages.default
+                                messages: messages.default || {}
                             };
                         } catch (error) {
-                            console.error(`Failed to load messages for ${localeConfig.code}:`, error);
+                            console.error(`❌ Failed to load messages for ${localeConfig.code}:`, error);
                             return {
                                 code: localeConfig.code,
-                                messages: {} // Fallback to empty object
+                                messages: {}
                             };
                         }
                     });
 
-                    // Wait for all translations to load
                     const loadedMessages = await Promise.all(messagePromises);
+                    console.log('📦 All message promises resolved:', loadedMessages.length);
 
-                    // Build the availableMessages object dynamically
                     const allMessages: Record<LocaleCode, Record<string, any>> = {};
                     loadedMessages.forEach(({ code, messages }) => {
                         allMessages[code as LocaleCode] = messages;
                     });
 
+                    const currentLocale = get().locale;
+                    console.log('🎯 Setting messages for current locale:', currentLocale);
+
                     set((state) => {
                         state.availableMessages = allMessages;
-                        state.messages = allMessages[state.locale] || {};
+                        state.messages = allMessages[currentLocale] || {};
                         state.isTranslationsReady = true;
                         state.translationError = null;
+                        state.isInitializing = false;
                     });
 
                     const loadedLocales = loadedMessages.map(m => m.code).join(', ');
-                    console.log(`✅ Translations loaded for: ${loadedLocales}`);
+                    console.log(`🎉 Translations loaded successfully for: ${loadedLocales}`);
 
                 } catch (error) {
-                    console.error('❌ Failed to load translations:', error);
+                    console.error('💥 Failed to load translations:', error);
                     set((state) => {
-                        state.translationError = 'Failed to load translations';
+                        state.translationError = `Failed to load translations: ${error instanceof Error ? error.message : 'Unknown error'}`;
                         state.isTranslationsReady = false;
+                        state.isInitializing = false;
                     });
                 }
             },
@@ -105,7 +124,6 @@ export const useLocaleStore = create<LocaleState>()(
                     return;
                 }
 
-                // Check if we have the messages ready
                 if (!currentState.availableMessages[newLocale]) {
                     console.warn(`Messages not available for locale: ${newLocale}`);
                     return;
@@ -134,10 +152,14 @@ export const useLocaleStore = create<LocaleState>()(
                 }, 50);
             },
 
-            hydrate: async () => {
+            // FIXED: Make hydrate synchronous and only set isHydrated
+            hydrate: () => {
                 if (typeof window === 'undefined') return;
 
+                console.log('🚀 Starting locale hydration...');
+
                 const localeData = getLocaleDataClient();
+                console.log('📱 Locale data from client:', localeData);
 
                 set((state) => {
                     state.locale = localeData.locale;
@@ -146,11 +168,7 @@ export const useLocaleStore = create<LocaleState>()(
                 });
 
                 updateDocumentLocale(localeData.locale, localeData.direction);
-
-                const currentState = get();
-                if (!currentState.isTranslationsReady) {
-                    await currentState.initializeMessages();
-                }
+                console.log('✅ Locale hydration complete');
             },
 
             reset: () => {
@@ -163,6 +181,7 @@ export const useLocaleStore = create<LocaleState>()(
                     state.translationError = null;
                     state.isHydrated = false;
                     state.isLoading = false;
+                    state.isInitializing = false;
                 });
 
                 if (typeof window !== 'undefined') {
@@ -173,7 +192,6 @@ export const useLocaleStore = create<LocaleState>()(
     )
 );
 
-// Rest of the file remains the same...
 function updateDocumentLocale(locale: LocaleCode, direction: LocaleDirection) {
     if (typeof window === 'undefined') return;
 
@@ -195,6 +213,7 @@ function updateDocumentLocale(locale: LocaleCode, direction: LocaleDirection) {
     }
 }
 
+// Keep subscription logic
 if (typeof window !== 'undefined') {
     useLocaleStore.subscribe(
         (state) => ({

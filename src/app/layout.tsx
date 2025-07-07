@@ -51,9 +51,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
             storageKey="flexiadmin-theme"
         >
-            {/* ✨ Replace NextIntlClientProvider with DynamicLocaleProvider */}
+            <LocaleHydrator initialLocale={locale} initialDirection={direction} />
             <LocaleProvider>
-                <LocaleHydrator initialLocale={locale} initialDirection={direction} />
                 {children}
             </LocaleProvider>
         </ThemeProvider>
