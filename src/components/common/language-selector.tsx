@@ -1,12 +1,12 @@
+// src/components/language-selector.tsx
 "use client";
 
-import React, { useTransition, useEffect, useState } from "react";
-import { useLocale } from "next-intl";
-import { Check } from "lucide-react";
-import { setUserLocale } from "@/stores/locale.store";
+import React, { useTransition, useState } from "react";
+import { Check, Loader2 } from "lucide-react";
+import { useLocaleStore } from "@/stores/locale.store";
 import {
-    localesConfig,
-    isValidLocaleCode,
+    SUPPORTED_LOCALES,
+    isSupportedLocale,
     type LocaleCode,
 } from "@/config/locales.config";
 import { Button } from "@/components/ui/button";
@@ -24,28 +24,27 @@ interface LocaleSwitcherProps {
 }
 
 export default function LanguageSelector({ className }: LocaleSwitcherProps) {
-    const currentLocale = useLocale() as LocaleCode;
+    const { locale: currentLocale, direction, setLocale, isHydrated, isLoading } = useLocaleStore();
     const [isPending, startTransition] = useTransition();
-    const [isClient, setIsClient] = useState(false);
-    const [isOpen, setIsOpen] = useState(false); // Track dropdown open state
+    const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+    const isDisabled = isPending || isLoading;
 
     const handleLocaleChange = (value: string) => {
-        if (!isValidLocaleCode(value) || value === currentLocale) return;
+        if (!isSupportedLocale(value) || value === currentLocale || isDisabled) return;
 
-        startTransition(async () => {
+        startTransition(() => {
             try {
-                await setUserLocale(value);
+                setLocale(value as LocaleCode);
+                setIsOpen(false);
             } catch (error) {
                 console.error("Failed to set user locale:", error);
             }
         });
     };
 
-    if (!isClient) {
+    // Show skeleton until hydrated
+    if (!isHydrated) {
         return (
             <Skeleton
                 aria-hidden
@@ -54,7 +53,7 @@ export default function LanguageSelector({ className }: LocaleSwitcherProps) {
         );
     }
 
-    const currentLocaleConfig = localesConfig.find((l) => l.code === currentLocale);
+    const currentLocaleConfig = SUPPORTED_LOCALES.find((l) => l.code === currentLocale);
 
     return (
         <div className="relative w-10 h-10 flex items-center justify-center">
@@ -63,40 +62,64 @@ export default function LanguageSelector({ className }: LocaleSwitcherProps) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        disabled={isPending}
+                        disabled={isDisabled}
                         className={cn(
-                            "rounded-full cursor-pointer w-10 h-10",
+                            "rounded-full cursor-pointer w-10 h-10 transition-all duration-200",
+                            "focus:outline-none focus-visible:ring-0 focus:ring-0",
                             isOpen && "bg-accent",
+                            isDisabled && "opacity-50",
                             className
                         )}
+                        aria-label={`Change language. Current: ${currentLocaleConfig?.name || currentLocale}`}
                     >
-            <span className="flex items-center justify-center text-[18px] w-7 h-7">
-              {currentLocaleConfig?.flag || "🌐"}
-            </span>
+                        {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <span className="flex items-center justify-center text-[18px] w-7 h-7">
+                                {currentLocaleConfig?.flag || "🌐"}
+                            </span>
+                        )}
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 p-1">
-                    {localesConfig.map((locale) => (
-                        <DropdownMenuItem
-                            key={locale.code}
-                            onClick={() => handleLocaleChange(locale.code)}
-                            disabled={locale.code === currentLocale || isPending}
-                            className="cursor-pointer"
-                        >
-                            <div className="flex items-center gap-3 w-full">
-                                <span className="text-lg">{locale.flag}</span>
-                                <div className="flex flex-col flex-1">
-                                    <span className="font-medium">{locale.name}</span>
-                                    <span className="text-xs text-muted-foreground">
-                    {locale.nativeName}
-                  </span>
-                                </div>
-                                {locale.code === currentLocale && (
-                                    <Check className="h-4 w-4 text-primary" />
+                <DropdownMenuContent
+                    side="bottom"
+                    align="end"
+
+                    className="w-42 p-1"
+
+                >
+                    {SUPPORTED_LOCALES.map((locale) => {
+                        const isCurrentLocale = locale.code === currentLocale;
+                        const isItemDisabled = isCurrentLocale || isDisabled;
+
+                        return (
+                            <DropdownMenuItem
+                                key={locale.code}
+                                onClick={() => handleLocaleChange(locale.code)}
+                                disabled={isItemDisabled}
+                                className={cn(
+                                    "cursor-pointer transition-colors duration-150",
+                                    isCurrentLocale && "bg-accent",
+                                    isItemDisabled && "opacity-50"
                                 )}
-                            </div>
-                        </DropdownMenuItem>
-                    ))}
+                            >
+                                <div className="flex items-center gap-3 w-full">
+                                    <span className="text-lg" role="img" aria-label={`${locale.name} flag`}>
+                                        {locale.flag}
+                                    </span>
+                                    <div className="flex flex-col flex-1">
+                                        <span className="font-medium">{locale.name}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {locale.nativeName}
+                                        </span>
+                                    </div>
+                                    {isCurrentLocale && (
+                                        <Check className="h-4 w-4 text-primary" aria-label="Currently selected" />
+                                    )}
+                                </div>
+                            </DropdownMenuItem>
+                        );
+                    })}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

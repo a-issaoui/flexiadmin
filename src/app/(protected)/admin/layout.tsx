@@ -4,13 +4,13 @@ import {cookies, headers} from 'next/headers';
 import {VerticalNavigation} from "@/components/features/navigation/vertical-navigation";
 import {SidebarProvider, SidebarInset} from '@/components/ui/sidebar';
 import {AppNavbar} from "@/components/features/navbar/app-navbar";
-import {isRTL} from "@/stores/locale.store";
+
 import {getIsMobileFromCookies} from "@/hooks/use-mobile";
 import {PageHeader} from "@/components/common/page-header";
 import React from "react";
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
-    const rtl = await isRTL();
+    const rtl = false;
 
     let sidebarOpen = true;
     let isMobileSSR = false;

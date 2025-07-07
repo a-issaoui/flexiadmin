@@ -1,80 +1,172 @@
-'use server'
+// src/stores/locale.store.ts
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { subscribeWithSelector } from 'zustand/middleware';
+import {
+    DEFAULT_LOCALE,
+    DEFAULT_DIRECTION,
+    getLocaleData,
+    LocaleCode,
+    LocaleDirection,
+} from '@/config/locales.config';
+import {
+    getLocaleDataClient,
+    setLocaleDataClient,
+    type LocaleData,
+} from '@/lib/cookies/locale/locale-cookie.client';
 
-import { cookies } from 'next/headers';
-import { defaultLocale, localesConfig, type LocaleCode } from '@/config/locales.config';
-import type { LocaleCookie } from '@/types/locale.types';
-
-const ONE_YEAR = 60 * 60 * 24 * 365;
-
-function getCookieName(): string {
-    return `${process.env.NEXT_PUBLIC_APP_NAME || 'NEXT'}_LOCALE`;
+interface LocaleState {
+    // Locale data properties
+    locale: LocaleCode;
+    direction: LocaleDirection;
+    // State management
+    isHydrated: boolean;
+    isLoading: boolean;
+    // Actions
+    setLocale: (locale: LocaleCode) => void;
+    hydrate: () => void;
+    reset: () => void;
 }
 
-export async function getUserLocale(): Promise<LocaleCookie> {
+export const useLocaleStore = create<LocaleState>()(
+    subscribeWithSelector(
+        immer((set, get) => ({
+            // Initial state
+            locale: DEFAULT_LOCALE,
+            direction: DEFAULT_DIRECTION,
+            isHydrated: false,
+            isLoading: false,
+
+            setLocale: (newLocale: LocaleCode) => {
+                const currentState = get();
+                if (currentState.locale === newLocale || currentState.isLoading) return;
+
+                const localeConfig = getLocaleData(newLocale);
+                if (!localeConfig) {
+                    console.warn(`Unsupported locale: ${newLocale}`);
+                    return;
+                }
+
+                set((state) => {
+                    state.isLoading = true;
+                });
+
+                // Use setTimeout to allow UI to show loading state
+                setTimeout(() => {
+                    set((state) => {
+                        state.locale = localeConfig.code;
+                        state.direction = localeConfig.direction;
+                        state.isLoading = false;
+                    });
+
+                    // Update cookie and DOM
+                    if (typeof window !== 'undefined') {
+                        const success = setLocaleDataClient(newLocale);
+                        if (success) {
+                            updateDocumentLocale(localeConfig.code, localeConfig.direction);
+                        }
+                    }
+                }, 50);
+            },
+
+            hydrate: () => {
+                if (typeof window === 'undefined') return;
+
+                const localeData = getLocaleDataClient();
+
+                set((state) => {
+                    state.locale = localeData.locale;
+                    state.direction = localeData.direction;
+                    state.isHydrated = true;
+                });
+
+                // Ensure DOM is in sync after hydration
+                updateDocumentLocale(localeData.locale, localeData.direction);
+            },
+
+            reset: () => {
+                set((state) => {
+                    state.locale = DEFAULT_LOCALE;
+                    state.direction = DEFAULT_DIRECTION;
+                    state.isHydrated = false;
+                    state.isLoading = false;
+                });
+
+                if (typeof window !== 'undefined') {
+                    updateDocumentLocale(DEFAULT_LOCALE, DEFAULT_DIRECTION);
+                }
+            },
+        }))
+    )
+);
+
+/** Update document locale attributes */
+function updateDocumentLocale(locale: LocaleCode, direction: LocaleDirection) {
+    if (typeof window === 'undefined') return;
+
     try {
+        const html = document.documentElement;
 
-        // Fallback to cookie
-        const cookieStore = await cookies();
-        const cookieValue = cookieStore.get(getCookieName())?.value;
+        if (html.lang !== locale) {
+            html.lang = locale;
+        }
 
-        if (cookieValue) {
-            const parsed = JSON.parse(cookieValue) as LocaleCookie;
-            const isValid = localesConfig.some(
-                ({ code, direction }) => code === parsed.lang && direction === parsed.dir
-            );
+        if (html.dir !== direction) {
+            html.dir = direction;
 
-            if (isValid) {
-                return parsed;
+            // Dispatch custom event for any components that need to react to direction change
+            window.dispatchEvent(new CustomEvent('localeDirectionChange', {
+                detail: { locale, direction }
+            }));
+        }
+    } catch (error) {
+        console.error('Failed to update document locale:', error);
+    }
+}
+
+// Subscribe to locale changes and update DOM reactively
+if (typeof window !== 'undefined') {
+    useLocaleStore.subscribe(
+        (state) => ({
+            locale: state.locale,
+            direction: state.direction,
+            isHydrated: state.isHydrated,
+            isLoading: state.isLoading
+        }),
+        ({ locale, direction, isHydrated, isLoading }) => {
+            if (isHydrated && !isLoading) {
+                updateDocumentLocale(locale, direction);
             }
+        },
+        {
+            equalityFn: (a, b) =>
+                a.locale === b.locale &&
+                a.direction === b.direction &&
+                a.isHydrated === b.isHydrated &&
+                a.isLoading === b.isLoading
         }
-    } catch (error) {
-        // Log error in development
-        if (process.env.NODE_ENV === 'development') {
-            console.warn('Could not read locale:', error);
-        }
-    }
-
-    // Return default locale config
-    const fallback = localesConfig.find(l => l.code === defaultLocale) || localesConfig[0];
-
-    return {
-        lang: fallback.code,
-        dir: fallback.direction,
-    };
+    );
 }
 
-export async function setUserLocale(lang: LocaleCode): Promise<void> {
-    const config = localesConfig.find(l => l.code === lang);
-
-    if (!config) {
-        throw new Error(`Invalid locale code: ${lang}`);
-    }
-
-    const value: LocaleCookie = {
-        lang: config.code,
-        dir: config.direction,
-    };
-
-    try {
-        const cookieStore = await cookies();
-
-        // Set cookie with enhanced security options
-        cookieStore.set(getCookieName(), JSON.stringify(value), {
-            httpOnly: false,
-            path: '/',
-            maxAge: ONE_YEAR,
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
-            // Add priority for better performance
-            priority: 'high' as const,
-        });
-    } catch (error) {
-        console.error('Failed to set locale cookie:', error);
-        throw new Error('Could not save locale preference');
-    }
+// Helper hook to get current locale data
+export function useCurrentLocaleData(): LocaleData {
+    const { locale, direction } = useLocaleStore();
+    return { locale, direction };
 }
 
-export async function isRTL(): Promise<boolean> {
-    const { dir } = await getUserLocale();
-    return dir === 'rtl';
+// Helper hooks for convenience
+export function useCurrentLocale(): LocaleCode {
+    return useLocaleStore((state) => state.locale);
+}
+
+export function useCurrentDirection(): LocaleDirection {
+    return useLocaleStore((state) => state.direction);
+}
+
+export function useIsLocaleLoading(): boolean {
+    return useLocaleStore((state) => state.isLoading);
+}
+
+export function useIsLocaleHydrated(): boolean {
+    return useLocaleStore((state) => state.isHydrated);
 }

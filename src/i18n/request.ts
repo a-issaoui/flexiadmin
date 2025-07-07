@@ -1,12 +1,12 @@
 import { getRequestConfig } from 'next-intl/server';
-import { getUserLocale } from "@/stores/locale.store";
+import { getLocaleDataSSR } from "@/lib/cookies/locale/locale-cookie.server";
 
 export default getRequestConfig(async () => {
-    const { lang } = await getUserLocale();
+    const { locale } = await getLocaleDataSSR();
 
     return {
-        locale: lang,
-        messages: (await import(`./messages/${lang}.json`)).default,
+        locale,
+        messages: (await import(`./messages/${locale}.json`)).default,
         timeZone: 'UTC',
         now: new Date(),
     };
