@@ -1,4 +1,7 @@
 // src/lib/navigation-permissions.ts
+
+import type { NavigationGroup, NavigationItem, UserPermissions } from '@/config/navigation/types';
+
 /**
  * This is our future permission filtering layer.
  * For now, it just passes navigation through unchanged.

@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import NavTrigger from '@/components/navigation/vertical-navigation/nav-trigger';
 import { Separator } from '@/components/ui/separator';
-import NavabarSearch from '@/components/features/navbar/navabar-search';
+import NavbarSearch from '@/components/features/navbar/navbar-search';
 import { NavbarUser } from '@/components/features/navbar/navbar-user';
 import { ThemeSwitcher } from '@/components/common/theme-switcher';
 import NavbarSms from '@/components/features/navbar/navbar-sms';
@@ -73,7 +73,7 @@ export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
                     {/* Search - Hidden on mobile, shown in responsive order */}
                     <div className="flex items-center gap-1 order-2 sm:order-1">
                         <div className="hidden sm:flex">
-                            <NavabarSearch />
+                            <NavbarSearch />
                         </div>
                     </div>
 

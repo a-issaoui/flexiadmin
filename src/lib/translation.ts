@@ -1,4 +1,10 @@
-import type { NavigationItem, NavigationConfig } from "@/types/navigation.types";
+import type { NavigationItem } from "@/config/navigation/types";
+
+// Temporary NavigationConfig type until it's properly defined
+interface NavigationConfig {
+  labelKey?: string;
+  label?: string;
+}
 
 export function getTranslationKey(
     item: NavigationItem | NavigationConfig,

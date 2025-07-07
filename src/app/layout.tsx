@@ -9,6 +9,7 @@ import {getLocaleDataSSR} from "@/lib/cookies/locale/locale-cookie.server";
 import LocaleHydrator from "@/components/hydration/locale-hydrator";
 import {RTLProvider} from "@/providers/rtl-provider";
 import {LocaleProvider} from "@/providers/locale-provider";
+import {ErrorBoundary, AsyncErrorBoundary} from "@/components/common/error-boundary";
 
 import "./globals.css";
 
@@ -75,12 +76,16 @@ export default async function RootLayout({children}: RootLayoutProps) {
 
                     {/* Enhanced provider that won't show skeleton for SSR content */}
                     <LocaleProvider>
-                        <div
-                            className="rtl-hydrating"
-                            data-testid="app-content"
-                        >
-                            {children}
-                        </div>
+                        <ErrorBoundary>
+                            <AsyncErrorBoundary>
+                                <div
+                                    className="rtl-hydrating"
+                                    data-testid="app-content"
+                                >
+                                    {children}
+                                </div>
+                            </AsyncErrorBoundary>
+                        </ErrorBoundary>
                     </LocaleProvider>
                 </RTLProvider>
             </NextIntlClientProvider>

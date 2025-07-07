@@ -3,6 +3,9 @@
 import type { IconProps } from "@/components/common/icon";
 import type { SafeColor } from '@/lib/color-validation';
 
+// Export SafeColor for other files to use
+export type { SafeColor };
+
 // Badge types
 export type BadgeVariant = "default" | "outline" | "ghost";
 export type BadgeShape = "default" | "square" | "circular";
@@ -44,6 +47,7 @@ export interface NavigationItem {
 
     // Future permission properties (optional for now)
     requiredPermissions?: string[];     // Permissions needed to see this item
+    permissionMode?: 'any' | 'all';    // Whether user needs any or all permissions
     fallbackBehavior?: 'hide' | 'disable' | 'show';  // What to do without permissions
     disabled?: boolean;                 // Whether the item is currently disabled
 }
