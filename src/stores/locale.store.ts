@@ -25,12 +25,14 @@ interface LocaleState {
     translationError: string | null;
     isHydrated: boolean;
     isLoading: boolean;
-    isInitializing: boolean; // NEW: Prevent multiple initialization attempts
+    isInitializing: boolean;
+    ssrMessages: Record<string, any>; // NEW: Store SSR messages
 
     setLocale: (locale: LocaleCode) => void;
     initializeMessages: () => Promise<void>;
     hydrate: () => void;
     reset: () => void;
+    setSSRMessages: (locale: LocaleCode, messages: Record<string, any>) => void; // NEW
 }
 
 export const useLocaleStore = create<LocaleState>()(
@@ -41,18 +43,48 @@ export const useLocaleStore = create<LocaleState>()(
             direction: DEFAULT_DIRECTION,
             messages: {},
             availableMessages: {},
+            ssrMessages: {}, // NEW
             isTranslationsReady: false,
             translationError: null,
             isHydrated: false,
             isLoading: false,
-            isInitializing: false, // NEW
+            isInitializing: false,
+
+            // NEW: Method to set SSR messages
+            setSSRMessages: (locale: LocaleCode, messages: Record<string, any>) => {
+                console.log(`📦 Setting SSR messages for ${locale}:`, Object.keys(messages).length, 'keys');
+
+                set((state) => {
+                    state.ssrMessages = messages;
+                    state.messages = messages;
+                    state.availableMessages[locale] = messages;
+                    state.locale = locale;
+
+                    // Mark as ready if we have SSR messages
+                    if (Object.keys(messages).length > 0) {
+                        state.isTranslationsReady = true;
+                        console.log('✅ Translations ready with SSR messages');
+                    }
+                });
+            },
 
             initializeMessages: async () => {
                 const currentState = get();
 
+                // If we already have SSR messages and they're for the current locale,
+                // just load the remaining locales in the background
+                if (currentState.isTranslationsReady &&
+                    Object.keys(currentState.ssrMessages).length > 0) {
+                    console.log('🔄 SSR messages available, loading remaining locales in background...');
+
+                    // Load remaining locales without blocking UI
+                    loadRemainingLocalesInBackground();
+                    return;
+                }
+
                 // Prevent multiple simultaneous initialization attempts
-                if (currentState.isInitializing || currentState.isTranslationsReady) {
-                    console.log('🔄 Messages already loading or ready, skipping...');
+                if (currentState.isInitializing) {
+                    console.log('🔄 Messages already loading, skipping...');
                     return;
                 }
 
@@ -62,13 +94,22 @@ export const useLocaleStore = create<LocaleState>()(
                 });
 
                 try {
-                    console.log('🌍 Loading translations for supported locales...');
+                    console.log('🌍 Loading translations for all supported locales...');
 
                     const messagePromises = SUPPORTED_LOCALES.map(async (localeConfig) => {
                         try {
-                            // More explicit import path
+                            // Skip if we already have this locale from SSR
+                            const existing = currentState.availableMessages[localeConfig.code];
+                            if (existing && Object.keys(existing).length > 0) {
+                                console.log(`⚡ Using cached messages for ${localeConfig.code}`);
+                                return {
+                                    code: localeConfig.code,
+                                    messages: existing
+                                };
+                            }
+
                             const messages = await import(`../i18n/messages/${localeConfig.code}.json`);
-                            console.log(`✅ Loaded ${localeConfig.code} messages:`, !!messages.default);
+                            console.log(`✅ Loaded ${localeConfig.code} messages:`, Object.keys(messages.default || {}).length, 'keys');
                             return {
                                 code: localeConfig.code,
                                 messages: messages.default || {}
@@ -95,14 +136,14 @@ export const useLocaleStore = create<LocaleState>()(
 
                     set((state) => {
                         state.availableMessages = allMessages;
-                        state.messages = allMessages[currentLocale] || {};
+                        state.messages = allMessages[currentLocale] || state.ssrMessages || {};
                         state.isTranslationsReady = true;
                         state.translationError = null;
                         state.isInitializing = false;
                     });
 
                     const loadedLocales = loadedMessages.map(m => m.code).join(', ');
-                    console.log(`🎉 Translations loaded successfully for: ${loadedLocales}`);
+                    console.log(`🎉 All translations loaded successfully: ${loadedLocales}`);
 
                 } catch (error) {
                     console.error('💥 Failed to load translations:', error);
@@ -124,35 +165,50 @@ export const useLocaleStore = create<LocaleState>()(
                     return;
                 }
 
-                if (!currentState.availableMessages[newLocale]) {
-                    console.warn(`Messages not available for locale: ${newLocale}`);
+                // Check if we have messages for this locale
+                const hasMessages = currentState.availableMessages[newLocale] &&
+                    Object.keys(currentState.availableMessages[newLocale]).length > 0;
+
+                if (!hasMessages) {
+                    console.warn(`Messages not available for locale: ${newLocale}, loading...`);
+                    // Set loading state and load the specific locale
+                    set((state) => {
+                        state.isLoading = true;
+                    });
+
+                    // Load the specific locale
+                    loadSpecificLocale(newLocale).then(() => {
+                        // Now switch to it
+                        set((state) => {
+                            state.locale = localeConfig.code;
+                            state.direction = localeConfig.direction;
+                            state.messages = state.availableMessages[newLocale] || {};
+                            state.isLoading = false;
+                        });
+
+                        if (typeof window !== 'undefined') {
+                            setLocaleDataClient(newLocale);
+                            updateDocumentLocale(localeConfig.code, localeConfig.direction);
+                        }
+                    });
                     return;
                 }
 
+                // Instant switch if messages are available
                 set((state) => {
-                    state.isLoading = true;
+                    state.locale = localeConfig.code;
+                    state.direction = localeConfig.direction;
+                    state.messages = state.availableMessages[newLocale];
                 });
 
-                setTimeout(() => {
-                    set((state) => {
-                        state.locale = localeConfig.code;
-                        state.direction = localeConfig.direction;
-                        state.messages = state.availableMessages[newLocale];
-                        state.isLoading = false;
-                    });
+                if (typeof window !== 'undefined') {
+                    setLocaleDataClient(newLocale);
+                    updateDocumentLocale(localeConfig.code, localeConfig.direction);
+                }
 
-                    if (typeof window !== 'undefined') {
-                        const success = setLocaleDataClient(newLocale);
-                        if (success) {
-                            updateDocumentLocale(localeConfig.code, localeConfig.direction);
-                        }
-                    }
-
-                    console.log(`🌍 Switched to ${newLocale} instantly!`);
-                }, 50);
+                console.log(`🌍 Switched to ${newLocale} instantly!`);
             },
 
-            // FIXED: Make hydrate synchronous and only set isHydrated
             hydrate: () => {
                 if (typeof window === 'undefined') return;
 
@@ -177,6 +233,7 @@ export const useLocaleStore = create<LocaleState>()(
                     state.direction = DEFAULT_DIRECTION;
                     state.messages = {};
                     state.availableMessages = {};
+                    state.ssrMessages = {};
                     state.isTranslationsReady = false;
                     state.translationError = null;
                     state.isHydrated = false;
@@ -191,6 +248,69 @@ export const useLocaleStore = create<LocaleState>()(
         }))
     )
 );
+
+// Helper function to load remaining locales in background
+async function loadRemainingLocalesInBackground() {
+    const currentState = useLocaleStore.getState();
+
+    try {
+        const missingLocales = SUPPORTED_LOCALES.filter(locale =>
+            !currentState.availableMessages[locale.code] ||
+            Object.keys(currentState.availableMessages[locale.code]).length === 0
+        );
+
+        if (missingLocales.length === 0) {
+            console.log('🎯 All locales already loaded');
+            return;
+        }
+
+        console.log('🔄 Loading missing locales in background:', missingLocales.map(l => l.code));
+
+        const loadPromises = missingLocales.map(async (localeConfig) => {
+            try {
+                const messages = await import(`../i18n/messages/${localeConfig.code}.json`);
+                return {
+                    code: localeConfig.code,
+                    messages: messages.default || {}
+                };
+            } catch (error) {
+                console.error(`❌ Failed to load background messages for ${localeConfig.code}:`, error);
+                return {
+                    code: localeConfig.code,
+                    messages: {}
+                };
+            }
+        });
+
+        const results = await Promise.all(loadPromises);
+
+        useLocaleStore.setState((state) => {
+            results.forEach(({ code, messages }) => {
+                state.availableMessages[code as LocaleCode] = messages;
+            });
+        });
+
+        console.log('✅ Background locale loading complete');
+    } catch (error) {
+        console.error('💥 Background locale loading failed:', error);
+    }
+}
+
+// Helper function to load a specific locale
+async function loadSpecificLocale(locale: LocaleCode) {
+    try {
+        console.log(`🔄 Loading specific locale: ${locale}`);
+        const messages = await import(`../i18n/messages/${locale}.json`);
+
+        useLocaleStore.setState((state) => {
+            state.availableMessages[locale] = messages.default || {};
+        });
+
+        console.log(`✅ Loaded specific locale: ${locale}`);
+    } catch (error) {
+        console.error(`❌ Failed to load specific locale ${locale}:`, error);
+    }
+}
 
 function updateDocumentLocale(locale: LocaleCode, direction: LocaleDirection) {
     if (typeof window === 'undefined') return;
@@ -237,7 +357,7 @@ if (typeof window !== 'undefined') {
     );
 }
 
-// Helper hooks
+// Helper hooks (unchanged)
 export function useCurrentLocaleData(): LocaleData {
     const { locale, direction } = useLocaleStore();
     return { locale, direction };

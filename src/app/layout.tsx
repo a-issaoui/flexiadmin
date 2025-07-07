@@ -1,6 +1,8 @@
 // src/app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
 import { getLocaleDataSSR } from "@/lib/cookies/locale/locale-cookie.server";
@@ -37,8 +39,13 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-    // Get initial locale data from cookie for hydration
+    // Get initial locale data from cookie
     const { locale, direction } = await getLocaleDataSSR();
+
+    // Get SSR messages for the current locale
+    const messages = await getMessages();
+
+    console.log(`🚀 SSR Layout - Locale: ${locale}, Direction: ${direction}, Messages: ${Object.keys(messages).length} keys`);
 
     return (
         <html lang={locale} dir={direction} suppressHydrationWarning>
@@ -51,10 +58,21 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
             storageKey="flexiadmin-theme"
         >
-            <LocaleHydrator initialLocale={locale} initialDirection={direction} />
-            <LocaleProvider>
-                {children}
-            </LocaleProvider>
+            {/* Provide SSR messages immediately */}
+            <NextIntlClientProvider
+                locale={locale}
+                messages={messages}
+                timeZone="UTC"
+                now={new Date()}
+            >
+                {/* Initialize the client store with SSR data */}
+                <LocaleHydrator initialLocale={locale} initialDirection={direction} />
+
+                {/* Enhanced provider that won't show skeleton for SSR content */}
+                <LocaleProvider>
+                    {children}
+                </LocaleProvider>
+            </NextIntlClientProvider>
         </ThemeProvider>
         </body>
         </html>
