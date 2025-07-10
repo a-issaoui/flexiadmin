@@ -1,6 +1,6 @@
 // src/components/features/navigation/vertical-navigation/components/nav-recursive-item.tsx
 
-import React, { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
     SidebarMenuButton,
@@ -16,7 +16,9 @@ import type { ProcessedNavigationItem } from '@/config/navigation/types';
 import NavPulsingDot from '@/components/navigation/vertical-navigation/components/nav-pulsing-dot';
 import NavBadge from '@/components/navigation/vertical-navigation/components/nav-badge';
 import NavActions from '@/components/navigation/vertical-navigation/components/nav-actions';
-import { sanitizeColor } from '@/lib/color-validation';
+import { sanitizeColor } from '@/lib/utils/color-utils';
+import { useNavigationStore } from '@/stores/navigation.store';
+import { useIsMobile } from "@/stores/mobile.store";
 
 interface NavRecursiveItemProps {
     item: ProcessedNavigationItem;
@@ -34,7 +36,7 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                                                                onMenuClick,
                                                                level
                                                            }) => {
-    const { state } = useSidebar();
+    const { state,collapsible } = useSidebar();
     const hasChildren = !!item.children?.length;
     const isSubmenu = level > 0;
 
@@ -85,15 +87,45 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
     }, [hasChildren, hasDescendantBadges, state]);
 
     /**
-     * For expanded sidebar, show a small indicator if children have badges
-     * but the menu is collapsed (closed, not sidebar collapsed)
+     * Enhanced menu state management with persistence
      */
-    const [isOpen, setIsOpen] = useState(item.defaultExpanded ?? isActive);
+    const { expandedItems, setItemExpanded } = useNavigationStore();
+    
+    // Check if any descendant is active to determine initial open state
+    const hasActiveDescendant = useMemo(() => {
+        if (!hasChildren) return false;
+        
+        const checkActiveDescendant = (navItem: ProcessedNavigationItem): boolean => {
+            if (navItem.href === currentPath) return true;
+            return navItem.children?.some(checkActiveDescendant) ?? false;
+        };
+        
+        return item.children?.some(checkActiveDescendant) ?? false;
+    }, [hasChildren, item.children, currentPath]);
+    
+    // Determine if item should be open (from store, defaultExpanded, or has active descendant)
+    const shouldBeOpen = expandedItems[item.id] ?? item.defaultExpanded ?? hasActiveDescendant ?? false;
+    const [isOpen, setIsOpen] = useState(shouldBeOpen);
+    
+    // Sync with store when shouldBeOpen changes
+    useEffect(() => {
+        if (shouldBeOpen !== isOpen) {
+            setIsOpen(shouldBeOpen);
+        }
+    }, [shouldBeOpen, isOpen]);
+    
+    // Update store when active descendant is detected
+    useEffect(() => {
+        if (hasActiveDescendant && !expandedItems[item.id]) {
+            setItemExpanded(item.id, true);
+        }
+    }, [hasActiveDescendant, item.id, expandedItems, setItemExpanded]);
+    
     const shouldShowExpandedIndicator = useMemo(() => {
         return hasChildren && hasDescendantBadges && state !== 'collapsed' && !isOpen;
     }, [hasChildren, hasDescendantBadges, state, isOpen]);
 
-
+    const isMobile = useIsMobile()
 
     const handleTriggerClick = useCallback(
         (e: React.MouseEvent) => {
@@ -105,89 +137,142 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
             }
 
             if (hasChildren) {
-                setIsOpen((prev) => !prev);
+                const newOpenState = !isOpen;
+                setIsOpen(newOpenState);
+                setItemExpanded(item.id, newOpenState);
             } else if (item.href) {
                 onMenuClick(item, e);
             }
         },
-        [hasChildren, item, onMenuClick]
+        [hasChildren, item, onMenuClick, isOpen, setItemExpanded]
     );
+    // Dynamic sizing based on nesting level for better visual hierarchy
+    const getIconSize = () => {
+        if (level === 0) return 20; // Main level
+        if (level === 1) return 18; // First submenu
+        if (level === 2) return 16; // Second submenu
+        return 12; // Deeper levels
+    };
+    
+    const getGapSize = () => {
+        if (level === 0) return 'gap-2.5'; // Main level
+        if (level === 1) return 'gap-2'; // First submenu
+        if (level === 2) return 'gap-1.5'; // Second submenu
+        return 'gap-1'; // Deeper levels
+    };
+    
+    const getMinHeight = () => {
+        if (level === 0) return 'min-h-[36px]'; // Main level
+        if (level === 1) return 'min-h-[32px]'; // First submenu - smaller
+        if (level === 2) return 'min-h-[30px]'; // Second submenu - even smaller
+        return 'min-h-[28px]'; // Deeper levels - smallest
+    };
+    
+    const getTextSize = () => {
+        if (level === 0) return 'text-sm'; // Main level
+        if (level === 1) return 'text-xs'; // First submenu
+        return 'text-xs'; // Deeper levels
+    };
 
-    const renderMenuContent = () => (
-        <>
-            {/* Enhanced icon with pulsing dot logic */}
-            {item.icon && (
-                <div className="relative">
+    const renderMenuContent = () => {
+        // COLLAPSED SIDEBAR MODE — show icon only
+        if (state === 'collapsed' && collapsible != 'none' && !isMobile) {
+            return (
+                <div className="relative flex items-center justify-center w-full">
                     <Icon
                         {...item.icon}
-                        size={isSubmenu ? 16 : 18}
-                        className={cn(
-                            "flex-shrink-0",
-                            item.disabled && "opacity-50"
-                        )}
-                        color={item.disabled ? undefined : (sanitizeColor(item.icon.color) || "currentColor")}
-                  />
-                    {/* CORRECTED: Only show pulsing dot for collapsed sidebar with child badges */}
+                        name={item.icon?.name as "HouseIcon"}
+                        size={getIconSize() || 20}
+                        className={cn("flex-shrink-0", item.disabled && "opacity-50")}
+                        color={item.disabled ? undefined : (sanitizeColor(item.icon?.color) || "currentColor")}
+                    />
                     {shouldShowPulsingDot && (
-                        <div className="absolute -top-2 -end-0.5">
-                            <NavPulsingDot color={item.dotColor || '#10b981'}/>
+                        <div className="absolute -top-2 end-0.5">
+                            <NavPulsingDot color={item.dotColor || '#10b981'} size={level > 0 ? 'sm' : 'md'} />
                         </div>
                     )}
                 </div>
-            )}
+            );
+        }
 
-            {/* Enhanced label with expanded indicator logic */}
-            <span className="flex-1 truncate flex items-center min-w-0">
+        // EXPANDED SIDEBAR MODE — show full content
+        return (
+            <>
+                {/* Icon */}
+                {item.icon && (
+                    <div className="relative">
+                        <Icon
+                            {...item.icon}
+                            size={getIconSize()}
+                            className={cn("flex-shrink-0", item.disabled && "opacity-50")}
+                            color={item.disabled ? undefined : (sanitizeColor(item.icon.color) || "currentColor")}
+                        />
+                        {shouldShowPulsingDot && (
+                            <div className="absolute -top-1.5 -end-0.5">
+                                <NavPulsingDot color={item.dotColor || '#10b981'} size={level > 0 ? 'sm' : 'md'} />
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Label and pulsing dot indicator */}
+                <span className="flex-1 truncate flex items-center min-w-0">
                 <span
-                    className={cn("truncate", item.disabled && "opacity-50")}
+                    className={cn("truncate", getTextSize(), item.disabled && "opacity-50")}
                     style={{
-                        color: item.disabled ? undefined : sanitizeColor(item.color)
+                        color: item.disabled ? undefined : sanitizeColor(item.color),
                     }}
                 >
                     {item.label}
                 </span>
-                {/* CORRECTED: Show small indicator for expanded sidebar when menu is closed but has child badges */}
-                {shouldShowExpandedIndicator && (
-                    <span className="ms-1 mb-1">
-                        <NavPulsingDot color={item.dotColor || '#10b981'} />
+                    {shouldShowExpandedIndicator && (
+                        <span className="ms-1">
+                        <NavPulsingDot color={item.dotColor || '#10b981'} size={level > 0 ? 'sm' : 'md'} />
                     </span>
-                )}
+                    )}
             </span>
 
-            {/* Badge - only for this specific item, not related to children */}
-            {item.badge && <NavBadge badge={item.badge} />}
+                {/* Badge */}
+                {item.badge && <NavBadge badge={item.badge} level={level} />}
 
-            {/* Actions support */}
-            {item.actions && (
-                <NavActions
-                    actions={item.actions}
-                    size="md"
-                    sideOffset={hasChildren ? 44 : 20}
-                />
-            )}
+                {/* Actions */}
+                {item.actions && (
+                    <NavActions
+                        actions={item.actions}
+                        size={level > 0 ? "sm" : "md"}
+                        sideOffset={hasChildren ? 44 : 20}
+                    />
+                )}
 
-            {/* Enhanced expand indicator with custom color */}
-            {hasChildren && (
-                <Icon
-                    name="CaretRightIcon"
-                    className={cn(
-                        'transition-transform flex-shrink-0',
-                        item.disabled && "opacity-50",
-                        isOpen
-                            ? 'ltr:rotate-90 rtl:rotate-90'
-                            : 'ltr:rotate-0 rtl:rotate-180'
-                    )}
-                    color={item.disabled ? undefined : (sanitizeColor(item.color) || "currentColor")}
-                />
-            )}
-        </>
-    );
+                {/* Expand icon */}
+                {hasChildren && (
+                    <Icon
+                        name="CaretRightIcon"
+                        size={level > 0 ? 12 : 14}
+                        className={cn(
+                            'transition-transform duration-200 flex-shrink-0',
+                            item.disabled && "opacity-50",
+                            isOpen
+                                ? 'ltr:rotate-90 rtl:rotate-90'
+                                : 'ltr:rotate-0 rtl:rotate-180'
+                        )}
+                        color={item.disabled ? undefined : (sanitizeColor(item.color) || "currentColor")}
+                    />
+                )}
+            </>
+        );
+    };
 
     const buttonProps = {
         isActive,
         tooltip: state === 'collapsed' ? item.label : undefined,
         className: cn(
             'w-full',
+            getGapSize(),
+            getMinHeight(),
+            // Enhanced mobile touch targets
+            isMobile && level > 0 && 'min-h-[40px]',
+
             item.disabled && 'cursor-not-allowed opacity-50'
         ),
         disabled: item.disabled,
@@ -235,9 +320,16 @@ const NavRecursiveItem: React.FC<NavRecursiveItemProps> = ({
                             e.stopPropagation();
                             return;
                         }
+                        e.preventDefault();
                         onMenuClick(item, e);
                     }}
-                    className="w-full flex items-center gap-2"
+                    className={cn(
+                        'w-full flex items-center',
+                        getGapSize(),
+                        getMinHeight(),
+                        // Enhanced mobile touch targets
+                        isMobile && level > 0 && 'min-h-[40px]'
+                    )}
                     aria-disabled={item.disabled}
                     style={{
                         // Apply custom color to the entire link if specified

@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     experimental: {
         optimizePackageImports: [
             '@phosphor-icons/react',
-            'lucide-react',
             '@radix-ui/react-icons',
             '@radix-ui/react-avatar',
             '@radix-ui/react-dialog',
@@ -17,6 +16,7 @@ const nextConfig: NextConfig = {
             '@radix-ui/react-slot',
             '@radix-ui/react-tooltip',
         ],
+        webpackBuildWorker: true,
     },
 
     webpack(config) {

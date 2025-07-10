@@ -7,25 +7,25 @@
 export interface AppError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: string;
   userId?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export class CustomError extends Error {
   public readonly code: string;
-  public readonly details?: any;
+  public readonly details?: unknown;
   public readonly timestamp: string;
   public readonly userId?: string;
-  public readonly context?: Record<string, any>;
+  public readonly context?: Record<string, unknown>;
 
   constructor(
     code: string,
     message: string,
-    details?: any,
+    details?: unknown,
     userId?: string,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'CustomError';
@@ -38,35 +38,35 @@ export class CustomError extends Error {
 }
 
 export class ValidationError extends CustomError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('VALIDATION_ERROR', message, details);
     this.name = 'ValidationError';
   }
 }
 
 export class NetworkError extends CustomError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('NETWORK_ERROR', message, details);
     this.name = 'NetworkError';
   }
 }
 
 export class AuthenticationError extends CustomError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('AUTH_ERROR', message, details);
     this.name = 'AuthenticationError';
   }
 }
 
 export class AuthorizationError extends CustomError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('AUTHORIZATION_ERROR', message, details);
     this.name = 'AuthorizationError';
   }
 }
 
 export class NotFoundError extends CustomError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('NOT_FOUND_ERROR', message, details);
     this.name = 'NotFoundError';
   }
@@ -86,7 +86,7 @@ export class ErrorLogger {
     return ErrorLogger.instance;
   }
 
-  log(error: Error | CustomError, context?: Record<string, any>): void {
+  log(error: Error | CustomError, context?: Record<string, unknown>): void {
     const appError: AppError = {
       code: error instanceof CustomError ? error.code : 'UNKNOWN_ERROR',
       message: error.message,
@@ -211,27 +211,28 @@ export const errorUtils = {
   /**
    * Handle API errors with proper error types
    */
-  handleApiError(error: any): CustomError {
-    if (error.response) {
-      const status = error.response.status;
-      const message = error.response.data?.message || error.message;
+  handleApiError(error: unknown): CustomError {
+    const errorObj = error as { response?: { status: number; data?: { message?: string; errors?: unknown } }; request?: unknown; message?: string };
+    if (errorObj.response) {
+      const status = errorObj.response.status;
+      const message = errorObj.response.data?.message || errorObj.message;
       
       switch (status) {
         case 401:
-          return new AuthenticationError(message);
+          return new AuthenticationError(message || 'Authentication failed');
         case 403:
-          return new AuthorizationError(message);
+          return new AuthorizationError(message || 'Authorization failed');
         case 404:
-          return new NotFoundError(message);
+          return new NotFoundError(message || 'Not found');
         case 422:
-          return new ValidationError(message, error.response.data?.errors);
+          return new ValidationError(message || 'Validation failed', errorObj.response.data?.errors);
         default:
-          return new NetworkError(message, { status, response: error.response.data });
+          return new NetworkError(message || 'Network error', { status, response: errorObj.response.data });
       }
-    } else if (error.request) {
-      return new NetworkError('Network request failed', { request: error.request });
+    } else if (errorObj.request) {
+      return new NetworkError('Network request failed', { request: errorObj.request });
     } else {
-      return new CustomError('UNKNOWN_ERROR', error.message, error);
+      return new CustomError('UNKNOWN_ERROR', errorObj.message || 'Unknown error', errorObj);
     }
   },
 

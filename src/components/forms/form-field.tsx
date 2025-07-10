@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { Icon } from '@/components/common/icon';
 import { format } from 'date-fns';
 
 export interface FormFieldProps {
@@ -20,8 +20,8 @@ export interface FormFieldProps {
   label?: string;
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'textarea' | 'select' | 'checkbox' | 'switch' | 'radio' | 'date' | 'file';
   placeholder?: string;
-  value?: any;
-  onChange?: (value: any) => void;
+  value?: unknown;
+  onChange?: (value: unknown) => void;
   onBlur?: () => void;
   error?: string;
   helperText?: string;
@@ -70,8 +70,12 @@ export function FormField({
   const fieldId = `field-${name}`;
   const hasError = !!error;
 
-  const handleChange = (newValue: any) => {
-    onChange?.(newValue);
+  const handleChange = (newValue: unknown) => {
+    try {
+      onChange?.(newValue);
+    } catch (error) {
+      console.error(`Error handling form field change for ${name}:`, error);
+    }
   };
 
   const renderField = () => {
@@ -82,7 +86,7 @@ export function FormField({
             id={fieldId}
             name={name}
             placeholder={placeholder}
-            value={value || ''}
+            value={value as string || ''}
             onChange={(e) => handleChange(e.target.value)}
             onBlur={onBlur}
             disabled={disabled}
@@ -97,7 +101,7 @@ export function FormField({
       case 'select':
         return (
           <Select
-            value={value}
+            value={value as string}
             onValueChange={handleChange}
             disabled={disabled}
           >
@@ -124,7 +128,7 @@ export function FormField({
             <Checkbox
               id={fieldId}
               name={name}
-              checked={value || false}
+              checked={value as boolean || false}
               onCheckedChange={handleChange}
               disabled={disabled}
             />
@@ -143,7 +147,7 @@ export function FormField({
             <Switch
               id={fieldId}
               name={name}
-              checked={value || false}
+              checked={value as boolean || false}
               onCheckedChange={handleChange}
               disabled={disabled}
             />
@@ -159,7 +163,7 @@ export function FormField({
       case 'radio':
         return (
           <RadioGroup
-            value={value}
+            value={value as string}
             onValueChange={handleChange}
             disabled={disabled}
           >
@@ -191,14 +195,14 @@ export function FormField({
                 )}
                 disabled={disabled}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {value ? format(new Date(value), 'PPP') : placeholder || 'Pick a date'}
+                <Icon name="CalendarIcon" size={16} className="mr-2" />
+                {value ? format(new Date(value as string), 'PPP') : placeholder || 'Pick a date'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={value ? new Date(value) : undefined}
+                selected={value ? new Date(value as string) : undefined}
                 onSelect={(date) => {
                   handleChange(date);
                   setDateOpen(false);
@@ -235,7 +239,7 @@ export function FormField({
               name={name}
               type={showPassword ? 'text' : 'password'}
               placeholder={placeholder}
-              value={value || ''}
+              value={value as string || ''}
               onChange={(e) => handleChange(e.target.value)}
               onBlur={onBlur}
               disabled={disabled}
@@ -253,9 +257,9 @@ export function FormField({
               disabled={disabled}
             >
               {showPassword ? (
-                <EyeOffIcon className="h-4 w-4" />
+                <Icon name="EyeSlashIcon" size={16} />
               ) : (
-                <EyeIcon className="h-4 w-4" />
+                <Icon name="EyeIcon" size={16} />
               )}
             </Button>
           </div>
@@ -268,7 +272,7 @@ export function FormField({
             name={name}
             type={type}
             placeholder={placeholder}
-            value={value || ''}
+            value={value as string || ''}
             onChange={(e) => {
               const newValue = type === 'number' ? parseFloat(e.target.value) : e.target.value;
               handleChange(newValue);

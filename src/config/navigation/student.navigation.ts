@@ -163,7 +163,7 @@ export const studentNavigation: NavigationGroup[] = [
                 id: 'forum',
                 labelKey: 'navigation.student.items.forum',
                 href: '/student/forum',
-                icon: { name: 'ChatBubbleIcon', weight: 'duotone' },
+                icon: { name: 'ChatCircleIcon', weight: 'duotone' },
                 color: '#f59e0b' as SafeColor,
             },
         ],

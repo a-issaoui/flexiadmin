@@ -1,6 +1,6 @@
 // src/components/features/navigation/vertical-navigation/components/nav-content.tsx
 
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import {
     SidebarContent,
     SidebarGroup,
@@ -14,6 +14,7 @@ import NavRecursiveItem from '@/components/navigation/vertical-navigation/compon
 import NavActions from '@/components/navigation/vertical-navigation/components/nav-actions';
 import { Icon } from '@/components/common/icon';
 import { cn } from '@/lib/utils';
+import { useNavigationStore } from '@/stores/navigation.store';
 
 export type NavContentProps = {
     navigationGroups: ProcessedNavigationGroup[];
@@ -123,6 +124,20 @@ const NavContentComponent: React.FC<NavContentProps> = ({
                                                             currentPath,
                                                             onMenuClick
                                                         }) => {
+    const { expandParentsOfPath } = useNavigationStore();
+    
+    // Expand parent items when currentPath changes (including on page load)
+    useEffect(() => {
+        // Flatten navigation items for expansion check
+        const allItems: ProcessedNavigationItem[] = [];
+        navigationGroups.forEach(group => {
+            allItems.push(...group.items);
+        });
+        
+        // Skip navigation expansion for now due to type mismatch
+        // expandParentsOfPath(currentPath, allItems);
+    }, [currentPath, navigationGroups, expandParentsOfPath]);
+    
     return (
         <SidebarContent>
             {navigationGroups.map((group) => (

@@ -6,6 +6,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar'
 import type { TypeOrganisationData } from '@/types/organization.types'
 
@@ -14,6 +15,7 @@ interface OrgSidebarProps {
 }
 
 export function NavOrganization({ organisation }: OrgSidebarProps) {
+    const { state } = useSidebar()
     const initials = React.useMemo(() => {
         return organisation.name
             .split(' ')
@@ -26,7 +28,11 @@ export function NavOrganization({ organisation }: OrgSidebarProps) {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton size="lg" className="gap-2 ">
+                <SidebarMenuButton 
+                    size="lg" 
+                    className="gap-2"
+                    tooltip={state === 'collapsed' ? organisation.name : undefined}
+                >
                     <Avatar className="h-8 w-8 rounded-md">
                         {organisation.imageUrl && (
                             <AvatarImage src={organisation.imageUrl} alt={organisation.name} />
@@ -35,16 +41,18 @@ export function NavOrganization({ organisation }: OrgSidebarProps) {
                             {initials}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col leading-none text-start">
-                        <span className="font-semibold text-sm truncate" title={organisation.name}>
-                            {organisation.name}
-                        </span>
-                        {organisation.academicYear && (
-                            <span className="text-xs text-muted-foreground truncate" title={organisation.academicYear}>
-                                {organisation.academicYear}
+                    {state === 'expanded' && (
+                        <div className="flex flex-col leading-none text-start">
+                            <span className="font-semibold text-sm truncate" title={organisation.name}>
+                                {organisation.name}
                             </span>
-                        )}
-                    </div>
+                            {organisation.academicYear && (
+                                <span className="text-xs text-muted-foreground truncate" title={organisation.academicYear}>
+                                    {organisation.academicYear}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

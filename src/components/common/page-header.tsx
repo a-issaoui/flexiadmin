@@ -73,7 +73,7 @@ export function PageHeader({
                 </Link>
 
                 {/* Dynamic breadcrumb items */}
-                {breadcrumbItems.map((item, index) => (
+                {breadcrumbItems.map((item) => (
                     <div key={item.path} className="flex items-center">
                         <span className={cn("mx-2", isRTL && "rotate-180")}>
                             /
@@ -83,12 +83,12 @@ export function PageHeader({
                                 {item.label}
                             </span>
                         ) : (
-                            <a
+                            <Link
                                 href={item.path}
                                 className="hover:text-foreground transition-colors"
                             >
                                 {item.label}
-                            </a>
+                            </Link>
                         )}
                     </div>
                 ))}

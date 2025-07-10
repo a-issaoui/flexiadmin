@@ -1,7 +1,7 @@
 // src/config/navigation/types.ts
 
 import type { IconProps } from "@/components/common/icon";
-import type { SafeColor } from '@/lib/color-validation';
+import type { SafeColor } from '@/lib/utils/color-utils';
 
 // Export SafeColor for other files to use
 export type { SafeColor };

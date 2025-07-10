@@ -17,5 +17,22 @@ export const NavigationActions = {
         console.log('Backup Settings...');
 
     },
-    // ... other actions
+    viewAttendanceReport: () => {
+        console.log('Viewing attendance report...');
+    },
+    scheduleMeeting: () => {
+        console.log('Scheduling meeting...');
+    },
+    submitAssignment: () => {
+        console.log('Submitting assignment...');
+    },
+    viewProgressReport: () => {
+        console.log('Viewing progress report...');
+    },
+    createAssessment: () => {
+        console.log('Creating assessment...');
+    },
+    exportGrades: () => {
+        console.log('Exporting grades...');
+    },
 };

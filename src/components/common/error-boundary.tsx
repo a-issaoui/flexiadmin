@@ -4,8 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { WarningIcon, ArrowClockwiseIcon } from '@phosphor-icons/react';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -77,7 +76,7 @@ export function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) 
     <Card className="w-full max-w-md mx-auto mt-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-destructive">
-          <AlertTriangle className="h-5 w-5" />
+          <WarningIcon className="h-5 w-5" />
           Something went wrong
         </CardTitle>
         <CardDescription>
@@ -86,7 +85,7 @@ export function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) 
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
+          <WarningIcon className="h-4 w-4" />
           <AlertTitle>Error Details</AlertTitle>
           <AlertDescription className="mt-2">
             <code className="text-sm font-mono break-all">
@@ -97,7 +96,7 @@ export function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) 
         
         <div className="flex gap-2">
           <Button onClick={resetError} variant="outline" className="flex-1">
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <ArrowClockwiseIcon className="h-4 w-4 mr-2" />
             Try Again
           </Button>
           <Button 

@@ -1,12 +1,13 @@
 // src/app/layout.tsx
 import type {Metadata, Viewport} from "next";
-import {Geist, Geist_Mono} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import {ThemeProvider} from "@/providers/theme-provider";
 import ProgressBar from "@/components/common/progress-bar";
 import {getLocaleDataSSR} from "@/lib/cookies/locale/locale-cookie.server";
+import {getMobileDataSSR} from "@/lib/cookies/mobile/mobile-cookie.server";
 import LocaleHydrator from "@/components/hydration/locale-hydrator";
+import {MobileHydrator} from "@/components/hydration/mobile-hydrator";
 import {RTLProvider} from "@/providers/rtl-provider";
 import {LocaleProvider} from "@/providers/locale-provider";
 import {ErrorBoundary, AsyncErrorBoundary} from "@/components/common/error-boundary";
@@ -16,19 +17,6 @@ import "./globals.css";
 interface RootLayoutProps {
     children: React.ReactNode;
 }
-
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-    display: 'swap',
-    preload: true,
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
-    display: 'swap',
-});
 
 export const metadata: Metadata = {
     title: "FlexiAdmin",
@@ -40,19 +28,28 @@ export const viewport: Viewport = {
     initialScale: 1,
 };
 
+// Force dynamic rendering for admin dashboard
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function RootLayout({children}: RootLayoutProps) {
     // Get initial locale data from cookie
     const {locale, direction} = await getLocaleDataSSR();
 
+    // Get initial mobile data from cookie
+    const mobileData = await getMobileDataSSR();
+
     // Get SSR messages for the current locale
     const messages = await getMessages();
 
-    console.log(`🚀 SSR Layout - Locale: ${locale}, Direction: ${direction}, Messages: ${Object.keys(messages).length} keys`);
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`🚀 SSR Layout - Locale: ${locale}, Direction: ${direction}, Messages: ${Object.keys(messages).length} keys`);
+    }
 
     return (
         <html lang={locale} dir={direction} suppressHydrationWarning>
         <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
+            className="antialiased min-h-screen bg-background text-foreground font-sans">
         <ProgressBar/>
         <ThemeProvider
             attribute="class"
@@ -73,6 +70,7 @@ export default async function RootLayout({children}: RootLayoutProps) {
                     locale={locale}
                 >
                     <LocaleHydrator initialLocale={locale} initialDirection={direction}/>
+                    <MobileHydrator initialData={mobileData} />
 
                     {/* Enhanced provider that won't show skeleton for SSR content */}
                     <LocaleProvider>

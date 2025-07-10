@@ -4,15 +4,26 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+interface TableProps extends React.ComponentProps<"table"> {
+  'aria-label'?: string;
+  'aria-describedby'?: string;
+  'aria-rowcount'?: number;
+  'aria-colcount'?: number;
+}
+
+function Table({ className, ...props }: TableProps) {
   return (
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
+      role="region"
+      aria-label="Data table"
+      tabIndex={0}
     >
       <table
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
+        role="table"
         {...props}
       />
     </div>
@@ -65,7 +76,36 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   )
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
+interface TableHeadProps extends React.ComponentProps<"th"> {
+  sortable?: boolean;
+  sortDirection?: 'asc' | 'desc' | 'none';
+  onSort?: () => void;
+}
+
+function TableHead({ 
+  className, 
+  sortable = false,
+  sortDirection = 'none',
+  onSort,
+  children,
+  ...props 
+}: TableHeadProps) {
+  const content = sortable ? (
+    <button
+      type="button"
+      className="flex items-center gap-2 w-full text-left font-medium hover:bg-muted/50 transition-colors rounded p-1 -m-1"
+      onClick={onSort}
+      aria-label={`Sort ${sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : 'unsorted'}`}
+    >
+      {children}
+      {sortable && (
+        <span className="text-xs opacity-50" aria-hidden="true">
+          {sortDirection === 'asc' ? '↑' : sortDirection === 'desc' ? '↓' : '↕'}
+        </span>
+      )}
+    </button>
+  ) : children;
+
   return (
     <th
       data-slot="table-head"
@@ -73,8 +113,11 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
         "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
+      scope="col"
       {...props}
-    />
+    >
+      {content}
+    </th>
   )
 }
 

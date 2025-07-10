@@ -1,7 +1,7 @@
 // src/components/features/navigation/vertical-navigation/components/nav-pulsing-dot.tsx
 
 import React, { memo } from 'react';
-import { sanitizeColor, getSafeColor } from '@/lib/color-validation';
+import { sanitizeColor } from '@/lib/utils/color-utils';
 type NavPulsingDotProps = {
     color?: string;
     size?: 'sm' | 'md' | 'lg';
@@ -31,7 +31,7 @@ const NavPulsingDot: React.FC<NavPulsingDotProps> = ({
         lg: 'h-2.5 w-2.5'
     };
     // Validate the color with a fallback
-    const safeColor = getSafeColor(color, '#10b981');
+    const safeColor = sanitizeColor(color) || '#10b981';
     return (
         <span className={`relative inline-flex ${sizeClasses[size]} ${className || ''}`}>
             <span

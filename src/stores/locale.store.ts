@@ -16,23 +16,27 @@ import {
     type LocaleData,
 } from '@/lib/cookies/locale/locale-cookie.client';
 
+// Type for translation messages
+type TranslationMessages = Record<string, unknown>;
+
 interface LocaleState {
     locale: LocaleCode;
     direction: LocaleDirection;
-    messages: Record<string, any>;
-    availableMessages: Record<LocaleCode, Record<string, any>>;
+    messages: TranslationMessages;
+    availableMessages: Partial<Record<LocaleCode, TranslationMessages>>;
     isTranslationsReady: boolean;
     translationError: string | null;
     isHydrated: boolean;
     isLoading: boolean;
     isInitializing: boolean;
-    ssrMessages: Record<string, any>; // NEW: Store SSR messages
+    ssrMessages: TranslationMessages; // NEW: Store SSR messages
+    hasLoadedBackground: boolean; // NEW: Prevent duplicate background loading
 
     setLocale: (locale: LocaleCode) => void;
     initializeMessages: () => Promise<void>;
     hydrate: () => void;
     reset: () => void;
-    setSSRMessages: (locale: LocaleCode, messages: Record<string, any>) => void; // NEW
+    setSSRMessages: (locale: LocaleCode, messages: TranslationMessages) => void; // NEW
 }
 
 export const useLocaleStore = create<LocaleState>()(
@@ -41,18 +45,21 @@ export const useLocaleStore = create<LocaleState>()(
             // Initial state
             locale: DEFAULT_LOCALE,
             direction: DEFAULT_DIRECTION,
-            messages: {},
-            availableMessages: {},
-            ssrMessages: {}, // NEW
+            messages: {} as TranslationMessages,
+            availableMessages: {} as Partial<Record<LocaleCode, TranslationMessages>>,
+            ssrMessages: {} as TranslationMessages, // NEW
             isTranslationsReady: false,
             translationError: null,
             isHydrated: false,
             isLoading: false,
             isInitializing: false,
+            hasLoadedBackground: false, // NEW: Track background loading
 
             // NEW: Method to set SSR messages
-            setSSRMessages: (locale: LocaleCode, messages: Record<string, any>) => {
-                console.log(`📦 Setting SSR messages for ${locale}:`, Object.keys(messages).length, 'keys');
+            setSSRMessages: (locale: LocaleCode, messages: TranslationMessages) => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`📦 Setting SSR messages for ${locale}:`, Object.keys(messages).length, 'keys');
+                }
 
                 set((state) => {
                     state.ssrMessages = messages;
@@ -75,7 +82,17 @@ export const useLocaleStore = create<LocaleState>()(
                 // just load the remaining locales in the background
                 if (currentState.isTranslationsReady &&
                     Object.keys(currentState.ssrMessages).length > 0) {
-                    console.log('🔄 SSR messages available, loading remaining locales in background...');
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('🔄 SSR messages available, loading remaining locales in background...');
+                    }
+
+                    // Prevent duplicate background loading
+                    if (currentState.hasLoadedBackground) {
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log('🎯 Background loading already completed, skipping...');
+                        }
+                        return;
+                    }
 
                     // Load remaining locales without blocking UI
                     loadRemainingLocalesInBackground();
@@ -126,7 +143,7 @@ export const useLocaleStore = create<LocaleState>()(
                     const loadedMessages = await Promise.all(messagePromises);
                     console.log('📦 All message promises resolved:', loadedMessages.length);
 
-                    const allMessages: Record<LocaleCode, Record<string, any>> = {};
+                    const allMessages: Partial<Record<LocaleCode, TranslationMessages>> = {};
                     loadedMessages.forEach(({ code, messages }) => {
                         allMessages[code as LocaleCode] = messages;
                     });
@@ -167,7 +184,7 @@ export const useLocaleStore = create<LocaleState>()(
 
                 // Check if we have messages for this locale
                 const hasMessages = currentState.availableMessages[newLocale] &&
-                    Object.keys(currentState.availableMessages[newLocale]).length > 0;
+                    Object.keys(currentState.availableMessages[newLocale] || {}).length > 0;
 
                 if (!hasMessages) {
                     console.warn(`Messages not available for locale: ${newLocale}, loading...`);
@@ -198,7 +215,7 @@ export const useLocaleStore = create<LocaleState>()(
                 set((state) => {
                     state.locale = localeConfig.code;
                     state.direction = localeConfig.direction;
-                    state.messages = state.availableMessages[newLocale];
+                    state.messages = state.availableMessages[newLocale] || {};
                 });
 
                 if (typeof window !== 'undefined') {
@@ -231,14 +248,15 @@ export const useLocaleStore = create<LocaleState>()(
                 set((state) => {
                     state.locale = DEFAULT_LOCALE;
                     state.direction = DEFAULT_DIRECTION;
-                    state.messages = {};
-                    state.availableMessages = {};
-                    state.ssrMessages = {};
+                    state.messages = {} as TranslationMessages;
+                    state.availableMessages = {} as Partial<Record<LocaleCode, TranslationMessages>>;
+                    state.ssrMessages = {} as TranslationMessages;
                     state.isTranslationsReady = false;
                     state.translationError = null;
                     state.isHydrated = false;
                     state.isLoading = false;
                     state.isInitializing = false;
+                    state.hasLoadedBackground = false;
                 });
 
                 if (typeof window !== 'undefined') {
@@ -256,15 +274,19 @@ async function loadRemainingLocalesInBackground() {
     try {
         const missingLocales = SUPPORTED_LOCALES.filter(locale =>
             !currentState.availableMessages[locale.code] ||
-            Object.keys(currentState.availableMessages[locale.code]).length === 0
+            Object.keys(currentState.availableMessages[locale.code] || {}).length === 0
         );
 
         if (missingLocales.length === 0) {
-            console.log('🎯 All locales already loaded');
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🎯 All locales already loaded');
+            }
             return;
         }
 
-        console.log('🔄 Loading missing locales in background:', missingLocales.map(l => l.code));
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔄 Loading missing locales in background:', missingLocales.map(l => l.code));
+        }
 
         const loadPromises = missingLocales.map(async (localeConfig) => {
             try {
@@ -288,9 +310,13 @@ async function loadRemainingLocalesInBackground() {
             results.forEach(({ code, messages }) => {
                 state.availableMessages[code as LocaleCode] = messages;
             });
+            // Set the flag to prevent duplicate background loading
+            state.hasLoadedBackground = true;
         });
 
-        console.log('✅ Background locale loading complete');
+        if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Background locale loading complete');
+        }
     } catch (error) {
         console.error('💥 Background locale loading failed:', error);
     }
@@ -379,7 +405,7 @@ export function useIsLocaleHydrated(): boolean {
     return useLocaleStore((state) => state.isHydrated);
 }
 
-export function useCurrentMessages(): Record<string, any> {
+export function useCurrentMessages(): TranslationMessages {
     return useLocaleStore((state) => state.messages);
 }
 

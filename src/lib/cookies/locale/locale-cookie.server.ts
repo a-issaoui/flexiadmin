@@ -48,13 +48,16 @@ export async function getLocaleDataSSR(): Promise<LocaleData> {
         const raw = cookieStore.get(COOKIE_NAME)?.value;
         return parseLocaleData(raw);
     } catch (error) {
-        console.warn('Failed to get locale cookie on server:', error);
+        // Silently return default data during static generation
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to get locale cookie on server:', error);
+        }
         return DEFAULT_LOCALE_DATA;
     }
 }
 
 /** 🍪 Server-side: Get locale data from cookie (synchronous - for middleware) */
-export function getLocaleDataSSRSync(cookieStore: any): LocaleData {
+export function getLocaleDataSSRSync(cookieStore: { get: (name: string) => { value?: string } | undefined }): LocaleData {
     try {
         const raw = cookieStore.get(COOKIE_NAME)?.value;
         return parseLocaleData(raw);
@@ -142,7 +145,7 @@ export async function hasLocaleDataSSR(): Promise<boolean> {
 }
 
 /** 🍪 Pages Router: Get locale data from request object */
-export function getLocaleDataFromReq(req: any): LocaleData {
+export function getLocaleDataFromReq(req: { cookies?: Record<string, string> }): LocaleData {
     try {
         if (!req?.cookies) return DEFAULT_LOCALE_DATA;
         const raw = req.cookies[COOKIE_NAME];

@@ -161,10 +161,10 @@ export function isLocaleConfig(obj: unknown): obj is LocaleConfig {
         'nativeName' in obj &&
         'flag' in obj &&
         'direction' in obj &&
-        typeof (obj as any).code === 'string' &&
-        typeof (obj as any).name === 'string' &&
-        typeof (obj as any).nativeName === 'string' &&
-        typeof (obj as any).flag === 'string' &&
-        ((obj as any).direction === 'ltr' || (obj as any).direction === 'rtl')
+        typeof (obj as LocaleConfig).code === 'string' &&
+        typeof (obj as LocaleConfig).name === 'string' &&
+        typeof (obj as LocaleConfig).nativeName === 'string' &&
+        typeof (obj as LocaleConfig).flag === 'string' &&
+        ((obj as LocaleConfig).direction === 'ltr' || (obj as LocaleConfig).direction === 'rtl')
     );
 }

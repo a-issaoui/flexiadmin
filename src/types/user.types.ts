@@ -39,7 +39,7 @@ export interface User {
     preferences: UserPreferences;
     
     // Metadata
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface Address {
@@ -105,7 +105,7 @@ export interface CreateUserRequest {
     dateOfBirth?: Date;
     gender?: Gender;
     address?: Address;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface UpdateUserRequest {
@@ -122,7 +122,7 @@ export interface UpdateUserRequest {
     address?: Address;
     academicInfo?: Partial<AcademicInfo>;
     preferences?: Partial<UserPreferences>;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface UserFilters {
@@ -197,15 +197,15 @@ export function isValidUserStatus(status: string): status is UserStatus {
     return ['active', 'inactive', 'pending', 'suspended'].includes(status);
 }
 
-export function isUser(obj: any): obj is User {
+export function isUser(obj: unknown): obj is User {
     return (
         typeof obj === 'object' &&
         obj !== null &&
-        typeof obj.id === 'string' &&
-        typeof obj.email === 'string' &&
-        typeof obj.firstName === 'string' &&
-        typeof obj.lastName === 'string' &&
-        isValidUserRole(obj.role) &&
-        isValidUserStatus(obj.status)
+        typeof (obj as User).id === 'string' &&
+        typeof (obj as User).email === 'string' &&
+        typeof (obj as User).firstName === 'string' &&
+        typeof (obj as User).lastName === 'string' &&
+        isValidUserRole((obj as User).role) &&
+        isValidUserStatus((obj as User).status)
     );
 }

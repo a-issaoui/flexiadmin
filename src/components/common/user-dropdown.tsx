@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icon } from '@/components/common/icon';
-import { useIsMobileWithCookies } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/stores/mobile.store';
 import type { UserType } from '@/types/user.types';
 
 interface UserDropdownProps {
@@ -88,7 +88,7 @@ export function UserDropdown({
                                  collisionPadding,
                                  isMobileSSR = false,
                              }: UserDropdownProps) {
-    const { isMobile } = useIsMobileWithCookies();
+    const isMobile = useIsMobile();
     const t = useTranslations('UserDropdown');
 
     // Always call hooks before returns

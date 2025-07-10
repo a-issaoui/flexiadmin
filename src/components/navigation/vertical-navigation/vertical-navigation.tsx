@@ -12,6 +12,8 @@ import { UserData } from "@/data/user-data";
 import useMenuHandler from "@/hooks/use-menu-handler"
 import { useRoleNavigation } from "@/hooks/use-navigation";
 import { useRTL } from "@/providers/rtl-provider";
+import { useSidebar } from "@/stores/sidebar.store";
+
 import type { UserPermissions } from '@/config/navigation/types';
 
 export type VerticalNavigationProps = {
@@ -20,25 +22,35 @@ export type VerticalNavigationProps = {
 }
 
 /**
- * Main vertical navigation component with automatic RTL detection.
- * No need to pass RTL props - it detects direction automatically!
+ * Main vertical navigation component integrated with sidebar store.
  */
-export default function VerticalNavigation({ role, userPermissions }: VerticalNavigationProps) {
+export default function VerticalNavigation({ role }: VerticalNavigationProps) {
     const pathname = usePathname();
     const { handleMenuClick } = useMenuHandler();
-    const { isRTL } = useRTL(); // Automatically detect RTL
+    const { isRTL } = useRTL();
+    
+    // Use sidebar store for state management
+    const { side, variant, collapsible, setSide } = useSidebar();
 
     // Get the navigation data for the specified role
-    const navigationGroups = useRoleNavigation(role, userPermissions);
+    const navigationGroups = useRoleNavigation(role);
 
-    // Automatically determine sidebar side based on RTL
-    const side: 'left' | 'right' = isRTL ? 'right' : 'left';
+    // Auto-adjust sidebar side based on RTL if needed
+    React.useEffect(() => {
+        const preferredSide: 'left' | 'right' = isRTL ? 'right' : 'left';
+        if (side !== preferredSide) {
+            setSide(preferredSide);
+        }
+    }, [isRTL, side, setSide]);
 
     return (
         <Sidebar
-            variant="sidebar"
+            variant={variant}
             side={side}
-            collapsible="icon"
+            collapsible={collapsible}
+            id="navigation"
+            role="navigation"
+            aria-label="Main navigation"
         >
             <SidebarHeader>
                 <NavOrganization organisation={OrganisationData} />

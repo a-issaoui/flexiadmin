@@ -1,18 +1,18 @@
 // src/providers/locale-provider.tsx
 'use client';
 
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode, useMemo, useRef } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
-import { useLocaleStore, useCurrentMessages, useTranslationsReady } from '@/stores/locale.store';
+import {
+    useLocaleStore,
+    useCurrentMessages,
+} from '@/stores/locale.store';
 
 interface LocaleProviderProps {
     children: ReactNode;
     fallback?: ReactNode;
 }
 
-/**
- * Minimal loading indicator for locale switching only
- */
 function LocaleSwitchingIndicator() {
     return (
         <div className="fixed top-4 right-4 bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg z-50">
@@ -24,11 +24,11 @@ function LocaleSwitchingIndicator() {
     );
 }
 
-/**
- * Enhanced locale provider that eliminates initial loading skeleton
- * Only shows loading when actually switching between locales
- */
-export function LocaleProvider({ children, fallback }: LocaleProviderProps) {
+const LocaleProviderComponent = ({ children, fallback }: LocaleProviderProps) => {
+    // ✅ Always call all hooks unconditionally - including refs at the top
+    const hasTriggeredBackgroundLoad = useRef(false);
+    const renderCountRef = useRef(0);
+    
     const {
         locale,
         isHydrated,
@@ -36,33 +36,35 @@ export function LocaleProvider({ children, fallback }: LocaleProviderProps) {
         isLoading,
         isInitializing,
         translationError,
-        initializeMessages
+        initializeMessages,
     } = useLocaleStore();
 
     const messages = useCurrentMessages();
 
-    // Enhanced initialization effect - but only for background loading
-    useEffect(() => {
-        console.log('🔍 LocaleProvider state check:', {
-            isHydrated,
-            isTranslationsReady,
-            isLoading,
-            isInitializing,
-            translationError,
-            hasMessages: Object.keys(messages).length > 0
-        });
+    // ✅ Defensive default fallback to avoid hook mismatch
+    const safeMessages = useMemo(() => messages || {}, [messages]);
 
-        // Only initialize background loading if we're hydrated and ready but haven't started loading other locales
-        if (isHydrated && isTranslationsReady && !isInitializing && !translationError) {
-            // Check if we need to load additional locales in background
-            setTimeout(() => {
-                console.log('🔄 Checking if background locale loading is needed...');
+    // ✅ Derived values with safe defaults
+    const hasAnyMessages = useMemo(() => Object.keys(safeMessages).length > 0, [safeMessages]);
+    const shouldBlockRender = useMemo(() => {
+        return (!isHydrated && !hasAnyMessages) || (!hasAnyMessages && !isTranslationsReady);
+    }, [isHydrated, isTranslationsReady, hasAnyMessages]);
+
+    const showSwitchingIndicator = useMemo(() => {
+        return isLoading && isHydrated && isTranslationsReady;
+    }, [isLoading, isHydrated, isTranslationsReady]);
+    
+    useEffect(() => {
+        if (isHydrated && isTranslationsReady && !isInitializing && !translationError && !hasTriggeredBackgroundLoad.current) {
+            hasTriggeredBackgroundLoad.current = true;
+            const timer = setTimeout(() => {
                 initializeMessages();
-            }, 1000); // Delay to avoid blocking initial render
+            }, 1000);
+            return () => clearTimeout(timer);
         }
     }, [isHydrated, isTranslationsReady, isInitializing, translationError, initializeMessages]);
 
-    // Show error state
+    // ✅ Error UI
     if (translationError) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
@@ -76,7 +78,6 @@ export function LocaleProvider({ children, fallback }: LocaleProviderProps) {
                     <div className="flex gap-2 justify-center">
                         <button
                             onClick={() => {
-                                console.log('🔄 Manual retry...');
                                 useLocaleStore.getState().reset();
                                 setTimeout(() => {
                                     useLocaleStore.getState().hydrate();
@@ -98,21 +99,8 @@ export function LocaleProvider({ children, fallback }: LocaleProviderProps) {
         );
     }
 
-    // NEW LOGIC: Only block rendering if we truly don't have any messages
-    // This eliminates the skeleton for SSR-loaded content
-    const hasAnyMessages = Object.keys(messages).length > 0;
-    const shouldBlockRender = (!isHydrated && !hasAnyMessages) || (!hasAnyMessages && !isTranslationsReady);
-
+    // ✅ Initial loading fallback
     if (shouldBlockRender) {
-        console.log('⏳ Blocking render - no messages available:', {
-            isHydrated,
-            isTranslationsReady,
-            hasAnyMessages,
-            reason: !isHydrated && !hasAnyMessages ? 'not hydrated and no messages' :
-                !hasAnyMessages && !isTranslationsReady ? 'no messages and not ready' : 'unknown'
-        });
-
-        // Only return fallback if absolutely necessary
         return fallback || (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center space-y-4">
@@ -123,30 +111,38 @@ export function LocaleProvider({ children, fallback }: LocaleProviderProps) {
         );
     }
 
-    // Show locale switching indicator only when actively switching
-    const showSwitchingIndicator = isLoading && isHydrated && isTranslationsReady;
-
-    console.log('✅ Rendering with locale provider:', {
-        locale,
-        messageKeys: Object.keys(messages).slice(0, 5),
-        totalKeys: Object.keys(messages).length,
-        isLoading,
-        showSwitchingIndicator
-    });
+    // Use ref to track renders and prevent duplicate logs
+    renderCountRef.current += 1;
+    
+    // ✅ Dev logs - only log first render to avoid duplicates
+    if (process.env.NODE_ENV === 'development' && renderCountRef.current === 1) {
+        console.log('✅ LocaleProvider rendering', {
+            locale,
+            totalKeys: Object.keys(safeMessages).length,
+            isLoading,
+            showSwitchingIndicator,
+        });
+    }
 
     return (
         <>
             <NextIntlClientProvider
                 locale={locale}
-                messages={messages}
+                messages={safeMessages}
                 timeZone="UTC"
                 now={new Date()}
             >
                 {children}
             </NextIntlClientProvider>
 
-            {/* Show switching indicator only when changing locales */}
             {showSwitchingIndicator && <LocaleSwitchingIndicator />}
         </>
     );
-}
+};
+
+// Memoize the LocaleProvider to prevent unnecessary re-renders
+// Custom comparison function to prevent re-renders when only children change
+export const LocaleProvider = React.memo(LocaleProviderComponent, (prevProps, nextProps) => {
+  // Only re-render if fallback prop changes (children changes are expected)
+  return prevProps.fallback === nextProps.fallback;
+});

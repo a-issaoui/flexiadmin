@@ -2,7 +2,7 @@
 
 "use client"
 
-import { forwardRef } from "react"
+import { forwardRef, memo } from "react"
 import { cn } from "@/lib/utils"
 import type { IconProps as PhosphorIconProps } from "@phosphor-icons/react"
 
@@ -82,6 +82,22 @@ import {
 
     // Additional icons that might be needed
     ArrowClockwiseIcon,
+    
+    // Icons to replace lucide-react
+    CircleIcon,
+    DotsThreeIcon,
+    EyeIcon,
+    EyeSlashIcon,
+    SidebarIcon,
+    
+    // Additional missing icons
+    FileTextIcon,
+    ClipboardIcon,
+    SpeakerHighIcon,
+    BookOpenIcon,
+    PaperPlaneRightIcon,
+    MedalIcon,
+    BooksIcon,
 } from "@phosphor-icons/react"
 
 // Enhanced icon registry with all the icons used in navigation
@@ -148,6 +164,32 @@ const iconRegistry = {
 
     // Additional icons that might be needed
     ArrowClockwiseIcon,
+    
+    // Icons to replace lucide-react
+    CircleIcon,
+    DotsThreeIcon,
+    EyeIcon,
+    EyeSlashIcon,
+    SidebarIcon,
+    
+    // Additional missing icons
+    FileTextIcon,
+    ClipboardIcon,
+    
+    // Missing navigation icons with aliases
+    SpeakerHighIcon,
+    BookOpenIcon,
+    PaperPlaneRightIcon,
+    MedalIcon,
+    BooksIcon,
+    
+    // Icon aliases for backward compatibility
+    LibraryIcon: BooksIcon,
+    ChatIcon: ChatCircleIcon,
+    SpeakerIcon: SpeakerHighIcon,
+    CalendarEventIcon: CalendarIcon,
+    PaperPlaneIcon: PaperPlaneRightIcon,
+    AwardIcon: MedalIcon,
 } as const
 
 // Export the enhanced type for use in other components
@@ -159,8 +201,8 @@ export interface IconProps extends Omit<PhosphorIconProps, 'ref'> {
     className?: string
 }
 
-// Enhanced Icon component with better error handling
-export const Icon = forwardRef<SVGSVGElement, IconProps>(({
+// Enhanced Icon component with better error handling and performance optimization
+const IconComponent = forwardRef<SVGSVGElement, IconProps>(({
                                                               name,
                                                               size = 20,
                                                               weight = "regular",
@@ -207,4 +249,7 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(({
     )
 })
 
-Icon.displayName = "Icon"
+IconComponent.displayName = "Icon"
+
+// Export memoized version for performance
+export const Icon = memo(IconComponent)

@@ -12,14 +12,14 @@ export interface ApiResponse<T> {
 export interface ApiError {
   message: string;
   code: string;
-  details?: any;
+  details?: unknown;
   status: number;
 }
 
 export interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers?: Record<string, string>;
-  body?: any;
+  body?: unknown;
   timeout?: number;
   retries?: number;
   requireAuth?: boolean;
@@ -107,15 +107,15 @@ class ApiClient {
     return this.makeRequest<T>(endpoint, { ...config, method: 'GET' });
   }
 
-  async post<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, { ...config, method: 'POST', body });
   }
 
-  async put<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, { ...config, method: 'PUT', body });
   }
 
-  async patch<T>(endpoint: string, body?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, body?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, { ...config, method: 'PATCH', body });
   }
 
@@ -127,7 +127,7 @@ class ApiClient {
   async upload<T>(
     endpoint: string,
     file: File,
-    additionalData?: Record<string, any>,
+    additionalData?: Record<string, unknown>,
     config?: RequestConfig
   ): Promise<ApiResponse<T>> {
     const formData = new FormData();
@@ -147,7 +147,7 @@ class ApiClient {
       method: 'POST',
       headers,
       body: formData,
-    } as any);
+    } as RequestConfig);
   }
 }
 

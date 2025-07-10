@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { Icon } from '@/components/common/icon';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -11,12 +11,11 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { 
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useTranslations } from 'next-intl';
 
 // Mock search results - in a real app, this would come from an API
 const mockSearchResults = [
@@ -59,10 +58,15 @@ export default function NavbarSearch() {
     }, []);
 
     const handleSelect = (href: string) => {
-        setOpen(false);
-        setSearchTerm('');
-        // In a real app, use router.push(href)
-        window.location.href = href;
+        try {
+            setOpen(false);
+            setSearchTerm('');
+            // In a real app, use router.push(href)
+            window.location.href = href;
+        } catch (error) {
+            console.error('Error navigating to:', href, error);
+            // In a real app, show a toast notification
+        }
     };
 
     return (
@@ -73,9 +77,9 @@ export default function NavbarSearch() {
                         variant='outline'
                         role="combobox"
                         aria-expanded={open}
-                        className='bg-background text-muted-foreground relative h-9 w-full justify-start rounded-[0.5rem] text-sm font-normal shadow-none sm:pe-12 md:w-40 lg:w-64'
+                        className='bg-background text-muted-foreground relative h-9 w-full justify-start rounded-[0.5rem] text-sm font-normal shadow-none sm:pe-12 md:w-42  lg:w-64'
                     >
-                        <MagnifyingGlass size={16} weight="duotone" className='me-2 h-4 w-4' />
+                        <Icon name="MagnifyingGlassIcon" size={16} weight="duotone" className='me-2 h-4 w-4' />
                         Search...
                         <kbd className='bg-muted pointer-events-none absolute top-[0.3rem] end-[0.3rem] hidden h-6 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex'>
                             <span className='text-xs'>⌘</span>K

@@ -8,7 +8,8 @@ import {
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/common/icon';
 import { cn } from '@/lib/utils';
-import type { NavigationAction } from '@/types/navigation.types';
+import { useRTL } from '@/providers/rtl-provider';
+import type { NavigationAction } from '@/config/navigation/types';
 
 type NavActionsProps = {
     actions: NavigationAction[];
@@ -19,6 +20,7 @@ type NavActionsProps = {
 const NavActions: React.FC<NavActionsProps> = ({ actions, size = 'md', sideOffset = 20 }) => {
     const t = useTranslations('actions');
     const [isOpen, setIsOpen] = useState(false);
+    const { isRTL } = useRTL();
 
     const handleActionClick = useCallback(
         (e: React.MouseEvent, action: NavigationAction) => {
@@ -59,12 +61,15 @@ const NavActions: React.FC<NavActionsProps> = ({ actions, size = 'md', sideOffse
                     <span className="sr-only">More actions</span>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start" sideOffset={sideOffset}>
+            <DropdownMenuContent side={isRTL ? "left" : "right"} align="start" sideOffset={sideOffset}>
                 {actions.map((action) => (
                     <DropdownMenuItem
                         key={action.id}
                         onClick={(e) => handleActionClick(e, action)}
-                        className="flex items-center gap-2"
+                        className={cn(
+                            "flex items-center gap-2",
+                            isRTL && "flex-row-reverse"
+                        )}
                     >
                         {action.icon && (
                             <Icon

@@ -11,7 +11,7 @@ interface LocaleHydratorProps {
     initialDirection: string;
 }
 
-export default function LocaleHydrator({ initialLocale, initialDirection }: LocaleHydratorProps) {
+export default function LocaleHydrator({ initialLocale }: LocaleHydratorProps) {
     const { hydrate, isHydrated, setSSRMessages, initializeMessages } = useLocaleStore();
     const ssrMessages = useMessages(); // Get messages from Next-Intl SSR
 

@@ -5,7 +5,7 @@
  */
 
 // Base API response wrapper
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   message?: string;
   success: boolean;
@@ -17,7 +17,7 @@ export interface ApiResponse<T = any> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
   status: number;
   timestamp: string;
   path?: string;
@@ -29,7 +29,7 @@ export interface ValidationError {
   field: string;
   message: string;
   code: string;
-  value?: any;
+  value?: unknown;
 }
 
 // Paginated response wrapper
@@ -66,7 +66,7 @@ export interface SearchParams {
 }
 
 export interface FilterParams {
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   startDate?: Date | string;
   endDate?: Date | string;
 }
@@ -83,7 +83,7 @@ export interface FileUploadResponse {
   url: string;
   path: string;
   uploadedAt: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface BulkOperationResponse {
@@ -93,7 +93,7 @@ export interface BulkOperationResponse {
   errors: Array<{
     index: number;
     error: string;
-    item?: any;
+    item?: unknown;
   }>;
 }
 
@@ -105,8 +105,8 @@ export interface AuditLog {
   resourceId: string;
   userId: string;
   userEmail: string;
-  changes?: Record<string, { from: any; to: any }>;
-  metadata?: Record<string, any>;
+  changes?: Record<string, { from: unknown; to: unknown }>;
+  metadata?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
   timestamp: Date;
@@ -144,7 +144,7 @@ export interface StatsResponse {
 // Export/Import types
 export interface ExportRequest {
   format: 'csv' | 'xlsx' | 'json' | 'pdf';
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   fields?: string[];
   includeDeleted?: boolean;
 }
@@ -182,7 +182,7 @@ export interface ImportResponse {
     row: number;
     field?: string;
     message: string;
-    value?: any;
+    value?: unknown;
   }>;
   downloadErrorsUrl?: string;
   createdAt: Date;
@@ -190,12 +190,12 @@ export interface ImportResponse {
 }
 
 // Real-time updates
-export interface WebSocketMessage<T = any> {
+export interface WebSocketMessage<T = unknown> {
   type: string;
   payload: T;
   timestamp: Date;
   userId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationMessage {

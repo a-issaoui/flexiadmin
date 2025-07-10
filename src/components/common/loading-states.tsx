@@ -3,39 +3,119 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Icon } from '@/components/common/icon';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// Generic loading spinner
+// Generic loading spinner with enhanced UX
 export interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   text?: string;
+  delay?: number; // Delay before showing spinner to prevent flicker
+  variant?: 'spin' | 'pulse' | 'bounce';
 }
 
-export function LoadingSpinner({ size = 'md', className, text }: LoadingSpinnerProps) {
+export function LoadingSpinner({ 
+  size = 'md', 
+  className, 
+  text, 
+  delay = 200,
+  variant = 'spin' 
+}: LoadingSpinnerProps) {
+  const [isVisible, setIsVisible] = React.useState(delay === 0);
+
+  React.useEffect(() => {
+    if (delay > 0) {
+      const timer = setTimeout(() => setIsVisible(true), delay);
+      return () => clearTimeout(timer);
+    }
+  }, [delay]);
+
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-6 w-6',
     lg: 'h-8 w-8',
   };
 
+  const animationClasses = {
+    spin: 'animate-spin',
+    pulse: 'animate-pulse',
+    bounce: 'animate-bounce',
+  };
+
+  if (!isVisible) return null;
+
   return (
-    <div className={cn('flex items-center justify-center gap-2', className)}>
-      <Loader2 className={cn('animate-spin', sizeClasses[size])} role="status" aria-hidden="true" />
-      {text && <span className="text-sm text-muted-foreground">{text}</span>}
+    <div className={cn(
+      'flex items-center justify-center gap-2 transition-opacity duration-200 fade-in',
+      className
+    )}>
+      <Icon 
+        name="CircleNotchIcon" 
+        size={size === 'sm' ? 16 : size === 'md' ? 24 : 32} 
+        className={cn(animationClasses[variant], sizeClasses[size])} 
+        role="status" 
+        aria-label={text || 'Loading'}
+      />
+      {text && (
+        <span className="text-sm text-muted-foreground animate-pulse">
+          {text}
+        </span>
+      )}
     </div>
   );
 }
 
-// Full page loading state
-export function PageLoading({ title = 'Loading...' }: { title?: string }) {
+// Enhanced full page loading state with progress indication
+export interface PageLoadingProps {
+  title?: string;
+  subtitle?: string;
+  progress?: number; // 0-100
+  showProgress?: boolean;
+  className?: string;
+}
+
+export function PageLoading({ 
+  title = 'Loading...', 
+  subtitle,
+  progress,
+  showProgress = false,
+  className 
+}: PageLoadingProps) {
   return (
-    <div className="flex items-center justify-center min-h-[400px] w-full">
-      <div className="text-center space-y-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-muted-foreground">{title}</p>
+    <div className={cn(
+      "flex items-center justify-center min-h-[400px] w-full",
+      "animate-in fade-in duration-300",
+      className
+    )}>
+      <div className="text-center space-y-6 max-w-md">
+        <LoadingSpinner size="lg" delay={0} />
+        
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium text-foreground">{title}</h3>
+          {subtitle && (
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          )}
+        </div>
+
+        {showProgress && progress !== undefined && (
+          <div className="space-y-2">
+            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round(progress)}% complete
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -231,21 +311,69 @@ export function ChartSkeleton({ height = 300 }: { height?: number }) {
   );
 }
 
-// Button loading state
+// Enhanced button loading state with better UX
+export interface LoadingButtonProps extends React.ComponentProps<typeof Button> {
+  loading: boolean;
+  children: React.ReactNode;
+  disabled?: boolean;
+  loadingText?: string;
+  successIcon?: boolean;
+  showSuccess?: boolean;
+  successDuration?: number;
+}
+
 export function LoadingButton({
   loading,
   children,
   disabled,
+  loadingText,
+  successIcon = false,
+  showSuccess = false,
+  successDuration = 2000,
   ...props
-}: {
-  loading: boolean;
-  children: React.ReactNode;
-  disabled?: boolean;
-} & React.ComponentProps<typeof Button>) {
+}: LoadingButtonProps) {
+  const [showSuccessState, setShowSuccessState] = React.useState(false);
+
+  React.useEffect(() => {
+    if (showSuccess && !loading) {
+      setShowSuccessState(true);
+      const timer = setTimeout(() => setShowSuccessState(false), successDuration);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess, loading, successDuration]);
+
+  const buttonContent = () => {
+    if (showSuccessState && successIcon) {
+      return (
+        <>
+          <Icon name="CheckIcon" size={16} className="mr-2 text-green-600" />
+          Success
+        </>
+      );
+    }
+    
+    if (loading) {
+      return (
+        <>
+          <Icon name="CircleNotchIcon" size={16} className="mr-2 animate-spin" />
+          {loadingText || children}
+        </>
+      );
+    }
+    
+    return children;
+  };
+
   return (
-    <Button disabled={loading || disabled} {...props}>
-      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {children}
+    <Button 
+      disabled={loading || disabled || showSuccessState} 
+      className={cn(
+        "transition-all duration-200",
+        showSuccessState && "bg-green-600 hover:bg-green-600"
+      )}
+      {...props}
+    >
+      {buttonContent()}
     </Button>
   );
 }
@@ -267,27 +395,105 @@ export function RefreshButton({
       disabled={loading}
       {...props}
     >
-      <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+      <Icon name="ArrowCounterClockwiseIcon" size={16} className={cn(loading && 'animate-spin')} />
     </Button>
   );
 }
 
-// Content with loading overlay
+// Enhanced content with loading overlay
+export interface LoadingOverlayProps {
+  loading: boolean;
+  children: React.ReactNode;
+  className?: string;
+  loadingText?: string;
+  blur?: boolean;
+  opacity?: number;
+}
+
 export function LoadingOverlay({
   loading,
   children,
   className,
-}: {
-  loading: boolean;
-  children: React.ReactNode;
-  className?: string;
-}) {
+  loadingText,
+  blur = true,
+  opacity = 50,
+}: LoadingOverlayProps) {
   return (
     <div className={cn('relative', className)}>
-      {children}
+      <div className={cn(
+        "transition-all duration-200",
+        loading && blur && "blur-[2px]",
+        loading && "pointer-events-none"
+      )}>
+        {children}
+      </div>
       {loading && (
-        <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10">
-          <LoadingSpinner size="lg" />
+        <div 
+          className={cn(
+            "absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-200",
+            `bg-background/${opacity}`
+          )}
+          role="progressbar"
+          aria-label={loadingText || "Loading content"}
+        >
+          <LoadingSpinner size="lg" text={loadingText} delay={0} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Progressive loading for lists and tables
+export interface ProgressiveLoadingProps {
+  items: unknown[];
+  loading: boolean;
+  renderItem: (item: unknown, index: number) => React.ReactNode;
+  renderSkeleton: () => React.ReactNode;
+  skeletonCount?: number;
+  className?: string;
+  staggered?: boolean;
+}
+
+export function ProgressiveLoading({
+  items,
+  loading,
+  renderItem,
+  renderSkeleton,
+  skeletonCount = 5,
+  className,
+  staggered = true,
+}: ProgressiveLoadingProps) {
+  if (loading && items.length === 0) {
+    return (
+      <div className={cn("space-y-2", className)}>
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              "animate-in fade-in duration-200",
+              staggered && `delay-${i * 100}`
+            )}
+          >
+            {renderSkeleton()}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      {items.map((item, index) => (
+        <div
+          key={(item as { id?: string | number }).id || index}
+          className="animate-in fade-in duration-200"
+        >
+          {renderItem(item, index)}
+        </div>
+      ))}
+      {loading && items.length > 0 && (
+        <div className="animate-in fade-in duration-200">
+          {renderSkeleton()}
         </div>
       )}
     </div>

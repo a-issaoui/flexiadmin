@@ -103,7 +103,13 @@ class UserService {
     byRole: Record<string, number>;
     recentRegistrations: number;
   }>> {
-    return apiClient.get<any>(`${this.basePath}/stats`);
+    return apiClient.get<{
+      total: number;
+      active: number;
+      inactive: number;
+      byRole: Record<string, number>;
+      recentRegistrations: number;
+    }>(`${this.basePath}/stats`);
   }
 
   // Export users
@@ -132,7 +138,11 @@ class UserService {
     failed: number;
     errors: string[];
   }>> {
-    return apiClient.upload<any>(`${this.basePath}/import`, file);
+    return apiClient.upload<{
+      imported: number;
+      failed: number;
+      errors: string[];
+    }>(`${this.basePath}/import`, file);
   }
 }
 

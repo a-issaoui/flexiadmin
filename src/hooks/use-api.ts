@@ -12,7 +12,7 @@ export interface UseApiState<T> {
 
 export interface UseApiOptions {
   immediate?: boolean;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
   retries?: number;
   retryDelay?: number;
@@ -122,7 +122,7 @@ export function useApi<T>(
 /**
  * Hook for handling mutations (POST, PUT, DELETE)
  */
-export function useMutation<T, P = any>(
+export function useMutation<T, P = unknown>(
   apiCall: (params: P) => Promise<ApiResponse<T>>,
   options: UseApiOptions = {}
 ) {
@@ -202,8 +202,8 @@ export function useMutation<T, P = any>(
  * Hook for handling paginated API calls
  */
 export function usePaginatedApi<T>(
-  apiCall: (params: any) => Promise<ApiResponse<{ items: T[]; total: number; page: number; totalPages: number }>>,
-  initialParams: any = {},
+  apiCall: (params: unknown) => Promise<ApiResponse<{ items: T[]; total: number; page: number; totalPages: number }>>,
+  initialParams: unknown = {},
   options: UseApiOptions = {}
 ) {
   const [params, setParams] = useState(initialParams);
@@ -218,15 +218,15 @@ export function usePaginatedApi<T>(
   } = useApi(() => apiCall(params), { ...options, immediate: true });
 
   const setPage = useCallback((page: number) => {
-    setParams(prev => ({ ...prev, page }));
+    setParams((prev: Record<string, unknown>) => ({ ...prev, page }));
   }, []);
 
   const setLimit = useCallback((limit: number) => {
-    setParams(prev => ({ ...prev, limit, page: 1 }));
+    setParams((prev: Record<string, unknown>) => ({ ...prev, limit, page: 1 }));
   }, []);
 
-  const setFilters = useCallback((filters: any) => {
-    setParams(prev => ({ ...prev, ...filters, page: 1 }));
+  const setFilters = useCallback((filters: Record<string, unknown>) => {
+    setParams((prev: Record<string, unknown>) => ({ ...prev, ...filters, page: 1 }));
   }, []);
 
   const refresh = useCallback(() => {

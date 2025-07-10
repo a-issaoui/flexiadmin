@@ -79,8 +79,18 @@ const notificationActions = {
     'general': { primary: 'View', secondary: 'Dismiss' }
 };
 
+// Define types for better type safety
+type Priority = 'high' | 'normal' | 'low';
+type NotificationType = 'security' | 'system' | 'general' | 'comment';
+
+interface NotificationIconProps {
+    iconName: string;
+    className?: string;
+    priority: Priority;
+}
+
 // Simplified icon component
-const NotificationIcon = memo(({ iconName, className, priority }) => {
+const NotificationIcon = memo(({ iconName, className, priority }: NotificationIconProps) => {
     return (
         <div className={cn(
             "relative flex-shrink-0 mt-0.5",
@@ -88,7 +98,7 @@ const NotificationIcon = memo(({ iconName, className, priority }) => {
             priority === 'normal' && "text-blue-500",
             priority === 'low' && "text-gray-500"
         )}>
-            <Icon name={iconName} size={20} weight="duotone" className={className} />
+            <Icon name={iconName as "BellIcon"} size={20} weight="duotone" className={className} />
             {priority === 'high' && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
             )}
@@ -112,9 +122,9 @@ const NavbarNotification = memo(() => {
     // Sort notifications by priority and time
     const sortedNotifications = useMemo(() => {
         return [...notifications].sort((a, b) => {
-            const priorityOrder = { high: 3, normal: 2, low: 1 };
-            const aPriority = priorityOrder[a.priority] || 2;
-            const bPriority = priorityOrder[b.priority] || 2;
+            const priorityOrder: Record<Priority, number> = { high: 3, normal: 2, low: 1 };
+            const aPriority = priorityOrder[a.priority as Priority] || 2;
+            const bPriority = priorityOrder[b.priority as Priority] || 2;
 
             if (aPriority !== bPriority) {
                 return bPriority - aPriority;
@@ -125,7 +135,7 @@ const NavbarNotification = memo(() => {
                 return a.read ? 1 : -1;
             }
 
-            return new Date(b.time) - new Date(a.time);
+            return 0; // Keep original order for items with same priority and read status
         });
     }, [notifications]);
 
@@ -137,7 +147,7 @@ const NavbarNotification = memo(() => {
         return notifications.filter(n => !n.read && n.priority === 'high').length;
     }, [notifications]);
 
-    const handleNotificationClick = useCallback((notificationId, action = 'view') => {
+    const handleNotificationClick = useCallback((notificationId: string, action = 'view') => {
         console.log(`Notification ${notificationId} ${action} clicked.`);
 
         // Haptic feedback
@@ -172,7 +182,7 @@ const NavbarNotification = memo(() => {
         setActiveDropdown(null);
     }, [setActiveDropdown]);
 
-    const handleOpenChange = useCallback((open) => {
+    const handleOpenChange = useCallback((open: boolean) => {
         setActiveDropdown(open ? 'notifications' : null);
     }, [setActiveDropdown]);
 
@@ -248,14 +258,14 @@ const NavbarNotification = memo(() => {
                     <div className="py-8 px-3 text-center">
                         <Icon name="BellIcon" size={32} className="mx-auto mb-2 text-muted-foreground/50" />
                         <p className="text-sm text-muted-foreground">No notifications yet</p>
-                        <p className="text-xs text-muted-foreground/70 mt-1">We'll notify you when something happens</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">We&apos;ll notify you when something happens</p>
                     </div>
                 ) : (
                     <ScrollArea className="h-[350px] max-h-[350px]">
                         <div className="p-1">
-                            {sortedNotifications.map((notification, index) => {
+                            {sortedNotifications.map((notification) => {
                                 const { id, title, message, time, read, icon, priority, type } = notification;
-                                const actions = notificationActions[type] || notificationActions.general;
+                                const actions = notificationActions[type as NotificationType] || notificationActions.general;
 
                                 return (
                                     <DropdownMenuItem
@@ -282,7 +292,7 @@ const NavbarNotification = memo(() => {
 
                                             <NotificationIcon
                                                 iconName={icon}
-                                                priority={priority}
+                                                priority={priority as Priority}
                                                 className="mr-2 shrink-0"
                                             />
 

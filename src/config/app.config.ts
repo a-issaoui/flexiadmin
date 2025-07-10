@@ -1,8 +1,10 @@
 // config/app.config.ts
+import { sidebarConfig } from './sidebar.config';
+
 export const appConfig = {
     name: 'FlexiAdmin',
-    description: 'Modern admin dashboard with internationalization support',
-    version: '1.0.0',
+    description: 'Modern admin dashboard',
+    version: '2.1.0',
 
     // URLs
     urls: {
@@ -10,32 +12,37 @@ export const appConfig = {
         api: process.env.NEXT_PUBLIC_API_URL || '/api',
     },
 
-    // Features
-    features: {
-        auth: {
-            sessionTimeout: 30 * 60 * 1000, // 30 minutes
-            rememberMeDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
-        },
-        notifications: {
-            pollingInterval: 30 * 1000, // 30 seconds
-            maxItems: 50,
-        },
+    // Cookie names
+    cookies: {
+        sidebar: 'flexiadmin-sidebar',
+        theme: 'flexiadmin-theme',
+        language: 'flexiadmin-language',
+        session: 'flexiadmin-session',
+        mobile: 'flexiadmin-mobile',
     },
 
     // UI Configuration
     ui: {
         sidebar: {
-            defaultOpen: true,
-            mobileBreakpoint: 768,
-            width: {
-                expanded: '16rem',
-                collapsed: '3rem',
-                mobile: '18rem',
-            },
+            defaultOpen: sidebarConfig.defaultOpen,
+            defaultOpenMobile: sidebarConfig.defaultOpenMobile,
+            defaultSide: sidebarConfig.defaultSide,
+            defaultVariant: sidebarConfig.defaultVariant,
+            defaultCollapsible: sidebarConfig.defaultCollapsible,
+            enablePersistence: sidebarConfig.enablePersistence,
         },
         theme: {
             defaultTheme: 'system' as const,
-            storageKey: 'flexiadmin-theme',
         },
     },
+
+    // Development
+    development: {
+        enableDebugMode: process.env.NODE_ENV === 'development',
+    },
 } as const;
+
+// Type exports for better TypeScript support
+export type AppConfig = typeof appConfig;
+export type CookieNames = typeof appConfig.cookies;
+export type UIConfig = typeof appConfig.ui;

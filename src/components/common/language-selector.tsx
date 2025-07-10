@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useTransition, useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Icon } from "@/components/common/icon";
 import { useLocaleStore } from "@/stores/locale.store"; // Updated import
 import {
     SUPPORTED_LOCALES,
@@ -26,7 +26,6 @@ interface LocaleSwitcherProps {
 export default function LanguageSelector({ className }: LocaleSwitcherProps) {
     const {
         locale: currentLocale,
-        direction,
         setLocale,
         isHydrated,
         isLoading,
@@ -103,7 +102,7 @@ export default function LanguageSelector({ className }: LocaleSwitcherProps) {
                         aria-label={`Change language. Current: ${currentLocaleConfig?.name || currentLocale}`}
                     >
                         {isLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Icon name="CircleNotchIcon" size={16} className="animate-spin" />
                         ) : (
                             <span className="flex items-center justify-center text-[18px] w-7 h-7">
                                 {currentLocaleConfig?.flag || "🌐"}
@@ -142,7 +141,7 @@ export default function LanguageSelector({ className }: LocaleSwitcherProps) {
                                         </span>
                                     </div>
                                     {isCurrentLocale && (
-                                        <Check className="h-4 w-4 text-primary" aria-label="Currently selected" />
+                                        <Icon name="CheckIcon" size={16} className="text-primary" aria-label="Currently selected" />
                                     )}
                                 </div>
                             </DropdownMenuItem>

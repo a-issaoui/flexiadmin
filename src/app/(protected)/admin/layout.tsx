@@ -1,53 +1,57 @@
 // src/app/(protected)/admin/layout.tsx
 
-import { cookies, headers } from 'next/headers';
 import { VerticalNavigation } from "@/components/navigation/vertical-navigation";
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppNavbar } from "@/components/features/navbar/app-navbar";
-import { getIsMobileFromCookies } from "@/hooks/use-mobile";
 import { PageHeader } from "@/components/common/page-header";
+import { SidebarHydrator } from "@/components/hydration/sidebar-hydrator";
+import { LayoutSettingsSheet } from "@/components/layout/layout-settings-sheet";
+import { getSidebarDataSSR } from "@/lib/cookies/sidebar/sidebar-cookie.server";
+import { sidebarConfig } from "@/config/sidebar.config";
 import React from "react";
 
+// Force dynamic rendering for admin dashboard
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-    let sidebarOpen = true;
-    let isMobileSSR = false;
+    let sidebarData;
 
     try {
-        const cookieStore = await cookies();
-        const headersList = await headers();
-
-        // Read sidebar state
-        const sidebarState = cookieStore.get('sidebar_state')?.value;
-        sidebarOpen = sidebarState === 'true';
-
-        // Read mobile state from cookies
-        const cookieHeader = headersList.get('cookie') || '';
-        isMobileSSR = getIsMobileFromCookies(cookieHeader);
+        // Read sidebar state from SSR-friendly cookies
+        sidebarData = await getSidebarDataSSR();
     } catch (error) {
         console.error('Cookie state fetch failed:', error);
+        // Use centralized default values from config
+        sidebarData = {
+            open: sidebarConfig.defaultOpen,
+            openMobile: sidebarConfig.defaultOpenMobile,
+            side: sidebarConfig.defaultSide,
+            variant: sidebarConfig.defaultVariant,
+            collapsible: sidebarConfig.defaultCollapsible,
+        };
     }
 
     // Note: RTL is now handled automatically by RTLProvider in root layout
     // No need to pass RTL props to any component!
 
     return (
-        <SidebarProvider defaultOpen={sidebarOpen}>
-            <div className="flex h-screen w-full overflow-hidden">
-                {/* No RTL props needed - components detect RTL automatically */}
-                <VerticalNavigation
-                    role="admin"
-                    userPermissions={undefined}
-                />
-                <SidebarInset className="flex flex-1 flex-col min-w-0">
-                    <div className="w-full px-4 sm:px-6 lg:px-8">
-                        <AppNavbar isMobileSSR={isMobileSSR} />
-                    </div>
-                    <main className="flex-1 overflow-auto px-4 py-4 sm:px-6 lg:px-8">
-                        <PageHeader showBreadcrumb={true} />
-                        {children}
-                    </main>
-                </SidebarInset>
-            </div>
+        <SidebarProvider defaultOpen={sidebarData.open}>
+            <SidebarHydrator initialData={sidebarData} />
+            <VerticalNavigation
+                role="admin"
+                userPermissions={undefined}
+            />
+            <SidebarInset >
+                <div className="w-full px-4 sm:px-6 lg:px-8">
+                    <AppNavbar />
+                </div>
+                <main className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8">
+                    <PageHeader showBreadcrumb={true} />
+                    {children}
+                </main>
+            </SidebarInset>
+            <LayoutSettingsSheet />
         </SidebarProvider>
     );
 }

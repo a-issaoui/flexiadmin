@@ -2,7 +2,6 @@
 "use client";
 
 import React, { createContext, useContext, useState } from 'react';
-import NavTrigger from '@/components/navigation/vertical-navigation/nav-trigger';
 import { Separator } from '@/components/ui/separator';
 import NavbarSearch from '@/components/features/navbar/navbar-search';
 import { NavbarUser } from '@/components/features/navbar/navbar-user';
@@ -10,11 +9,12 @@ import { ThemeSwitcher } from '@/components/common/theme-switcher';
 import NavbarSms from '@/components/features/navbar/navbar-sms';
 import NavbarNotification from '@/components/features/navbar/navbar-notification';
 import LanguageSelector from '@/components/common/language-selector';
+import NavTrigger from "@/components/navigation/vertical-navigation/nav-trigger";
 import { UserData } from '@/data/user-data';
 import { useRTL } from '@/providers/rtl-provider';
 
 // Define allowed dropdown types or null
-type DropdownType = 'user' | null;
+type DropdownType = 'user' | 'notifications' | null;
 
 interface NavbarContextType {
     isSearchOpen: boolean;
@@ -35,15 +35,16 @@ export const useNavbar = (): NavbarContextType => {
 };
 
 interface AppNavbarProps {
-    isMobileSSR?: boolean;
+    // No props needed - mobile state is now global
+    className?: string;
 }
 
-export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
+export function AppNavbar({}: AppNavbarProps = {}) {
     const [activeDropdown, setActiveDropdown] = useState<DropdownType>(null);
     const [isSearchOpen, setSearchOpen] = useState(false);
 
     // Automatically detect RTL - no props needed!
-    const { isRTL, direction } = useRTL();
+    const { direction } = useRTL();
 
     return (
         <NavbarContext.Provider
@@ -55,38 +56,31 @@ export function AppNavbar({ isMobileSSR }: AppNavbarProps) {
             }}
         >
             <nav
-                className="flex h-14 shrink-0 items-center justify-between gap-2 transition-all duration-300 ease-in-out backdrop-blur-sm bg-background/95"
+                className="relative flex h-14 items-center justify-between px-2 backdrop-blur-sm bg-background/95"
                 role="navigation"
                 aria-label="Main navigation"
-                dir={direction} // Set direction for proper RTL behavior
+                dir={direction}
             >
-                <div className={`flex items-center gap-2 sm:gap-3`}>
-                    {/* NavTrigger automatically detects RTL */}
-                    <NavTrigger
-                        isMobileSSR={isMobileSSR}
-                        className={isRTL ? "translate-x-4" : "-translate-x-4"}
-                    />
-                    <Separator orientation="vertical" className="h-4 opacity-60 me-2" />
+                {/* Start: NavTrigger */}
+                <div className="flex items-center z-10">
+                    <NavTrigger/>
+                    <Separator orientation="vertical" className="h-4 opacity-60 me-2"/>
                 </div>
 
-                <div className={`flex items-center gap-1 sm:gap-1.5`}>
-                    {/* Search - Hidden on mobile, shown in responsive order */}
-                    <div className="flex items-center gap-1 order-2 sm:order-1">
-                        <div className="hidden sm:flex">
-                            <NavbarSearch />
-                        </div>
-                    </div>
 
-                    {/* Component controls - Priority order for mobile */}
-                    <div className="flex items-center gap-1 order-1 sm:order-2">
-                        <LanguageSelector />
-                        <ThemeSwitcher />
-                        <NavbarSms />
-                        <NavbarNotification />
-                        <NavbarUser user={UserData} />
+                {/* End: Controls */}
+                <div className="flex items-center gap-1 sm:gap-1.5 z-10">
+                    <div className="pointer-events-auto hidden sm:flex">
+                        <NavbarSearch/>
                     </div>
+                    <LanguageSelector/>
+                    <ThemeSwitcher/>
+                    <NavbarSms/>
+                    <NavbarNotification/>
+                    <NavbarUser user={UserData}/>
                 </div>
             </nav>
+
         </NavbarContext.Provider>
     );
 }
